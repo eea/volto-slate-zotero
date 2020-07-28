@@ -1,0 +1,23 @@
+{
+  "name": "@eeacms/volto-slate-zotero",
+  "version": "0.0.1",
+  "description": "Zotero integration with Volto Slate Footnotes",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "./node_modules/.bin/prettier --single-quote --check 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
+    "prettier:fix": "./node_modules/.bin/prettier --single-quote --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
+    "lint": "./node_modules/eslint/bin/eslint.js --max-warnings=0 'src/**/*.{js,jsx}'",
+    "lint:fix": "./node_modules/eslint/bin/eslint.js --fix 'src/**/*.{js,jsx}'"
+  },
+  "author": "European Environment Agency: IDM2 A-Team",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "babel-plugin-istanbul": "6.0.0",
+    "eslint": "7.3.1",
+    "eslint-plugin-react": "^7.20.3",
+    "prettier": "2.0.5"
+  }
+}

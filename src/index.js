@@ -1,4 +1,7 @@
+import installPlugins from './plugins';
+
 const applyConfig = (config) => {
+  installPlugins(config);
   return config;
 };
 

@@ -1,6 +1,6 @@
 # volto-slate-zotero
 
-[Zotero](https://www.zotero.org/) integration with [Volto Slate](https://github.com/eea/volto-slate/tree/develop) Footnotes
+[Zotero](https://www.zotero.org/) integration with [Volto Slate](https://github.com/eea/volto-slate/tree/develop)
 
 
 ## Develop
@@ -33,8 +33,8 @@ Before starting make sure your development environment is properly set. See [Vol
             },
 
             "addons": [
-                "volto-slate",
-                "@eeacms/volto-slate-zotero"
+                "volto-slate:asDefault",
+                "volto-slate-zotero"
             ],
 
             "workspaces": [
@@ -42,8 +42,8 @@ Before starting make sure your development environment is properly set. See [Vol
             ],
 
             "dependencies": {
-                "@plone/volto": "github:eea/volto#7.3.0-beta.1",
-                "volto-slate": "github:eea/volto-slate#0.3.4"
+                "@plone/volto": "github:eea/volto#7.7.0-beta.1",
+                "volto-slate": "github:eea/volto-slate#0.3.9"
             }
         }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Popup } from 'semantic-ui-react';
 
 export const ZoteroElement = ({ attributes, children, element, mode }) => {
   const { data = {} } = element;
@@ -15,9 +16,16 @@ export const ZoteroElement = ({ attributes, children, element, mode }) => {
           {children}
         </a>
       ) : (
-        <span {...attributes} className="footnote zotero-edit-node">
-          {children}
-        </span>
+        <Popup
+          content={data.footnote}
+          header="Zotero"
+          position="bottom left"
+          trigger={
+            <span {...attributes} className="footnote zotero-edit-node">
+              {children}
+            </span>
+          }
+        />
       )}
     </>
   );

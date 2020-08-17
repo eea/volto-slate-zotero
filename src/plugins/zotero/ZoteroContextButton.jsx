@@ -1,5 +1,5 @@
 import React from 'react';
-import editingSVG from '@plone/volto/icons/editing.svg';
+import editingSVG from '@plone/volto/icons/blog-entry.svg';
 import { useIntl, defineMessages } from 'react-intl';
 import { isActiveZotero, unwrapZotero } from './utils';
 import clearSVG from '@plone/volto/icons/delete.svg';

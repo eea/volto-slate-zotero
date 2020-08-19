@@ -11,7 +11,7 @@ import { useDispatch } from 'react-redux';
 
 import './less/editor.less';
 
-const ZoteroButton = () => {
+const ZoteroButton = ({ ...props }) => {
   const editor = useSlate();
   const isZotero = isActiveZotero(editor);
   const dispatch = useDispatch();
@@ -20,6 +20,7 @@ const ZoteroButton = () => {
     <>
       {hasRangeSelection(editor) && (
         <ToolbarButton
+          {...props}
           active={isZotero}
           onMouseDown={() => {
             dispatch({ type: EDITOR, show: true });

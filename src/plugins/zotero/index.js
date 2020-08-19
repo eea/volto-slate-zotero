@@ -19,7 +19,9 @@ export default (config) => {
     zotero_editor,
   };
 
-  slate.buttons.zotero = (props) => <ZoteroButton {...props} />;
+  slate.buttons.zotero = (props) => (
+    <ZoteroButton {...props} title="Insert citation" />
+  );
   slate.elements.zotero = ZoteroElement;
 
   slate.extensions = [...(slate.extensions || []), withZotero];

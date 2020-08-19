@@ -13,8 +13,8 @@ const messages = defineMessages({
     defaultMessage: 'Edit citation',
   },
   delete: {
-    id: 'Delete citation',
-    defaultMessage: 'Delete citation',
+    id: 'Remove citation',
+    defaultMessage: 'Remove citation',
   },
 });
 
@@ -26,6 +26,7 @@ export default (editor) => {
   return isActiveZotero(editor) ? (
     <React.Fragment key="zotero">
       <ToolbarButton
+        title={intl.formatMessage(messages.edit)}
         icon={editingSVG}
         active={showEditor}
         aria-label={intl.formatMessage(messages.edit)}
@@ -34,6 +35,7 @@ export default (editor) => {
         }}
       />
       <ToolbarButton
+        title={intl.formatMessage(messages.delete)}
         icon={clearSVG}
         aria-label={intl.formatMessage(messages.delete)}
         alt={intl.formatMessage(messages.delete)}

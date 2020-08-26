@@ -1,8 +1,10 @@
 import { Icon } from '@plone/volto/components';
 import backSVG from '@plone/volto/icons/back.svg';
+import cloudSVG from '@plone/volto/icons/cloud.svg';
 import rightArrowSVG from '@plone/volto/icons/right-key.svg';
 import React, { useState } from 'react';
 import { Button, Input, Loader } from 'semantic-ui-react';
+// const cloudSVG = 'https://guidelines.openaire.eu/en/latest/_images/openaire.png'
 
 const MasterDetailWidget = (props) => {
   const [hideCollection, setHideCollection] = useState(false);
@@ -65,7 +67,7 @@ const MasterDetailWidget = (props) => {
           <button
             onClick={(ev) => {
               ev.preventDefault();
-              return pushItem(index);
+              return pushItem(item);
             }}
           >
             {item.data.title ? `${item.data.title.slice(0, 100)}...` : ''}
@@ -81,10 +83,11 @@ const MasterDetailWidget = (props) => {
     props.searchResults.length > 0 ? (
       props.searchResults.map((item, index) => (
         <li>
+          {item.icon ? <Icon name={cloudSVG} size="30px" /> : null}
           <button
             onClick={(ev) => {
               ev.preventDefault();
-              return props.pushSearchItem(index);
+              return props.pushSearchItem(item);
             }}
           >
             {item.data.title ? `${item.data.title.slice(0, 100)}...` : ''}
@@ -132,6 +135,7 @@ const MasterDetailWidget = (props) => {
 
             <div className="vertical divider" />
           </header>
+
           <div className="pastanaga-menu-list">
             {props.loading ? (
               loaderComp

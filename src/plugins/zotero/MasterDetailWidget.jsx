@@ -1,9 +1,31 @@
 import { Icon } from '@plone/volto/components';
 import backSVG from '@plone/volto/icons/back.svg';
-import cloudSVG from '@plone/volto/icons/cloud.svg';
 import rightArrowSVG from '@plone/volto/icons/right-key.svg';
 import React, { useState } from 'react';
-import { Button, Input, Label, Loader, Menu, Tab } from 'semantic-ui-react';
+import {
+  Button,
+  Image,
+  Input,
+  Label,
+  Loader,
+  Menu,
+  Tab
+} from 'semantic-ui-react';
+
+const iconsObj = {
+  zotero: 'https://react.semantic-ui.com/images/avatar/small/daniel.jpg',
+  openaire: 'https://react.semantic-ui.com/images/avatar/small/jenny.jpg',
+};
+const labelObj = {
+  publications: {
+    name: 'Pub',
+    color: 'teal',
+  },
+  rsd: {
+    name: 'Data',
+    color: 'pink',
+  },
+};
 
 const makeList = (props, results) => (
   <ul>
@@ -11,7 +33,16 @@ const makeList = (props, results) => (
       props[results].length > 0 ? (
         props[results].map((item, index) => (
           <li>
-            {item.icon ? <Icon name={cloudSVG} size="30px" /> : null}
+            <Image
+              avatar
+              src={item.icon ? iconsObj[item.icon] : iconsObj.zotero}
+            />
+            {item.label ? (
+              <Label color={labelObj[item.label].color} horizontal>
+                {labelObj[item.label].name}
+              </Label>
+            ) : null}
+
             <button
               onClick={(ev) => {
                 ev.preventDefault();
@@ -28,6 +59,26 @@ const makeList = (props, results) => (
     ) : null}
   </ul>
 );
+
+let openAireFilterList = ['publications'];
+let searchForDoi = false;
+
+const makeOpenAireFilterList = (item) => {
+  // console.log('makeOpenAireFilterList item', item);
+  const itemIndex = openAireFilterList.indexOf(item);
+  const itemFound = itemIndex > -1;
+
+  if (!itemFound) {
+    openAireFilterList.push(item);
+  } else {
+    const len = openAireFilterList.length;
+    openAireFilterList.splice(len - 1, 1);
+    // console.log('makeOpenAireFilterList x', x);
+  }
+
+  // console.log('makeOpenAireFilterList itemIndex', itemIndex);
+  // console.log('makeOpenAireFilterList', openAireFilterList);
+};
 
 const panes = (props) => [
   {
@@ -49,21 +100,48 @@ const panes = (props) => [
   {
     menuItem: (
       <Menu.Item key="messages">
-        OpenAire Publications<Label>{props.openAireSearchResults.length}</Label>
+        OpenAire<Label>{props.openAireSearchResults.length}</Label>
       </Menu.Item>
     ),
     render: () => (
-      <Tab.Pane>{makeList(props, 'openAireSearchResults')}</Tab.Pane>
-    ),
-  },
-  {
-    menuItem: (
-      <Menu.Item key="messages">
-        OpenAire Data<Label>{props.openAireSearchResults.length}</Label>
-      </Menu.Item>
-    ),
-    render: () => (
-      <Tab.Pane>{makeList(props, 'openAireSearchResults')}</Tab.Pane>
+      <Tab.Pane>
+        <Button.Group basic size="small">
+          <Button
+            primary
+            active={openAireFilterList.indexOf('publications') > -1}
+            onClick={(ev) => {
+              ev.preventDefault();
+              makeOpenAireFilterList('publications');
+              props.openAireCallback(openAireFilterList, searchForDoi);
+            }}
+          >
+            Publications
+          </Button>
+          <Button
+            primary
+            active={openAireFilterList.indexOf('rsd') > -1}
+            onClick={(ev) => {
+              ev.preventDefault();
+              makeOpenAireFilterList('rsd');
+              props.openAireCallback(openAireFilterList, searchForDoi);
+            }}
+          >
+            Research Data
+          </Button>
+          <Button
+            primary
+            active={searchForDoi}
+            onClick={(ev) => {
+              ev.preventDefault();
+              searchForDoi = !searchForDoi;
+              props.openAireCallback(openAireFilterList, searchForDoi);
+            }}
+          >
+            DOI
+          </Button>
+        </Button.Group>
+        {makeList(props, 'openAireSearchResults')}
+      </Tab.Pane>
     ),
   },
 ];
@@ -72,6 +150,7 @@ const MasterDetailWidget = (props) => {
   const [hideCollection, setHideCollection] = useState(false);
   const [moveMenu, setMoveMenu] = useState(0);
   const [searchTerm, setSearchTerm] = useState(null);
+  console.log(props);
 
   const pull = () => {
     setMoveMenu(0);

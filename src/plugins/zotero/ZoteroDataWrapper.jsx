@@ -18,17 +18,30 @@ const zoteroBaseUrl = process.env.RAZZLE_URL;
 const url = `${zoteroBaseUrl}/collections/`;
 const urlSearch = `${zoteroBaseUrl}/items?q=`;
 
-const openAireUrlPublication = `http://api.openaire.eu/search/publications`;
+const openAireUrlBase = `http://api.openaire.eu/search`;
+// const openAireUrlPublication = `http://api.openaire.eu/search/publications`;
+
+const makeOpenAireUrlObj = (filterList) => {
+  const openAireUrl = {
+    publications: `${openAireUrlBase}/publications`,
+    rsd: `${openAireUrlBase}/datasets`,
+  };
+  // const result = [];
+  return filterList.reduce((accumulator, currentValue) => {
+    return [...accumulator, openAireUrl[currentValue]];
+  }, []);
+};
 
 const allRequests = {};
 const cacheAllRequests = (url, items) => {
   allRequests[url] = items;
 };
 
-const formatOpenAire = (item) => {
+const formatOpenAire = (item, label) => {
   const entry = item.metadata['oaf:entity']['oaf:result'];
-  const result = { data: {}, icon: 'cloudSVG', isOpenAire: true };
-  console.log('@@@@ entry', entry);
+  const result = { data: {}, icon: 'openaire', label, isOpenAire: true };
+  // console.log('@@@@ item', item);
+  // console.log('@@@@ entry', entry);
   const hasDoi = entry.pid
     ? Array.isArray(entry.pid)
       ? entry.pid.find((key) => key['@classid'] === 'doi')
@@ -51,13 +64,15 @@ const formatOpenAire = (item) => {
             lastName: creator['@surname'],
           };
         })
-      : [
+      : entry.creator
+      ? [
           {
             creatorType: 'author',
             firstName: entry.creator['@name'],
             lastName: entry.creator['@surname'],
           },
-        ],
+        ]
+      : [],
     url: entry.url,
     collections: [],
     relations: {},
@@ -125,7 +140,7 @@ const ZoteroDataWrapper = (props) => {
   const fetchSearch = (term, offset = 0) => {
     const finalUrl = `${urlSearch}${term}&start=${offset}`;
 
-    console.log('fetch search');
+    // console.log('fetch search');
 
     setSearchTerm(term);
 
@@ -162,30 +177,32 @@ const ZoteroDataWrapper = (props) => {
     });
   };
 
-  const fetchAireSearch = (term, offset = 0) => {
-    const openaireTitleUrl = `${openAireUrlPublication}/?title=${term}&format=json&size=20`;
+  const fetchAireSearch = (searchUrl, label, offset = 0) => {
+    // const openaireTitleUrl = `${openAireUrlPublication}/?title=${term}&format=json&size=20`;
     // const openaireDOIUrl = `${openAireUrlPublication}/?doi=${term}&format=json&size=20`;
-
-    console.log('aire search');
 
     setLoading(true);
     setShowResults(true);
 
     return new Promise((resolve, reject) => {
-      fetch(openaireTitleUrl, {
+      fetch(searchUrl, {
         method: 'GET',
       })
         .then((response) => response.json())
         .then((response) => {
           setLoading(false);
-          const results = response.response.results.result;
-          const formattedResults = results.map((item) => formatOpenAire(item));
+          // console.log('@@@@ response', response);
+          const results = response.response.results
+            ? response.response.results.result
+            : [];
+          const formattedResults = results.map((item) =>
+            formatOpenAire(item, label),
+          );
           const finalResult =
             offset > 0
               ? [...openAireSearchResults, ...formattedResults]
               : formattedResults;
 
-          // resolve(finalResult);
           allSearchPromises.push(resolve(finalResult));
         })
         .catch((error) => {
@@ -194,32 +211,10 @@ const ZoteroDataWrapper = (props) => {
           reject();
         });
     });
-    // allSearchPromises.push(openAirePromise);
-    // fetch(openaireDOIUrl, {
-    //   method: 'GET',
-    // })
-    //   .then((response) => response.json())
-    //   .then((response) => {
-    //     setLoading(false);
-    //     const results = response.response.results.result;
-    //     const formattedResults = results.map((item) => formatOpenAire(item));
-    //     const finalResult =
-    //       offset > 0
-    //         ? [...searchAireResults, ...formattedResults]
-    //         : formattedResults;
-    //     console.log('formattedResults', formattedResults);
-    //     console.log('finalResult', finalResult);
-    //     setSearchAireResults(finalResult);
-    //     // cacheAllRequests(openaireUrl, finalResult);
-    //   })
-    //   .catch((error) => {
-    //     console.log('@@@@ error', error);
-    //     setLoading(false);
-    //   });
   };
 
   const fetchItem = (zoteroId) => {
-    console.log('fetch item', zoteroId);
+    // console.log('fetch item', zoteroId);
     const testUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${style}`;
     if (allRequests[testUrl]) {
       setFootnoteRef(allRequests[testUrl]);
@@ -279,10 +274,15 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const onChangeSearchTerm = (value) => {
-    Promise.all([fetchSearch(value), fetchAireSearch(value)]).then((values) => {
+    const openairePublicationTitleUrl = `${openAireUrlBase}/publications/?title=${value}&format=json&size=20`;
+
+    Promise.all([
+      fetchSearch(value),
+      fetchAireSearch(openairePublicationTitleUrl, 'publications'),
+    ]).then((values) => {
       const zoteroResults = values[0];
       const aireResults = values[1];
-      console.log('all ', values);
+      // console.log('all ', values);
 
       const uniqueAireResults = aireResults.filter(
         (result) =>
@@ -310,22 +310,102 @@ const ZoteroDataWrapper = (props) => {
     setShowResults(false);
   };
 
+  const formatCitation = (selectedItem) => {
+    const { data } = selectedItem;
+
+    const name = data.creators[0]
+      ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
+      : '';
+    const date = name
+      ? data.date
+        ? `, ${data.date}`
+        : ''
+      : data.date
+      ? ` ${data.date}`
+      : '';
+    const title =
+      date || name
+        ? data.title
+          ? `, ${data.title}`
+          : ''
+        : data.title
+        ? ` ${data.title}`
+        : '';
+    const publisher =
+      title || date || name
+        ? data.publisher
+          ? `, ${data.publisher}`
+          : ''
+        : data.publisher
+        ? ` ${data.publisher}`
+        : '';
+    const place =
+      publisher || title || date || name
+        ? data.place
+          ? `, ${data.place || ''}`
+          : ''
+        : data.place
+        ? ` ${data.place}`
+        : '';
+
+    return `${name}${date}${title}${publisher}${place}.`;
+  };
+
   const pushItem = (selectedItem) => {
     fetchItem(selectedItem.key);
-    setfootnoteTitle(selectedItem.data.title);
+    // console.log('pushItem', selectedItem);
+
+    setfootnoteTitle(formatCitation(selectedItem));
     setItemIdRef(selectedItem.key);
   };
 
   const pushSearchItem = (selectedItem) => {
-    console.log('pushed item', selectedItem);
-    console.log('pushed selectedItem', selectedItem);
+    // console.log('pushed item', selectedItem);
+    // console.log('pushed selectedItem', selectedItem);
+
     if (selectedItem.isOpenAire) {
       saveItemToZotero(selectedItem);
     } else {
       fetchItem(selectedItem.key);
       setItemIdRef(selectedItem.key);
     }
-    setfootnoteTitle(selectedItem.data.title);
+    setfootnoteTitle(formatCitation(selectedItem));
+  };
+
+  /**
+   * Will search for openAire based on received filters
+   * @param {string[]} item
+   */
+  const openAireCallback = (filterList, searchForDoi) => {
+    // console.log('openaire callback filterList', filterList);
+    // console.log('openaire callback searchForDoi', searchForDoi);
+    const resultUrl = makeOpenAireUrlObj(filterList);
+
+    const promises = resultUrl.map((url, index) => {
+      console.log('openaire callback filterList[index]', filterList[index]);
+      const finalUrl = searchForDoi
+        ? `${url}/?doi=${searchTerm}&format=json&size=20`
+        : `${url}/?title=${searchTerm}&format=json&size=20`;
+      return fetchAireSearch(finalUrl, filterList[index]);
+    });
+
+    Promise.all(promises).then((promiseResults) => {
+      // const zoteroResults = promiseResults[0];
+      // const aireResults = promiseResults[1];
+      // console.log('all ', promiseResults);
+      const aireResults = promiseResults.reduce((accumulator, currentValue) => {
+        return [...accumulator, ...currentValue];
+      }, []);
+      // console.log('aireResults ', aireResults);
+
+      const uniqueAireResults = aireResults.filter(
+        (result) =>
+          !zoteroSearchResults.find(
+            (zoteroResult) => zoteroResult.data.DOI === result.data.DOI,
+          ),
+      );
+      setOpenAireSearchResults(uniqueAireResults);
+    });
   };
 
   // Similar to componentDidMount and componentDidUpdate:
@@ -386,6 +466,7 @@ const ZoteroDataWrapper = (props) => {
         pushSearchItem={pushSearchItem}
         showCollections={showCollections}
         handleLoadMore={handleLoadMore}
+        openAireCallback={openAireCallback}
       ></MasterDetailWidget>
       {collections.length === 15 ||
       items.length === 15 ||

@@ -2,7 +2,7 @@ import React from 'react';
 import { Popup } from 'semantic-ui-react';
 
 const makeFootnote = (footnote) => {
-  const free = footnote.replace('<?xml version="1.0"?>', '');
+  const free = footnote ? footnote.replace('<?xml version="1.0"?>', '') : '';
 
   return free;
 };

@@ -75,8 +75,10 @@ const ZoteroDataWrapper = (props) => {
   const [showResults, setShowResults] = useState(false);
   const [collections, setCollections] = useState([]);
   const [items, setItems] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchAireResults, setSearchAireResults] = useState([]);
+  const [allSearchResults, setAllSearchResults] = useState([]);
+  const [zoteroSearchResults, setZoteroSearchResults] = useState([]);
+  const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
+  // const [searchAireResults, setSearchAireResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [style, setStyle] = useState(zoteroEEAFormatFileUrl);
   const [searchTerm, setSearchTerm] = useState(null);
@@ -118,85 +120,102 @@ const ZoteroDataWrapper = (props) => {
     }
   };
 
+  const allSearchPromises = [];
+
   const fetchSearch = (term, offset = 0) => {
     const finalUrl = `${urlSearch}${term}&start=${offset}`;
-    setSearchTerm(term);
-    if (allRequests[finalUrl]) {
-      setShowResults(true);
-      setSearchResults(allRequests[finalUrl]);
-    } else {
-      setLoading(true);
-      setShowResults(true);
 
-      fetch(finalUrl, {
-        method: 'GET',
-        headers,
-      })
-        .then((response) => response.json())
-        .then((results) => {
-          const finalResult =
-            offset > 0 ? [...searchResults, ...results] : results;
-          setSearchResults(finalResult);
-          // cacheAllRequests(finalUrl, finalResult);
-          setLoading(false);
+    console.log('fetch search');
+
+    setSearchTerm(term);
+
+    return new Promise((resolve, reject) => {
+      if (allRequests[finalUrl]) {
+        setShowResults(true);
+        setZoteroSearchResults(allRequests[finalUrl]);
+      } else {
+        setLoading(true);
+        setShowResults(true);
+
+        fetch(finalUrl, {
+          method: 'GET',
+          headers,
         })
-        .catch((error) => {
-          console.log('@@@@ error', error);
-          setLoading(false);
-        });
-    }
+          .then((response) => response.json())
+          .then((results) => {
+            const finalResult =
+              offset > 0 ? [...zoteroSearchResults, ...results] : results;
+            // setZoteroSearchResults(finalResult);
+
+            setLoading(false);
+            // resolve(finalResult);
+            allSearchPromises.push(resolve(finalResult));
+          })
+          .catch((error) => {
+            console.log('@@@@ error', error);
+            setLoading(false);
+            reject();
+          });
+
+        // allSearchPromises.push(zoteroPromise);
+      }
+    });
   };
 
   const fetchAireSearch = (term, offset = 0) => {
     const openaireTitleUrl = `${openAireUrlPublication}/?title=${term}&format=json&size=20`;
-    const openaireDOIUrl = `${openAireUrlPublication}/?doi=${term}&format=json&size=20`;
+    // const openaireDOIUrl = `${openAireUrlPublication}/?doi=${term}&format=json&size=20`;
+
+    console.log('aire search');
 
     setLoading(true);
     setShowResults(true);
 
-    fetch(openaireTitleUrl, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        setLoading(false);
-        const results = response.response.results.result;
-        const formattedResults = results.map((item) => formatOpenAire(item));
-        const finalResult =
-          offset > 0
-            ? [...searchAireResults, ...formattedResults]
-            : formattedResults;
-        console.log('formattedResults', formattedResults);
-        console.log('finalResult', finalResult);
-        setSearchAireResults(finalResult);
-        // cacheAllRequests(openaireUrl, finalResult);
+    return new Promise((resolve, reject) => {
+      fetch(openaireTitleUrl, {
+        method: 'GET',
       })
-      .catch((error) => {
-        console.log('@@@@ error', error);
-        setLoading(false);
-      });
+        .then((response) => response.json())
+        .then((response) => {
+          setLoading(false);
+          const results = response.response.results.result;
+          const formattedResults = results.map((item) => formatOpenAire(item));
+          const finalResult =
+            offset > 0
+              ? [...openAireSearchResults, ...formattedResults]
+              : formattedResults;
 
-    fetch(openaireDOIUrl, {
-      method: 'GET',
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        setLoading(false);
-        const results = response.response.results.result;
-        const formattedResults = results.map((item) => formatOpenAire(item));
-        const finalResult =
-          offset > 0
-            ? [...searchAireResults, ...formattedResults]
-            : formattedResults;
-        console.log('formattedResults', formattedResults);
-        console.log('finalResult', finalResult);
-        setSearchAireResults(finalResult);
-        // cacheAllRequests(openaireUrl, finalResult);
-      })
-      .catch((error) => {
-        console.log('@@@@ error', error);
-        setLoading(false);
-      });
+          // resolve(finalResult);
+          allSearchPromises.push(resolve(finalResult));
+        })
+        .catch((error) => {
+          console.log('@@@@ error', error);
+          setLoading(false);
+          reject();
+        });
+    });
+    // allSearchPromises.push(openAirePromise);
+    // fetch(openaireDOIUrl, {
+    //   method: 'GET',
+    // })
+    //   .then((response) => response.json())
+    //   .then((response) => {
+    //     setLoading(false);
+    //     const results = response.response.results.result;
+    //     const formattedResults = results.map((item) => formatOpenAire(item));
+    //     const finalResult =
+    //       offset > 0
+    //         ? [...searchAireResults, ...formattedResults]
+    //         : formattedResults;
+    //     console.log('formattedResults', formattedResults);
+    //     console.log('finalResult', finalResult);
+    //     setSearchAireResults(finalResult);
+    //     // cacheAllRequests(openaireUrl, finalResult);
+    //   })
+    //   .catch((error) => {
+    //     console.log('@@@@ error', error);
+    //     setLoading(false);
+    //   });
   };
 
   const fetchItem = (zoteroId) => {
@@ -251,7 +270,7 @@ const ZoteroDataWrapper = (props) => {
 
   const handleLoadMore = (ev) => {
     if (showResults) {
-      fetchSearch(searchTerm, searchResults.length);
+      fetchSearch(searchTerm, zoteroSearchResults.length);
     } else if (selectedCollection === null) {
       fetchCollections(null, collections.length);
     } else {
@@ -259,22 +278,23 @@ const ZoteroDataWrapper = (props) => {
     }
   };
 
-  const handleShowOpenAireResults = () => {
-    console.log('searchAireResults', searchAireResults);
-    const uniqueAireResults = searchAireResults.filter(
-      (result) =>
-        !searchResults.find(
-          (zoteroResult) => zoteroResult.data.DOI === result.data.DOI,
-        ),
-    );
-    console.log('uniqueAireResults', uniqueAireResults);
-    setSearchResults([...searchResults, ...uniqueAireResults]);
-    console.log('searchResults', searchResults);
-  };
-
   const onChangeSearchTerm = (value) => {
-    fetchSearch(value);
-    fetchAireSearch(value);
+    Promise.all([fetchSearch(value), fetchAireSearch(value)]).then((values) => {
+      const zoteroResults = values[0];
+      const aireResults = values[1];
+      console.log('all ', values);
+
+      const uniqueAireResults = aireResults.filter(
+        (result) =>
+          !zoteroResults.find(
+            (zoteroResult) => zoteroResult.data.DOI === result.data.DOI,
+          ),
+      );
+      setOpenAireSearchResults(uniqueAireResults);
+      setZoteroSearchResults(zoteroResults);
+
+      setAllSearchResults([...zoteroResults, ...uniqueAireResults]);
+    });
   };
 
   const pull = () => {
@@ -360,20 +380,16 @@ const ZoteroDataWrapper = (props) => {
         selectedCollection={selectedCollection}
         onChangeSearchTerm={onChangeSearchTerm}
         showResults={showResults}
-        searchResults={searchResults}
+        allSearchResults={allSearchResults}
+        zoteroSearchResults={zoteroSearchResults}
+        openAireSearchResults={openAireSearchResults}
         pushSearchItem={pushSearchItem}
         showCollections={showCollections}
         handleLoadMore={handleLoadMore}
       ></MasterDetailWidget>
-      {showResults ? (
-        <Button primary onClick={handleShowOpenAireResults}>
-          Show OpenAire results
-        </Button>
-      ) : null}
-
       {collections.length === 15 ||
       items.length === 15 ||
-      (showResults && searchResults.length === 15) ? (
+      (showResults && allSearchResults.length === 15) ? (
         <Button primary onClick={handleLoadMore}>
           Load more
         </Button>

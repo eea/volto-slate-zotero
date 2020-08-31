@@ -3,8 +3,70 @@ import backSVG from '@plone/volto/icons/back.svg';
 import cloudSVG from '@plone/volto/icons/cloud.svg';
 import rightArrowSVG from '@plone/volto/icons/right-key.svg';
 import React, { useState } from 'react';
-import { Button, Input, Loader } from 'semantic-ui-react';
-// const cloudSVG = 'https://guidelines.openaire.eu/en/latest/_images/openaire.png'
+import { Button, Input, Label, Loader, Menu, Tab } from 'semantic-ui-react';
+
+const makeList = (props, results) => (
+  <ul>
+    {!props.loading ? (
+      props[results].length > 0 ? (
+        props[results].map((item, index) => (
+          <li>
+            {item.icon ? <Icon name={cloudSVG} size="30px" /> : null}
+            <button
+              onClick={(ev) => {
+                ev.preventDefault();
+                return props.pushSearchItem(item);
+              }}
+            >
+              {item.data.title ? `${item.data.title.slice(0, 100)}...` : ''}
+            </button>
+          </li>
+        ))
+      ) : (
+        <li>No results...</li>
+      )
+    ) : null}
+  </ul>
+);
+
+const panes = (props) => [
+  {
+    menuItem: (
+      <Menu.Item key="messages">
+        All<Label>{props.allSearchResults.length}</Label>
+      </Menu.Item>
+    ),
+    render: () => <Tab.Pane>{makeList(props, 'allSearchResults')}</Tab.Pane>,
+  },
+  {
+    menuItem: (
+      <Menu.Item key="messages">
+        Zotero<Label>{props.zoteroSearchResults.length}</Label>
+      </Menu.Item>
+    ),
+    render: () => <Tab.Pane>{makeList(props, 'zoteroSearchResults')}</Tab.Pane>,
+  },
+  {
+    menuItem: (
+      <Menu.Item key="messages">
+        OpenAire Publications<Label>{props.openAireSearchResults.length}</Label>
+      </Menu.Item>
+    ),
+    render: () => (
+      <Tab.Pane>{makeList(props, 'openAireSearchResults')}</Tab.Pane>
+    ),
+  },
+  {
+    menuItem: (
+      <Menu.Item key="messages">
+        OpenAire Data<Label>{props.openAireSearchResults.length}</Label>
+      </Menu.Item>
+    ),
+    render: () => (
+      <Tab.Pane>{makeList(props, 'openAireSearchResults')}</Tab.Pane>
+    ),
+  },
+];
 
 const MasterDetailWidget = (props) => {
   const [hideCollection, setHideCollection] = useState(false);
@@ -42,62 +104,50 @@ const MasterDetailWidget = (props) => {
     setSearchTerm(ev.target.value);
   };
 
-  const collectionsList = () => {
-    return !props.loading
-      ? props.collections.map((collection, index) => (
-          <li>
-            <button
-              onClick={(ev) => {
-                ev.preventDefault();
-                return pushCollection(index);
-              }}
-            >
-              {collection.data.name}
-              <Icon name={rightArrowSVG} size="24px" />
-            </button>
-          </li>
-        ))
-      : null;
-  };
+  const collectionsList = () => (
+    <ul>
+      {!props.loading
+        ? props.collections.map((collection, index) => (
+            <li>
+              <button
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  return pushCollection(index);
+                }}
+              >
+                {collection.data.name}
+                <Icon name={rightArrowSVG} size="24px" />
+              </button>
+            </li>
+          ))
+        : null}
+    </ul>
+  );
 
-  const itemsList = !props.loading ? (
-    props.items.length > 0 ? (
-      props.items.map((item, index) => (
-        <li>
-          <button
-            onClick={(ev) => {
-              ev.preventDefault();
-              return pushItem(item);
-            }}
-          >
-            {item.data.title ? `${item.data.title.slice(0, 100)}...` : ''}
-          </button>
-        </li>
-      ))
-    ) : (
-      <li>No results...</li>
-    )
-  ) : null;
+  const itemsList = () => (
+    <ul>
+      {!props.loading ? (
+        props.items.length > 0 ? (
+          props.items.map((item, index) => (
+            <li>
+              <button
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  return pushItem(item);
+                }}
+              >
+                {item.data.title ? `${item.data.title.slice(0, 100)}...` : ''}
+              </button>
+            </li>
+          ))
+        ) : (
+          <li>No results...</li>
+        )
+      ) : null}
+    </ul>
+  );
 
-  const searchResultsList = !props.loading ? (
-    props.searchResults.length > 0 ? (
-      props.searchResults.map((item, index) => (
-        <li>
-          {item.icon ? <Icon name={cloudSVG} size="30px" /> : null}
-          <button
-            onClick={(ev) => {
-              ev.preventDefault();
-              return props.pushSearchItem(item);
-            }}
-          >
-            {item.data.title ? `${item.data.title.slice(0, 100)}...` : ''}
-          </button>
-        </li>
-      ))
-    ) : (
-      <li>No results...</li>
-    )
-  ) : null;
+  const searchResultsList = () => <Tab panes={panes(props)} />;
 
   const collectionsClass = hideCollection
     ? 'collections pastanaga-menu transition-hide'
@@ -140,11 +190,7 @@ const MasterDetailWidget = (props) => {
             {props.loading ? (
               loaderComp
             ) : (
-              <>
-                <ul>
-                  {props.showResults ? searchResultsList : collectionsList()}
-                </ul>
-              </>
+              <>{props.showResults ? searchResultsList() : collectionsList()}</>
             )}
           </div>
         </div>
@@ -158,7 +204,7 @@ const MasterDetailWidget = (props) => {
             <h2>{props.collections[props.selectedCollection]?.data?.name}</h2>
           </header>
           <div className="pastanaga-menu-list">
-            {props.loading ? loaderComp : <ul>{itemsList}</ul>}
+            {props.loading ? loaderComp : itemsList()}
           </div>
         </div>
       </div>

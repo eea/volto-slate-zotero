@@ -8,6 +8,7 @@ import FootnotesBlockView from './blocks/Footnote/FootnotesBlockView';
 import { ZOTERO } from './constants';
 import { withZotero } from './extensions';
 import { zotero_editor } from './reducers';
+import { zotero_settings } from './reducers';
 import { ZoteroElement } from './render';
 import ZoteroButton from './ZoteroButton';
 import ZoteroContextButton from './ZoteroContextButton';
@@ -20,6 +21,7 @@ export default (config) => {
   config.addonReducers = {
     ...config.addonReducers,
     zotero_editor,
+    zotero_settings,
   };
 
   config.blocks.blocksConfig.slateFootnotes = {

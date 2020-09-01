@@ -1,6 +1,12 @@
 import React from 'react';
 import { Popup } from 'semantic-ui-react';
 
+const makeFootnote = (footnote) => {
+  const free = footnote ? footnote.replace('<?xml version="1.0"?>', '') : '';
+
+  return free;
+};
+
 export const ZoteroElement = ({ attributes, children, element, mode }) => {
   const { data = {} } = element;
   const { uid = 'undefined' } = data;
@@ -17,7 +23,6 @@ export const ZoteroElement = ({ attributes, children, element, mode }) => {
         </a>
       ) : (
         <Popup
-          content={data.footnote}
           header="Zotero"
           position="bottom left"
           trigger={
@@ -25,7 +30,15 @@ export const ZoteroElement = ({ attributes, children, element, mode }) => {
               {children}
             </span>
           }
-        />
+        >
+          <Popup.Content>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: makeFootnote(data.footnote),
+              }}
+            />{' '}
+          </Popup.Content>
+        </Popup>
       )}
     </>
   );

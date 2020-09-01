@@ -3,21 +3,12 @@ import briefcaseSVG from '@plone/volto/icons/briefcase.svg';
 import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'semantic-ui-react';
 // import InlineForm from 'volto-slate/futurevolto/InlineForm';
 import InlineForm from './InlineForm';
 import MasterDetailWidget from './MasterDetailWidget';
-
-const zoteroEEAFormatFileUrl = process.env.RAZZLE_FILE_URL;
-const bearer_token = process.env.RAZZLE_API;
-const bearer = 'Bearer ' + bearer_token;
-const headers = {
-  Authorization: bearer,
-  'Content-Type': 'application/json',
-};
-const zoteroBaseUrl = process.env.RAZZLE_URL;
-const url = `${zoteroBaseUrl}/collections/`;
-const urlSearch = `${zoteroBaseUrl}/items?q=`;
+import { getZoteroSettings } from './actions';
 
 const openAireUrlBase = `http://api.openaire.eu/search`;
 // const openAireUrlPublication = `http://api.openaire.eu/search/publications`;
@@ -97,10 +88,26 @@ const ZoteroDataWrapper = (props) => {
   const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
   // const [searchAireResults, setSearchAireResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [style, setStyle] = useState(zoteroEEAFormatFileUrl);
   const [searchTerm, setSearchTerm] = useState(null);
   const [newFormData, setNewFormData] = useState({});
   const [formData, setFormData] = useState({});
+  const zotero_settings = useSelector((state) => state?.zotero_settings?.api);
+  const dispatch = useDispatch();
+
+  const headers = {
+    Authorization: 'Bearer ' + zotero_settings?.password,
+    'Content-Type': 'application/json',
+  };
+
+  const zoteroBaseUrl = zotero_settings?.server;
+  const url = `${zoteroBaseUrl}/collections/`;
+  const urlSearch = `${zoteroBaseUrl}/items?q=`;
+
+  useEffect(() => {
+    if (!zotero_settings) {
+      dispatch(getZoteroSettings());
+    }
+  }, [dispatch, zotero_settings]);
 
   const fetchCollections = (collectionId, offset = 0) => {
     const tempUrl = collectionId ? `${url}${collectionId}/items/` : `${url}`;
@@ -219,7 +226,7 @@ const ZoteroDataWrapper = (props) => {
 
   const fetchItem = (zoteroId) => {
     // console.log('fetch item', zoteroId);
-    const testUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${style}`;
+    const testUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${zotero_settings?.style}`;
     return new Promise((resolve, reject) => {
       if (allRequests[testUrl]) {
         setFootnoteRef(allRequests[testUrl]);

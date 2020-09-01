@@ -13,8 +13,9 @@ import {
 } from 'semantic-ui-react';
 
 const iconsObj = {
-  zotero: 'https://react.semantic-ui.com/images/avatar/small/daniel.jpg',
-  openaire: 'https://react.semantic-ui.com/images/avatar/small/jenny.jpg',
+  zotero:
+    'https://www.zotero.org/static/images/bs4theme/zotero-logo.1519312231.svg',
+  openaire: 'https://guidelines.openaire.eu/en/latest/_images/openaire.png',
 };
 const labelObj = {
   publications: {

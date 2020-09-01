@@ -4,7 +4,8 @@ import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
 import React, { useEffect, useState } from 'react';
 import { Button } from 'semantic-ui-react';
-import InlineForm from 'volto-slate/futurevolto/InlineForm';
+// import InlineForm from 'volto-slate/futurevolto/InlineForm';
+import InlineForm from './InlineForm';
 import MasterDetailWidget from './MasterDetailWidget';
 
 const zoteroEEAFormatFileUrl = process.env.RAZZLE_FILE_URL;
@@ -26,7 +27,7 @@ const makeOpenAireUrlObj = (filterList) => {
     publications: `${openAireUrlBase}/publications`,
     rsd: `${openAireUrlBase}/datasets`,
   };
-  // const result = [];
+
   return filterList.reduce((accumulator, currentValue) => {
     return [...accumulator, openAireUrl[currentValue]];
   }, []);
@@ -87,6 +88,7 @@ const ZoteroDataWrapper = (props) => {
     props.formData?.footnoteTitle,
   );
   const [itemIdRef, setItemIdRef] = useState(props.formData?.zoteroId);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [collections, setCollections] = useState([]);
   const [items, setItems] = useState([]);
@@ -97,6 +99,8 @@ const ZoteroDataWrapper = (props) => {
   const [loading, setLoading] = useState(false);
   const [style, setStyle] = useState(zoteroEEAFormatFileUrl);
   const [searchTerm, setSearchTerm] = useState(null);
+  const [newFormData, setNewFormData] = useState({});
+  const [formData, setFormData] = useState({});
 
   const fetchCollections = (collectionId, offset = 0) => {
     const tempUrl = collectionId ? `${url}${collectionId}/items/` : `${url}`;
@@ -216,27 +220,32 @@ const ZoteroDataWrapper = (props) => {
   const fetchItem = (zoteroId) => {
     // console.log('fetch item', zoteroId);
     const testUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${style}`;
-    if (allRequests[testUrl]) {
-      setFootnoteRef(allRequests[testUrl]);
-    } else {
-      setLoading(true);
+    return new Promise((resolve, reject) => {
+      if (allRequests[testUrl]) {
+        setFootnoteRef(allRequests[testUrl]);
+        resolve();
+      } else {
+        setLoading(true);
 
-      fetch(testUrl, {
-        method: 'GET',
-        headers,
-      })
-        .then((response) => response.text())
-        .then((results) => {
-          // console.log('fetch results', results);
-          setFootnoteRef(results);
-          cacheAllRequests(testUrl, results);
-          setLoading(false);
+        fetch(testUrl, {
+          method: 'GET',
+          headers,
         })
-        .catch((error) => {
-          console.log('@@@@ error', error);
-          setLoading(false);
-        });
-    }
+          .then((response) => response.text())
+          .then((results) => {
+            // console.log('fetch results', results);
+            setFootnoteRef(results);
+            cacheAllRequests(testUrl, results);
+            setLoading(false);
+            resolve(results);
+          })
+          .catch((error) => {
+            console.log('@@@@ error', error);
+            setLoading(false);
+            reject();
+          });
+      }
+    });
   };
 
   const saveItemToZotero = (itemToSave) => {
@@ -244,23 +253,27 @@ const ZoteroDataWrapper = (props) => {
 
     setLoading(true);
 
-    fetch(testUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify([itemToSave.data]), // body data type must match "Content-Type" header
-    })
-      .then((response) => response.json())
-      .then((results) => {
-        // console.log('@@@@ results', results);
-        const itemId = results.success[0];
-
-        fetchItem(itemId);
-        setItemIdRef(itemId);
+    return new Promise((resolve, reject) => {
+      fetch(testUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify([itemToSave.data]), // body data type must match "Content-Type" header
       })
-      .catch((error) => {
-        console.log('@@@@ error', error);
-        setLoading(false);
-      });
+        .then((response) => response.json())
+        .then((results) => {
+          // console.log('@@@@ results', results);
+          const itemId = results.success[0];
+
+          // fetchItem(itemId);
+          // setItemIdRef(itemId);
+          resolve(itemId);
+        })
+        .catch((error) => {
+          console.log('@@@@ error', error);
+          setLoading(false);
+          reject();
+        });
+    });
   };
 
   const handleLoadMore = (ev) => {
@@ -354,22 +367,29 @@ const ZoteroDataWrapper = (props) => {
   const pushItem = (selectedItem) => {
     fetchItem(selectedItem.key);
     // console.log('pushItem', selectedItem);
-
+    setSelectedItem(selectedItem);
     setfootnoteTitle(formatCitation(selectedItem));
     setItemIdRef(selectedItem.key);
   };
 
   const pushSearchItem = (selectedItem) => {
     // console.log('pushed item', selectedItem);
-    // console.log('pushed selectedItem', selectedItem);
+    console.log('pushed selectedItem', selectedItem);
+    setSelectedItem(selectedItem);
+    setfootnoteTitle(formatCitation(selectedItem));
 
-    if (selectedItem.isOpenAire) {
-      saveItemToZotero(selectedItem);
-    } else {
+    if (!selectedItem.isOpenAire) {
       fetchItem(selectedItem.key);
       setItemIdRef(selectedItem.key);
     }
-    setfootnoteTitle(formatCitation(selectedItem));
+
+    // if (selectedItem.isOpenAire) {
+    //   saveItemToZotero(selectedItem);
+    // } else {
+    //   fetchItem(selectedItem.key);
+    //   setItemIdRef(selectedItem.key);
+    // }
+    // setfootnoteTitle(formatCitation(selectedItem));
   };
 
   /**
@@ -417,16 +437,38 @@ const ZoteroDataWrapper = (props) => {
 
   useEffect(() => {
     setfootnoteTitle(props.formData?.footnoteTitle);
+    setFootnoteRef(props.formData?.footnote);
+    setItemIdRef(props.formData?.zoteroId);
+
+    setNewFormData({
+      ...props.formData,
+      ...{ footnoteTitle },
+    });
+    setFormData({
+      ...props.formData,
+      ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
+    });
+    console.log('!!!!!!!!! formData', formData);
   }, [props]);
 
-  const newFormData = {
+  // setNewFormData({
+  //   ...props.formData,
+  //   ...{ footnoteTitle },
+  // });
+  // setFormData({
+  //   ...props.formData,
+  //   ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
+  // });
+  const newFormData1 = {
     ...props.formData,
     ...{ footnoteTitle },
   };
-  const formData = {
+  const formData1 = {
     ...props.formData,
     ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
   };
+  console.log('&&&& formData', formData);
+  console.log('&&&& props.formData', props.formData);
 
   return (
     <div id="zotero-comp">
@@ -434,12 +476,36 @@ const ZoteroDataWrapper = (props) => {
         schema={props.schema}
         title={props.title}
         icon={<VoltoIcon size="24px" name={briefcaseSVG} />}
-        formData={newFormData}
+        formData={newFormData1}
         headerActions={
           <>
             <button
               onClick={(id, value) => {
-                props.submitHandler(formData);
+                if (selectedItem && selectedItem.isOpenAire) {
+                  saveItemToZotero(selectedItem).then((itemId) => {
+                    setItemIdRef(itemId);
+                    console.log('@@@@ saveItemToZotero', itemId);
+                    fetchItem(itemId)
+                      .then((results) => {
+                        const formData = {
+                          ...props.formData,
+                          ...{
+                            footnote: results,
+                            zoteroId: itemId,
+                            footnoteTitle,
+                          },
+                        };
+                        console.log('@@@@ formData', formData);
+                        props.submitHandler(formData);
+                      })
+                      .catch((error) => {
+                        console.log('@@@@ error', error);
+                      });
+                  });
+                } else {
+                  console.log('%%%% formData', formData);
+                  props.submitHandler(formData1);
+                }
               }}
             >
               <VoltoIcon size="24px" name={checkSVG} />

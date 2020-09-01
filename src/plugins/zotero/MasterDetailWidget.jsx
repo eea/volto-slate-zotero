@@ -50,7 +50,7 @@ const makeList = (props, results) => (
                 return props.pushSearchItem(item);
               }}
             >
-              {item.data.title ? `${item.data.title.slice(0, 100)}...` : ''}
+              {item.data.title ? `${item.data.title.slice(0, 65)}...` : ''}
             </button>
           </li>
         ))

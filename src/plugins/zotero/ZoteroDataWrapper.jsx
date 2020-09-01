@@ -61,7 +61,7 @@ const formatOpenAire = (item, label) => {
       ? entry.creator.map((creator) => {
           return {
             creatorType: 'author',
-            firstName: creator['@name'],
+            firstName: creator['@name'] || creator.$,
             lastName: creator['@surname'],
           };
         })
@@ -69,7 +69,7 @@ const formatOpenAire = (item, label) => {
       ? [
           {
             creatorType: 'author',
-            firstName: entry.creator['@name'],
+            firstName: entry.creator['@name'] || entry.creator.$,
             lastName: entry.creator['@surname'],
           },
         ]
@@ -327,7 +327,11 @@ const ZoteroDataWrapper = (props) => {
     const { data } = selectedItem;
 
     const name = data.creators[0]
-      ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
+      ? data.creators[0]?.lastName && data.creators[0]?.firstName
+        ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
+        : data.creators[0]?.lastName
+        ? `${data.creators[0]?.lastName}`
+        : `${data.creators[0]?.firstName}`
       : '';
     const date = name
       ? data.date

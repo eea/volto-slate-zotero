@@ -34,7 +34,7 @@ const makeList = (props, results) => (
     {!props.loading ? (
       props[results].length > 0 ? (
         props[results].map((item, index) => (
-          <li>
+          <li key={`result-${item.label}-${index}`}>
             <Image
               avatar
               src={item.icon ? iconsObj[item.icon] : iconsObj.zotero}
@@ -80,7 +80,7 @@ const makeOpenAireFilterList = (item) => {
 const panes = (props) => [
   {
     menuItem: (
-      <Menu.Item key="messages">
+      <Menu.Item key="all-tab">
         All<Label>{props.allSearchResults.length}</Label>
       </Menu.Item>
     ),
@@ -88,7 +88,7 @@ const panes = (props) => [
   },
   {
     menuItem: (
-      <Menu.Item key="messages">
+      <Menu.Item key="zotero-tab">
         Zotero<Label>{props.zoteroSearchResults.length}</Label>
       </Menu.Item>
     ),
@@ -96,7 +96,7 @@ const panes = (props) => [
   },
   {
     menuItem: (
-      <Menu.Item key="messages">
+      <Menu.Item key="openaire-tab">
         OpenAire<Label>{props.openAireSearchResults.length}</Label>
       </Menu.Item>
     ),
@@ -183,7 +183,7 @@ const MasterDetailWidget = (props) => {
     <ul>
       {!props.loading
         ? props.collections.map((collection, index) => (
-            <li key={`li-${index}`}>
+            <li key={`collection-${index}`}>
               <button
                 onClick={(ev) => {
                   ev.preventDefault();
@@ -204,7 +204,7 @@ const MasterDetailWidget = (props) => {
       {!props.loading ? (
         props.items.length > 0 ? (
           props.items.map((item, index) => (
-            <li>
+            <li key={`item-${index}`}>
               <button
                 onClick={(ev) => {
                   ev.preventDefault();

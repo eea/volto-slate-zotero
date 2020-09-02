@@ -151,7 +151,7 @@ const MasterDetailWidget = (props) => {
   const [hideCollection, setHideCollection] = useState(false);
   const [moveMenu, setMoveMenu] = useState(0);
   const [searchTerm, setSearchTerm] = useState(null);
-  console.log(props);
+  // console.log(props);
 
   const pull = () => {
     setMoveMenu(0);

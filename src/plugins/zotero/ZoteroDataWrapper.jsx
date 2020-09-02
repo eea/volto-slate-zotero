@@ -73,6 +73,7 @@ const formatOpenAire = (item, label) => {
 };
 
 const ZoteroDataWrapper = (props) => {
+  const dispatch = useDispatch();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [footnote, setFootnoteRef] = useState(props.formData?.footnote);
   const [footnoteTitle, setfootnoteTitle] = useState(
@@ -92,7 +93,6 @@ const ZoteroDataWrapper = (props) => {
   const [newFormData, setNewFormData] = useState({});
   const [formData, setFormData] = useState({});
   const zotero_settings = useSelector((state) => state?.zotero_settings?.api);
-  const dispatch = useDispatch();
 
   const headers = {
     Authorization: 'Bearer ' + zotero_settings?.password,
@@ -103,48 +103,45 @@ const ZoteroDataWrapper = (props) => {
   const url = `${zoteroBaseUrl}/collections/`;
   const urlSearch = `${zoteroBaseUrl}/items?q=`;
 
-  useEffect(() => {
-    if (!zotero_settings) {
-      dispatch(getZoteroSettings());
-    }
-  }, [dispatch, zotero_settings]);
+  const fetchCollections = React.useCallback(
+    (collectionId, offset = 0) => {
+      const tempUrl = collectionId ? `${url}${collectionId}/items/` : `${url}`;
+      const finalUrl = `${tempUrl}?v=3&start=${offset}`;
 
-  const fetchCollections = (collectionId, offset = 0) => {
-    const tempUrl = collectionId ? `${url}${collectionId}/items/` : `${url}`;
-    const finalUrl = `${tempUrl}?v=3&start=${offset}`;
-
-    if (allRequests[finalUrl]) {
-      if (collectionId) {
-        setItems(allRequests[finalUrl]);
+      if (allRequests[finalUrl]) {
+        if (collectionId) {
+          setItems(allRequests[finalUrl]);
+        } else {
+          setCollections(allRequests[finalUrl]);
+        }
       } else {
-        setCollections(allRequests[finalUrl]);
-      }
-    } else {
-      setLoading(true);
+        setLoading(true);
 
-      fetch(finalUrl, {
-        method: 'GET',
-        headers,
-      })
-        .then((response) => response.json())
-        .then((results) => {
-          let finalResult = [];
-          if (collectionId) {
-            finalResult = offset > 0 ? [...items, ...results] : results;
-            setItems(finalResult);
-          } else {
-            finalResult = offset > 0 ? [...collections, ...results] : results;
-            setCollections(finalResult);
-          }
-          cacheAllRequests(finalUrl, finalResult);
-          setLoading(false);
+        fetch(finalUrl, {
+          method: 'GET',
+          headers,
         })
-        .catch((error) => {
-          console.log('@@@@ error', error);
-          setLoading(false);
-        });
-    }
-  };
+          .then((response) => response.json())
+          .then((results) => {
+            let finalResult = [];
+            if (collectionId) {
+              finalResult = offset > 0 ? [...items, ...results] : results;
+              setItems(finalResult);
+            } else {
+              finalResult = offset > 0 ? [...collections, ...results] : results;
+              setCollections(finalResult);
+            }
+            cacheAllRequests(finalUrl, finalResult);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.log('@@@@ error', error);
+            setLoading(false);
+          });
+      }
+    },
+    [collections, headers, items, url],
+  );
 
   const allSearchPromises = [];
 
@@ -385,7 +382,7 @@ const ZoteroDataWrapper = (props) => {
 
   const pushSearchItem = (selectedItem) => {
     // console.log('pushed item', selectedItem);
-    console.log('pushed selectedItem', selectedItem);
+    // console.log('pushed selectedItem', selectedItem);
     setSelectedItem(selectedItem);
     setfootnoteTitle(formatCitation(selectedItem));
 
@@ -413,7 +410,7 @@ const ZoteroDataWrapper = (props) => {
     const resultUrl = makeOpenAireUrlObj(filterList);
 
     const promises = resultUrl.map((url, index) => {
-      console.log('openaire callback filterList[index]', filterList[index]);
+      // console.log('openaire callback filterList[index]', filterList[index]);
       const finalUrl = searchForDoi
         ? `${url}/?doi=${searchTerm}&format=json&size=20`
         : `${url}/?title=${searchTerm}&format=json&size=20`;
@@ -435,16 +432,23 @@ const ZoteroDataWrapper = (props) => {
             (zoteroResult) => zoteroResult.data.DOI === result.data.DOI,
           ),
       );
+
       setOpenAireSearchResults(uniqueAireResults);
     });
   };
+
+  useEffect(() => {
+    if (!zotero_settings) {
+      dispatch(getZoteroSettings());
+    }
+  }, [dispatch, zotero_settings]);
 
   // Similar to componentDidMount and componentDidUpdate:
   // used only once at mount
   useEffect(() => {
     setfootnoteTitle(props.formData?.footnoteTitle);
     fetchCollections();
-  }, []); // to be used only once at mount
+  }, [fetchCollections, setfootnoteTitle, props]); // to be used only once at mount
 
   useEffect(() => {
     setfootnoteTitle(props.formData?.footnoteTitle);
@@ -459,8 +463,8 @@ const ZoteroDataWrapper = (props) => {
       ...props.formData,
       ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
     });
-    console.log('!!!!!!!!! formData', formData);
-  }, [props]);
+    // console.log('!!!!!!!!! formData', props.formData);
+  }, [props, footnoteTitle, footnote, itemIdRef]);
 
   // setNewFormData({
   //   ...props.formData,
@@ -478,9 +482,10 @@ const ZoteroDataWrapper = (props) => {
     ...props.formData,
     ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
   };
-  console.log('&&&& formData', formData);
-  console.log('&&&& props.formData', props.formData);
+  // console.log('&&&& formData', formData);
+  // console.log('&&&& props.formData', props.formData);
 
+  console.log('Zotero: Re-rended');
   return (
     <div id="zotero-comp">
       <InlineForm
@@ -495,7 +500,7 @@ const ZoteroDataWrapper = (props) => {
                 if (selectedItem && selectedItem.isOpenAire) {
                   saveItemToZotero(selectedItem).then((itemId) => {
                     setItemIdRef(itemId);
-                    console.log('@@@@ saveItemToZotero', itemId);
+                    // console.log('@@@@ saveItemToZotero', itemId);
                     fetchItem(itemId)
                       .then((results) => {
                         const formData = {
@@ -506,7 +511,7 @@ const ZoteroDataWrapper = (props) => {
                             footnoteTitle,
                           },
                         };
-                        console.log('@@@@ formData', formData);
+                        // console.log('@@@@ formData', formData);
                         props.submitHandler(formData);
                       })
                       .catch((error) => {
@@ -514,7 +519,7 @@ const ZoteroDataWrapper = (props) => {
                       });
                   });
                 } else {
-                  console.log('%%%% formData', formData);
+                  // console.log('%%%% formData', formData);
                   props.submitHandler(formData1);
                 }
               }}

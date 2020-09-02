@@ -188,7 +188,7 @@ const MasterDetailWidget = (props) => {
     <ul>
       {!props.loading
         ? props.collections.map((collection, index) => (
-            <li>
+            <li key={`li-${index}`}>
               <button
                 onClick={(ev) => {
                   ev.preventDefault();

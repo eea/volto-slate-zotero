@@ -1,5 +1,5 @@
 import React from 'react';
-import { Popup } from 'semantic-ui-react';
+import { Popup, Header } from 'semantic-ui-react';
 
 const makeFootnote = (footnote) => {
   const free = footnote ? footnote.replace('<?xml version="1.0"?>', '') : '';
@@ -23,7 +23,6 @@ export const ZoteroElement = ({ attributes, children, element, mode }) => {
         </a>
       ) : (
         <Popup
-          header="Zotero"
           position="bottom left"
           trigger={
             <span {...attributes} className="footnote zotero-edit-node">

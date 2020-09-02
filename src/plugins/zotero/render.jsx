@@ -1,5 +1,5 @@
 import React from 'react';
-import { Popup, Header } from 'semantic-ui-react';
+import { Popup } from 'semantic-ui-react';
 
 const makeFootnote = (footnote) => {
   const free = footnote ? footnote.replace('<?xml version="1.0"?>', '') : '';
@@ -19,7 +19,18 @@ export const ZoteroElement = ({ attributes, children, element, mode }) => {
           id={`ref-${uid}`}
           aria-describedby="footnote-label"
         >
-          {children}
+          <Popup
+            position="bottom left"
+            trigger={<span {...attributes}>{children}</span>}
+          >
+            <Popup.Content>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: makeFootnote(data.footnote),
+                }}
+              />{' '}
+            </Popup.Content>
+          </Popup>
         </a>
       ) : (
         <Popup

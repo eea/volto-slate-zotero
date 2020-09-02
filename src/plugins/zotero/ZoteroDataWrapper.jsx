@@ -10,7 +10,7 @@ import { getZoteroSettings } from './actions';
 import InlineForm from './InlineForm';
 import MasterDetailWidget from './MasterDetailWidget';
 
-const openAireUrlBase = `http://api.openaire.eu/search`;
+const openAireUrlBase = `https://api.openaire.eu/search`;
 
 const makeOpenAireUrlObj = (filterList) => {
   const openAireUrl = {

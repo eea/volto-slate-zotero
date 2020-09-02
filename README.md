@@ -1,83 +1,70 @@
 # volto-slate-zotero
+[![Releases](https://img.shields.io/github/v/release/eea/volto-slate-zotero)](https://github.com/eea/volto-slate-zotero/releases)
 
-[Zotero](https://www.zotero.org/) integration with [Volto Slate](https://github.com/eea/volto-slate/tree/develop)
+[Zotero](https://www.zotero.org/) integration with [Volto Slate](https://github.com/eea/volto-slate/tree/develop) [Volto](https://github.com/plone/volto) add-on
 
+## Features
 
-## Develop
+* Volto Slate Footnotes integration with Zotero
+* OpenAire integration
 
-Before starting make sure your development environment is properly set. See [Volto Developer Documentation](https://docs.voltocms.com/getting-started/install/)
+## Getting started
 
-1. Install `mrs.developer`
+1. Create new volto project if you don't already have one:
+    ```
+    $ npm install -g @plone/create-volto-app
+    $ create-volto-app my-volto-project
+    $ cd my-volto-project
+    ```
 
-        $ npm install -g mrs.developer
+1. Update `package.json`:
+    ``` JSON
+    "addons": [
+        "volto-slate:asDefault",
+        "@eeacms/volto-slate-zotero"
+    ],
 
-1. Install `@plone/create-volto-app`
+    "dependencies": {
+        "@plone/volto": "github:eea/volto#7.11.1-beta.1",
+        "volto-slate": "github:eea/volto-slate#0.5.3",
+        "@eeacms/volto-slate-zotero": "github:eea/volto-slate-zotero#0.1.0"
+    }
+    ```
 
-        $ npm install -g @plone/create-volto-app
-
-1. Create new volto app
-
-        $ create-volto-app my-zotero-project
-        $ cd my-zotero-project
-
-1. Update `package.json` with the following information:
-
-        {
-            "name": "my-zotero-project",
-            "description": "My zotero project",
-
-            "private": true,
-
-            "scripts": {
-                "develop": "missdev --config=jsconfig.json --output=addons"
-            },
-
-            "addons": [
-                "volto-slate:asDefault",
-                "volto-slate-zotero"
-            ],
-
-            "workspaces": [
-                "src/addons/volto-slate-zotero"
-            ],
-
-            "dependencies": {
-                "@plone/volto": "github:eea/volto#7.7.0-beta.1",
-                "volto-slate": "github:eea/volto-slate#0.3.9"
-            }
-        }
-
-1. Add the following to `mrs.developer.json`:
-
-        {
-            "volto-slate-zotero": {
-                "url": "https://github.com/eea/volto-slate-zotero.git",
-                "branch": "develop",
-                "path": "src"
-            }
-        }
-
-1. Install
-
-        $ yarn develop
-        $ yarn
-
-1. Start backend
-
-        $ docker run -d --name plone -p 8080:8080 -e SITE=Plone -e VERSIONS="plone.restapi=7.0.0a4" -e ADDONS="kitconcept.volto" plone:5
-
-    ...wait for backend to setup and start - `Ready to handle requests`:
-
-        $ docker logs -f plone
-
-    ...you can also check http://localhost:8080/Plone
-
-1. Start frontend
-
-        $ yarn start
+1. Install new add-ons and restart Volto:
+    ```
+    $ yarn
+    $ yarn start
+    ```
 
 1. Go to http://localhost:3000
 
-1. Happy hacking!
+1. Happy editing!
 
-        $ cd src/addons/volto-slate-zotero/
+## Dependencies
+
+### Backend
+
+* [Plone](https://plone.org/download)
+* [plone.restapi](https://pypi.org/project/plone.restapi/)
+* [eea.zotero](https://pypi.org/project/eea.zotero)
+
+### Frontend
+
+* [Volto](https://github.com/plone/volto)
+* [volto-slate](https://github.com/eea/volto-slate)
+
+## How to contribute
+
+See [DEVELOP.md](DEVELOP.md).
+
+## Copyright and license
+
+The Initial Owner of the Original Code is European Environment Agency (EEA).
+All Rights Reserved.
+
+See [LICENSE.md](LICENSE.md) for details.
+
+## Funding
+
+[European Environment Agency (EU)](http://eea.europa.eu)

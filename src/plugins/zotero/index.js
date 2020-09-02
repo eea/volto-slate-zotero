@@ -1,14 +1,50 @@
-import React from 'react';
+// TODO! important! Read https://www.smashingmagazine.com/2015/01/designing-for-print-with-css/
 
+import codeSVG from '@plone/volto/icons/code.svg';
+import React from 'react';
+import { FOOTNOTE } from 'volto-slate/constants';
+import FootnotesBlockEdit from './blocks/Footnote/FootnotesBlockEdit';
+import FootnotesBlockView from './blocks/Footnote/FootnotesBlockView';
+import { ZOTERO } from './constants';
+import { withZotero } from './extensions';
+import { zotero_editor } from './reducers';
+import { zotero_settings } from './reducers';
 import { ZoteroElement } from './render';
 import ZoteroButton from './ZoteroButton';
-import { withZotero } from './extensions';
+import ZoteroContextButton from './ZoteroContextButton';
+import ZoteroSidebarEditor from './ZoteroSidebarEditor';
 
 export default (config) => {
   const { settings } = config;
   const { slate } = settings;
 
-  slate.buttons.zotero = (props) => <ZoteroButton {...props} />;
+  config.addonReducers = {
+    ...config.addonReducers,
+    zotero_editor,
+    zotero_settings,
+  };
+
+  config.blocks.blocksConfig.slateFootnotes = {
+    id: 'slateFootnotes',
+    title: 'Slate Footnotes',
+    icon: codeSVG,
+    group: 'text',
+    view: FootnotesBlockView,
+    edit: FootnotesBlockEdit,
+    restricted: false,
+    mostUsed: true,
+    blockHasOwnFocusManagement: false,
+    sidebarTab: 1,
+    security: {
+      addPermission: [],
+      view: [],
+    },
+  };
+  config.settings.footnotes = [...(config.settings.footnotes || []), FOOTNOTE];
+
+  slate.buttons.zotero = (props) => (
+    <ZoteroButton {...props} title="Insert citation" />
+  );
   slate.elements.zotero = ZoteroElement;
 
   slate.extensions = [...(slate.extensions || []), withZotero];
@@ -18,8 +54,11 @@ export default (config) => {
     'zotero',
   ];
 
-  slate.nodeTypesToHighlight.push('zotero');
+  slate.contextToolbarButtons.push(ZoteroContextButton);
+  slate.persistentHelpers.push(ZoteroSidebarEditor);
 
-  settings.footnotes = [...(settings.footnotes || []), 'zotero'];
+  slate.nodeTypesToHighlight.push(ZOTERO);
+
+  settings.footnotes = [...(settings.footnotes || []), ZOTERO];
   return config;
 };

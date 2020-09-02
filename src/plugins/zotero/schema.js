@@ -1,17 +1,17 @@
 export const ZoteroSchema = {
-  title: 'Zotero entry',
+  title: 'Footnote entry',
   fieldsets: [
     {
       id: 'default',
       title: 'Default',
-      fields: ['footnote'],
+      fields: ['footnoteTitle'],
     },
   ],
   properties: {
-    footnote: {
+    footnoteTitle: {
       title: 'Reference text',
       widget: 'textarea',
     },
   },
-  required: ['footnote'],
+  required: [],
 };

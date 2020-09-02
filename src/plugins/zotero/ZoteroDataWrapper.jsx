@@ -3,24 +3,14 @@ import briefcaseSVG from '@plone/volto/icons/briefcase.svg';
 import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from 'semantic-ui-react';
+import { getZoteroSettings } from './actions';
 // import InlineForm from 'volto-slate/futurevolto/InlineForm';
 import InlineForm from './InlineForm';
 import MasterDetailWidget from './MasterDetailWidget';
 
-const zoteroEEAFormatFileUrl = process.env.RAZZLE_FILE_URL;
-const bearer_token = process.env.RAZZLE_API;
-const bearer = 'Bearer ' + bearer_token;
-const headers = {
-  Authorization: bearer,
-  'Content-Type': 'application/json',
-};
-const zoteroBaseUrl = process.env.RAZZLE_URL;
-const url = `${zoteroBaseUrl}/collections/`;
-const urlSearch = `${zoteroBaseUrl}/items?q=`;
-
 const openAireUrlBase = `http://api.openaire.eu/search`;
-// const openAireUrlPublication = `http://api.openaire.eu/search/publications`;
 
 const makeOpenAireUrlObj = (filterList) => {
   const openAireUrl = {
@@ -41,8 +31,7 @@ const cacheAllRequests = (url, items) => {
 const formatOpenAire = (item, label) => {
   const entry = item.metadata['oaf:entity']['oaf:result'];
   const result = { data: {}, icon: 'openaire', label, isOpenAire: true };
-  // console.log('@@@@ item', item);
-  // console.log('@@@@ entry', entry);
+
   const hasDoi = entry.pid
     ? Array.isArray(entry.pid)
       ? entry.pid.find((key) => key['@classid'] === 'doi')
@@ -95,12 +84,21 @@ const ZoteroDataWrapper = (props) => {
   const [allSearchResults, setAllSearchResults] = useState([]);
   const [zoteroSearchResults, setZoteroSearchResults] = useState([]);
   const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
-  // const [searchAireResults, setSearchAireResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [style, setStyle] = useState(zoteroEEAFormatFileUrl);
   const [searchTerm, setSearchTerm] = useState(null);
   const [newFormData, setNewFormData] = useState({});
   const [formData, setFormData] = useState({});
+  const zotero_settings = useSelector((state) => state?.zotero_settings?.api);
+  const dispatch = useDispatch();
+
+  const headers = {
+    Authorization: 'Bearer ' + zotero_settings?.password,
+    'Content-Type': 'application/json',
+  };
+
+  const zoteroBaseUrl = zotero_settings?.server;
+  const url = `${zoteroBaseUrl}/collections/`;
+  const urlSearch = `${zoteroBaseUrl}/items?q=`;
 
   const fetchCollections = (collectionId, offset = 0) => {
     const tempUrl = collectionId ? `${url}${collectionId}/items/` : `${url}`;
@@ -133,7 +131,7 @@ const ZoteroDataWrapper = (props) => {
           setLoading(false);
         })
         .catch((error) => {
-          console.log('@@@@ error', error);
+          // console.log('@@@@ error', error);
           setLoading(false);
         });
     }
@@ -143,8 +141,6 @@ const ZoteroDataWrapper = (props) => {
 
   const fetchSearch = (term, offset = 0) => {
     const finalUrl = `${urlSearch}${term}&start=${offset}`;
-
-    // console.log('fetch search');
 
     setSearchTerm(term);
 
@@ -164,27 +160,19 @@ const ZoteroDataWrapper = (props) => {
           .then((results) => {
             const finalResult =
               offset > 0 ? [...zoteroSearchResults, ...results] : results;
-            // setZoteroSearchResults(finalResult);
 
             setLoading(false);
-            // resolve(finalResult);
             allSearchPromises.push(resolve(finalResult));
           })
           .catch((error) => {
-            console.log('@@@@ error', error);
             setLoading(false);
             reject();
           });
-
-        // allSearchPromises.push(zoteroPromise);
       }
     });
   };
 
   const fetchAireSearch = (searchUrl, label, offset = 0) => {
-    // const openaireTitleUrl = `${openAireUrlPublication}/?title=${term}&format=json&size=20`;
-    // const openaireDOIUrl = `${openAireUrlPublication}/?doi=${term}&format=json&size=20`;
-
     setLoading(true);
     setShowResults(true);
 
@@ -195,7 +183,6 @@ const ZoteroDataWrapper = (props) => {
         .then((response) => response.json())
         .then((response) => {
           setLoading(false);
-          // console.log('@@@@ response', response);
           const results = response.response.results
             ? response.response.results.result
             : [];
@@ -210,7 +197,6 @@ const ZoteroDataWrapper = (props) => {
           allSearchPromises.push(resolve(finalResult));
         })
         .catch((error) => {
-          console.log('@@@@ error', error);
           setLoading(false);
           reject();
         });
@@ -218,8 +204,7 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const fetchItem = (zoteroId) => {
-    // console.log('fetch item', zoteroId);
-    const testUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${style}`;
+    const testUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${zotero_settings?.style}`;
     return new Promise((resolve, reject) => {
       if (allRequests[testUrl]) {
         setFootnoteRef(allRequests[testUrl]);
@@ -233,14 +218,12 @@ const ZoteroDataWrapper = (props) => {
         })
           .then((response) => response.text())
           .then((results) => {
-            // console.log('fetch results', results);
             setFootnoteRef(results);
             cacheAllRequests(testUrl, results);
             setLoading(false);
             resolve(results);
           })
           .catch((error) => {
-            console.log('@@@@ error', error);
             setLoading(false);
             reject();
           });
@@ -261,15 +244,11 @@ const ZoteroDataWrapper = (props) => {
       })
         .then((response) => response.json())
         .then((results) => {
-          // console.log('@@@@ results', results);
           const itemId = results.success[0];
 
-          // fetchItem(itemId);
-          // setItemIdRef(itemId);
           resolve(itemId);
         })
         .catch((error) => {
-          console.log('@@@@ error', error);
           setLoading(false);
           reject();
         });
@@ -295,7 +274,6 @@ const ZoteroDataWrapper = (props) => {
     ]).then((values) => {
       const zoteroResults = values[0];
       const aireResults = values[1];
-      // console.log('all ', values);
 
       const uniqueAireResults = aireResults.filter(
         (result) =>
@@ -370,15 +348,12 @@ const ZoteroDataWrapper = (props) => {
 
   const pushItem = (selectedItem) => {
     fetchItem(selectedItem.key);
-    // console.log('pushItem', selectedItem);
     setSelectedItem(selectedItem);
     setfootnoteTitle(formatCitation(selectedItem));
     setItemIdRef(selectedItem.key);
   };
 
   const pushSearchItem = (selectedItem) => {
-    // console.log('pushed item', selectedItem);
-    console.log('pushed selectedItem', selectedItem);
     setSelectedItem(selectedItem);
     setfootnoteTitle(formatCitation(selectedItem));
 
@@ -386,14 +361,6 @@ const ZoteroDataWrapper = (props) => {
       fetchItem(selectedItem.key);
       setItemIdRef(selectedItem.key);
     }
-
-    // if (selectedItem.isOpenAire) {
-    //   saveItemToZotero(selectedItem);
-    // } else {
-    //   fetchItem(selectedItem.key);
-    //   setItemIdRef(selectedItem.key);
-    // }
-    // setfootnoteTitle(formatCitation(selectedItem));
   };
 
   /**
@@ -401,12 +368,8 @@ const ZoteroDataWrapper = (props) => {
    * @param {string[]} item
    */
   const openAireCallback = (filterList, searchForDoi) => {
-    // console.log('openaire callback filterList', filterList);
-    // console.log('openaire callback searchForDoi', searchForDoi);
     const resultUrl = makeOpenAireUrlObj(filterList);
-
     const promises = resultUrl.map((url, index) => {
-      console.log('openaire callback filterList[index]', filterList[index]);
       const finalUrl = searchForDoi
         ? `${url}/?doi=${searchTerm}&format=json&size=20`
         : `${url}/?title=${searchTerm}&format=json&size=20`;
@@ -414,13 +377,9 @@ const ZoteroDataWrapper = (props) => {
     });
 
     Promise.all(promises).then((promiseResults) => {
-      // const zoteroResults = promiseResults[0];
-      // const aireResults = promiseResults[1];
-      // console.log('all ', promiseResults);
       const aireResults = promiseResults.reduce((accumulator, currentValue) => {
         return [...accumulator, ...currentValue];
       }, []);
-      // console.log('aireResults ', aireResults);
 
       const uniqueAireResults = aireResults.filter(
         (result) =>
@@ -435,9 +394,16 @@ const ZoteroDataWrapper = (props) => {
   // Similar to componentDidMount and componentDidUpdate:
   // used only once at mount
   useEffect(() => {
-    setfootnoteTitle(props.formData?.footnoteTitle);
-    fetchCollections();
+    dispatch(getZoteroSettings());
   }, []); // to be used only once at mount
+
+  useEffect(() => {
+    setfootnoteTitle(props.formData?.footnoteTitle);
+  }, [props.formData?.footnoteTitle]); // to be used only once at mount
+
+  useEffect(() => {
+    fetchCollections();
+  }, [zotero_settings]); // to be used only once at mount
 
   useEffect(() => {
     setfootnoteTitle(props.formData?.footnoteTitle);
@@ -452,17 +418,13 @@ const ZoteroDataWrapper = (props) => {
       ...props.formData,
       ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
     });
-    console.log('!!!!!!!!! formData', formData);
-  }, [props]);
+  }, [
+    props.formData,
+    props.formData?.footnote,
+    props.formData?.footnoteTitle,
+    props.formData?.zoteroId,
+  ]);
 
-  // setNewFormData({
-  //   ...props.formData,
-  //   ...{ footnoteTitle },
-  // });
-  // setFormData({
-  //   ...props.formData,
-  //   ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
-  // });
   const newFormData1 = {
     ...props.formData,
     ...{ footnoteTitle },
@@ -471,8 +433,6 @@ const ZoteroDataWrapper = (props) => {
     ...props.formData,
     ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
   };
-  console.log('&&&& formData', formData);
-  console.log('&&&& props.formData', props.formData);
 
   return (
     <div id="zotero-comp">
@@ -488,7 +448,6 @@ const ZoteroDataWrapper = (props) => {
                 if (selectedItem && selectedItem.isOpenAire) {
                   saveItemToZotero(selectedItem).then((itemId) => {
                     setItemIdRef(itemId);
-                    console.log('@@@@ saveItemToZotero', itemId);
                     fetchItem(itemId)
                       .then((results) => {
                         const formData = {
@@ -499,15 +458,11 @@ const ZoteroDataWrapper = (props) => {
                             footnoteTitle,
                           },
                         };
-                        console.log('@@@@ formData', formData);
                         props.submitHandler(formData);
                       })
-                      .catch((error) => {
-                        console.log('@@@@ error', error);
-                      });
+                      .catch((error) => {});
                   });
                 } else {
-                  console.log('%%%% formData', formData);
                   props.submitHandler(formData1);
                 }
               }}

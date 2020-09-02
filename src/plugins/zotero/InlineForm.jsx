@@ -30,7 +30,7 @@ const InlineForm = ({
   intl,
 }) => {
   const _ = intl.formatMessage;
-  console.log('formdata', formData);
+
   return (
     <Segment.Group raised className="form">
       <header className="header pulled">

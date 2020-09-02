@@ -11,11 +11,12 @@ import {
   Menu,
   Tab
 } from 'semantic-ui-react';
+import zoteroSVG from './images/openaire.png';
+import openairePNG from './images/zotero.svg';
 
 const iconsObj = {
-  zotero:
-    'https://www.zotero.org/static/images/bs4theme/zotero-logo.1519312231.svg',
-  openaire: 'https://guidelines.openaire.eu/en/latest/_images/openaire.png',
+  zotero: zoteroSVG,
+  openaire: openairePNG,
 };
 const labelObj = {
   publications: {
@@ -65,7 +66,6 @@ let openAireFilterList = ['publications'];
 let searchForDoi = false;
 
 const makeOpenAireFilterList = (item) => {
-  // console.log('makeOpenAireFilterList item', item);
   const itemIndex = openAireFilterList.indexOf(item);
   const itemFound = itemIndex > -1;
 
@@ -74,11 +74,7 @@ const makeOpenAireFilterList = (item) => {
   } else {
     const len = openAireFilterList.length;
     openAireFilterList.splice(len - 1, 1);
-    // console.log('makeOpenAireFilterList x', x);
   }
-
-  // console.log('makeOpenAireFilterList itemIndex', itemIndex);
-  // console.log('makeOpenAireFilterList', openAireFilterList);
 };
 
 const panes = (props) => [
@@ -151,7 +147,6 @@ const MasterDetailWidget = (props) => {
   const [hideCollection, setHideCollection] = useState(false);
   const [moveMenu, setMoveMenu] = useState(0);
   const [searchTerm, setSearchTerm] = useState(null);
-  console.log(props);
 
   const pull = () => {
     setMoveMenu(0);
@@ -255,6 +250,7 @@ const MasterDetailWidget = (props) => {
               Show Library
             </Button>
             <Input
+              fluid
               action={{
                 icon: 'search',
                 onClick: handleInput,
@@ -262,6 +258,7 @@ const MasterDetailWidget = (props) => {
               placeholder="Search..."
               onChange={onChange}
             />
+            {/* <Input fluid icon="search" placeholder="Search. ff.." /> */}
 
             <div className="vertical divider" />
           </header>

@@ -402,7 +402,9 @@ const ZoteroDataWrapper = (props) => {
   }, [props.formData?.footnoteTitle]); // to be used only once at mount
 
   useEffect(() => {
-    fetchCollections();
+    if (zotero_settings) {
+      fetchCollections();
+    }
   }, [zotero_settings]); // to be used only once at mount
 
   useEffect(() => {

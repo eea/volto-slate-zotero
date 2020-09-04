@@ -1,9 +1,10 @@
-import { Icon as VoltoIcon } from '@plone/volto/components';
+import { Icon as VoltoIcon, Toast } from '@plone/volto/components';
 import briefcaseSVG from '@plone/volto/icons/briefcase.svg';
 import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { Button } from 'semantic-ui-react';
 import { getZoteroSettings } from './actions';
 // import InlineForm from 'volto-slate/futurevolto/InlineForm';
@@ -490,6 +491,12 @@ const ZoteroDataWrapper = (props) => {
                             footnoteTitle,
                           },
                         };
+                        toast.success(
+                          <Toast
+                            success
+                            title="Successfully added to Zotero Library"
+                          />,
+                        );
                         props.submitHandler(formData);
                       })
                       .catch((error) => {});

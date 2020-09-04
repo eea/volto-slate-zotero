@@ -69,7 +69,7 @@ const makeList = (props, resultsType, handleClick, activeIndex) => (
                       floated="right"
                       onClick={(ev) => props.pushSearchItem(item)}
                     >
-                      use
+                      preview
                     </Button>
                   </Card.Description>
                   <Card.Meta>
@@ -323,7 +323,7 @@ const MasterDetailWidget = (props) => {
                         floated="right"
                         onClick={(ev) => props.pushItem(item)}
                       >
-                        use
+                        preview
                       </Button>
                     </Card.Description>
                     <Card.Meta>

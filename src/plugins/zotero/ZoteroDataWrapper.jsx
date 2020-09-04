@@ -494,7 +494,8 @@ const ZoteroDataWrapper = (props) => {
                         toast.success(
                           <Toast
                             success
-                            title="Successfully added to Zotero Library"
+                            title="Success"
+                            content="Successfully added to Zotero Library"
                           />,
                         );
                         props.submitHandler(formData);

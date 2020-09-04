@@ -1,5 +1,5 @@
 export const ZoteroSchema = {
-  title: 'Footnote entry',
+  title: 'Zotero citation',
   fieldsets: [
     {
       id: 'default',

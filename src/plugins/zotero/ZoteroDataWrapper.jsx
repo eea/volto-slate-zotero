@@ -12,6 +12,51 @@ import MasterDetailWidget from './MasterDetailWidget';
 
 const openAireUrlBase = `https://api.openaire.eu/search`;
 
+const formatCitation = (selectedItem) => {
+  const { data } = selectedItem;
+
+  const name = data.creators[0]
+    ? data.creators[0]?.lastName && data.creators[0]?.firstName
+      ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
+      : data.creators[0]?.lastName
+      ? `${data.creators[0]?.lastName}`
+      : `${data.creators[0]?.firstName}`
+    : '';
+  const date = name
+    ? data.date
+      ? `, ${data.date}`
+      : ''
+    : data.date
+    ? ` ${data.date}`
+    : '';
+  const title =
+    date || name
+      ? data.title
+        ? `, ${data.title.slice(0, 40)}`
+        : ''
+      : data.title
+      ? ` ${data.title.slice(0, 40)}`
+      : '';
+  const publicationTitle =
+    title || date || name
+      ? data.publicationTitle
+        ? `, ${data.publicationTitle}`
+        : ''
+      : data.publicationTitle
+      ? ` ${data.publicationTitle}`
+      : '';
+  const place =
+    publicationTitle || title || date || name
+      ? data.place
+        ? `, ${data.place || ''}`
+        : ''
+      : data.place
+      ? ` ${data.place}`
+      : '';
+
+  return `${name}${date}${title}${publicationTitle}${place}.`;
+};
+
 const makeOpenAireUrlObj = (filterList) => {
   const openAireUrl = {
     publications: `${openAireUrlBase}/publications`,
@@ -30,7 +75,13 @@ const cacheAllRequests = (url, items) => {
 
 const formatOpenAire = (item, label) => {
   const entry = item.metadata['oaf:entity']['oaf:result'];
-  const result = { data: {}, icon: 'openaire', label, isOpenAire: true };
+  const result = {
+    data: {},
+    icon: 'openaire',
+    label,
+    isOpenAire: true,
+    citationTitle: '',
+  };
 
   const hasDoi = entry.pid
     ? Array.isArray(entry.pid)
@@ -50,23 +101,30 @@ const formatOpenAire = (item, label) => {
       ? entry.creator.map((creator) => {
           return {
             creatorType: 'author',
-            firstName: creator['@name'] || creator.$,
-            lastName: creator['@surname'],
+            lastName: creator['@surname'] || creator.$,
+            firstName: creator['@name'] || '',
           };
         })
       : entry.creator
       ? [
           {
             creatorType: 'author',
-            firstName: entry.creator['@name'] || entry.creator.$,
-            lastName: entry.creator['@surname'],
+            lastName: entry.creator['@surname'] || entry.creator.$,
+            firstName: entry.creator['@name'] || '',
           },
         ]
       : [],
     url: entry.url,
+    publicationTitle: entry.publisher?.$,
+    date:
+      entry.dateofacceptance && entry.dateofacceptance.$
+        ? new Date(entry.dateofacceptance.$).getUTCFullYear()
+        : null,
     collections: [],
     relations: {},
   };
+  result.citationTitle = formatCitation(result);
+
   return result;
 };
 
@@ -121,8 +179,15 @@ const ZoteroDataWrapper = (props) => {
         .then((results) => {
           let finalResult = [];
           if (collectionId) {
-            finalResult = offset > 0 ? [...items, ...results] : results;
-            setItems(finalResult);
+            let mergedResult = offset > 0 ? [...items, ...results] : results;
+            const formattedResults = mergedResult.map((item) => {
+              const formattedItem = { ...item };
+              formattedItem.citationTitle = formatCitation(item);
+
+              return formattedItem;
+            });
+            setItems(formattedResults);
+            finalResult = formattedResults.slice();
           } else {
             finalResult = offset > 0 ? [...collections, ...results] : results;
             setCollections(finalResult);
@@ -136,8 +201,6 @@ const ZoteroDataWrapper = (props) => {
         });
     }
   };
-
-  const allSearchPromises = [];
 
   const fetchSearch = (term, offset = 0) => {
     const finalUrl = `${urlSearch}${term}&start=${offset}`;
@@ -161,8 +224,14 @@ const ZoteroDataWrapper = (props) => {
             const finalResult =
               offset > 0 ? [...zoteroSearchResults, ...results] : results;
 
+            const formattedResults = finalResult.map((item) => {
+              const formattedItem = { ...item };
+              formattedItem.citationTitle = formatCitation(item);
+
+              return formattedItem;
+            });
             setLoading(false);
-            allSearchPromises.push(resolve(finalResult));
+            resolve(formattedResults);
           })
           .catch((error) => {
             setLoading(false);
@@ -194,7 +263,7 @@ const ZoteroDataWrapper = (props) => {
               ? [...openAireSearchResults, ...formattedResults]
               : formattedResults;
 
-          allSearchPromises.push(resolve(finalResult));
+          resolve(finalResult);
         })
         .catch((error) => {
           setLoading(false);
@@ -245,7 +314,6 @@ const ZoteroDataWrapper = (props) => {
         .then((response) => response.json())
         .then((results) => {
           const itemId = results.success[0];
-
           resolve(itemId);
         })
         .catch((error) => {
@@ -265,12 +333,16 @@ const ZoteroDataWrapper = (props) => {
     }
   };
 
-  const onChangeSearchTerm = (value) => {
-    const openairePublicationTitleUrl = `${openAireUrlBase}/publications/?title=${value}&format=json&size=20`;
+  const onChangeSearchTerm = (searchTerm) => {
+    const patt = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g);
+    const searchForDoi = patt.test(searchTerm);
+    const finalUrl = searchForDoi
+      ? `${openAireUrlBase}/publications/?doi=${searchTerm}&format=json&size=20`
+      : `${openAireUrlBase}/publications/?title=${searchTerm}&format=json&size=20`;
 
     Promise.all([
-      fetchSearch(value),
-      fetchAireSearch(openairePublicationTitleUrl, 'publications'),
+      fetchSearch(searchTerm),
+      fetchAireSearch(finalUrl, 'publications'),
     ]).then((values) => {
       const zoteroResults = values[0];
       const aireResults = values[1];
@@ -301,51 +373,6 @@ const ZoteroDataWrapper = (props) => {
     setShowResults(false);
   };
 
-  const formatCitation = (selectedItem) => {
-    const { data } = selectedItem;
-
-    const name = data.creators[0]
-      ? data.creators[0]?.lastName && data.creators[0]?.firstName
-        ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
-        : data.creators[0]?.lastName
-        ? `${data.creators[0]?.lastName}`
-        : `${data.creators[0]?.firstName}`
-      : '';
-    const date = name
-      ? data.date
-        ? `, ${data.date}`
-        : ''
-      : data.date
-      ? ` ${data.date}`
-      : '';
-    const title =
-      date || name
-        ? data.title
-          ? `, ${data.title}`
-          : ''
-        : data.title
-        ? ` ${data.title}`
-        : '';
-    const publisher =
-      title || date || name
-        ? data.publisher
-          ? `, ${data.publisher}`
-          : ''
-        : data.publisher
-        ? ` ${data.publisher}`
-        : '';
-    const place =
-      publisher || title || date || name
-        ? data.place
-          ? `, ${data.place || ''}`
-          : ''
-        : data.place
-        ? ` ${data.place}`
-        : '';
-
-    return `${name}${date}${title}${publisher}${place}.`;
-  };
-
   const pushItem = (selectedItem) => {
     fetchItem(selectedItem.key);
     setSelectedItem(selectedItem);
@@ -367,8 +394,11 @@ const ZoteroDataWrapper = (props) => {
    * Will search for openAire based on received filters
    * @param {string[]} item
    */
-  const openAireCallback = (filterList, searchForDoi) => {
+  const openAireCallback = (filterList) => {
     const resultUrl = makeOpenAireUrlObj(filterList);
+    const patt = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g);
+    const searchForDoi = patt.test(searchTerm);
+
     const promises = resultUrl.map((url, index) => {
       const finalUrl = searchForDoi
         ? `${url}/?doi=${searchTerm}&format=json&size=20`
@@ -497,7 +527,7 @@ const ZoteroDataWrapper = (props) => {
       ></MasterDetailWidget>
       {collections.length === 15 ||
       items.length === 15 ||
-      (showResults && allSearchResults.length === 15) ? (
+      (showResults && allSearchResults.length > 15) ? (
         <Button primary onClick={handleLoadMore}>
           Load more
         </Button>

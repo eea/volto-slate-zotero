@@ -2,10 +2,9 @@
 
 import codeSVG from '@plone/volto/icons/code.svg';
 import React from 'react';
-import { FOOTNOTE } from 'volto-slate/constants';
 import FootnotesBlockEdit from './blocks/Footnote/FootnotesBlockEdit';
 import FootnotesBlockView from './blocks/Footnote/FootnotesBlockView';
-import { ZOTERO } from './constants';
+import { FOOTNOTE, ZOTERO } from './constants';
 import { withZotero } from './extensions';
 import { zotero_editor } from './reducers';
 import { zotero_settings } from './reducers';

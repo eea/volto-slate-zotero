@@ -1,7 +1,7 @@
 import { makeInlineElementPlugin } from 'volto-slate/components/ElementEditor';
 import { ZoteroEditorSchema } from './schema';
 import { withZotero } from './extensions';
-import { FOOTNOTE } from '../constants';
+import { ZOTERO } from '../constants';
 import { ZoteroElement } from './render';
 import { defineMessages } from 'react-intl'; // , defineMessages
 import tagSVG from '@plone/volto/icons/blog-entry.svg';
@@ -27,9 +27,9 @@ export default function install(config) {
   };
 
   const opts = {
-    pluginId: FOOTNOTE,
+    pluginId: ZOTERO,
     pluginEditor: ZoteroEditor,
-    elementType: FOOTNOTE,
+    elementType: ZOTERO,
     element: ZoteroElement,
     isInlineElement: true,
     editSchema: ZoteroEditorSchema,

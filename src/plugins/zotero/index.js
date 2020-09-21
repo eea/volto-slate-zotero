@@ -1,7 +1,4 @@
-import codeSVG from '@plone/volto/icons/code.svg';
-import FootnotesBlockEdit from './Blocks/Footnote/FootnotesBlockEdit';
-import FootnotesBlockView from './Blocks/Footnote/FootnotesBlockView';
-import { FOOTNOTE } from './constants';
+import { ZOTERO } from './constants';
 import installZoteroFootnoteEditor from './editor';
 import './less/editor.less';
 
@@ -11,26 +8,7 @@ import './less/editor.less';
  * configuration for all the blocks.
  */
 export default function install(config) {
-  config.blocks.blocksConfig.slateFootnotes = {
-    id: 'slateFootnotes',
-    title: 'Footnotes list',
-    icon: codeSVG,
-    group: 'text',
-    view: FootnotesBlockView,
-    edit: FootnotesBlockEdit,
-    restricted: false,
-    mostUsed: false,
-    blockHasOwnFocusManagement: false,
-    sidebarTab: 1,
-    security: {
-      addPermission: [],
-      view: [],
-    },
-  };
-
-  config.settings.footnotes = [...(config.settings.footnotes || []), FOOTNOTE];
-
+  config.settings.footnotes = [...(config.settings.footnotes || []), ZOTERO];
   config = installZoteroFootnoteEditor(config);
-
   return config;
 }

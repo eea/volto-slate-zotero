@@ -1,5 +1,4 @@
 import { SidebarPortal } from '@plone/volto/components';
-import { useFormStateContext } from '@plone/volto/components/manage/Form/FormContext';
 import React from 'react';
 import InlineForm from 'volto-slate/futurevolto/InlineForm';
 import FootnotesBlockView from './FootnotesBlockView';
@@ -10,12 +9,10 @@ import { FootnoteBlockSchema as schema } from './schema';
  * @param {object} props Contains the props received by any Edit component of a registered Volto block: `selected`, `block`, `data`, `onChangeBlock` etc.
  */
 const FootnotesBlockEdit = (props) => {
-  const { selected, block, data, onChangeBlock } = props;
-  const { contextData } = useFormStateContext();
-  const { formData } = contextData;
+  const { selected, block, data, onChangeBlock, properties } = props;
   return (
     <>
-      <FootnotesBlockView {...props} properties={formData} />
+      <FootnotesBlockView {...props} properties={properties} />
       <SidebarPortal selected={selected}>
         <InlineForm
           schema={schema}

@@ -1,4 +1,4 @@
-import { ZOTERO_SETTINGS } from './constants';
+import { ZOTERO_SETTINGS } from '../constants';
 
 export function getZoteroSettings() {
   return {

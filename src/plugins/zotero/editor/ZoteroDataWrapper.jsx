@@ -13,6 +13,22 @@ import MasterDetailWidget from './MasterDetailWidget';
 
 const openAireUrlBase = `https://api.openaire.eu/search`;
 
+const doiRegex = '(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![%"#? ])\\S)+)';
+const doi = (opts) => {
+  opts = opts || {};
+  return opts.exact
+    ? new RegExp('(?:^' + doiRegex + '$)')
+    : new RegExp('(?:' + doiRegex + ')', 'g');
+};
+const findDOI = (newStr) => {
+  if (!newStr) {
+    return;
+  }
+  const match = doi().exec(newStr);
+
+  return match ? match[0] : null;
+};
+
 const formatCitation = (selectedItem) => {
   const { data } = selectedItem;
 
@@ -335,10 +351,11 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const onChangeSearchTerm = (searchTerm) => {
-    const patt = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g);
-    const searchForDoi = patt.test(searchTerm);
+    // const patt = new RegExp(/\b(10[.][0-9]{4,}(?:[.][0-9]+)*)\b/g);
+    // const searchForDoi = patt.test(searchTerm);
+    const searchForDoi = findDOI(searchTerm);
     const finalUrl = searchForDoi
-      ? `${openAireUrlBase}/publications/?doi=${searchTerm}&format=json&size=20`
+      ? `${openAireUrlBase}/publications/?doi=${searchForDoi}&format=json&size=20`
       : `${openAireUrlBase}/publications/?title=${searchTerm}&format=json&size=20`;
 
     Promise.all([

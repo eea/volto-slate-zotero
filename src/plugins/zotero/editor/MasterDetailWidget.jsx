@@ -10,10 +10,10 @@ import {
   Label,
   Loader,
   Menu,
-  Tab
+  Tab,
 } from 'semantic-ui-react';
-import openairePNG from './images/openaire.png';
-import zoteroSVG from './images/zotero.svg';
+import openairePNG from '../images/openaire.png';
+import zoteroSVG from '../images/zotero.svg';
 
 const iconsObj = {
   zotero: zoteroSVG,

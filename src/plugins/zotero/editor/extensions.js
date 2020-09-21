@@ -1,17 +1,17 @@
-import { ZOTERO } from './constants';
+import { FOOTNOTE } from '../constants';
 import { nanoid } from 'volto-slate/utils';
 import { Transforms } from 'slate';
 
 export const withZotero = (editor) => {
-  const { isInline, normalizeNode } = editor;
+  const { normalizeNode, isInline } = editor;
 
   editor.isInline = (element) => {
-    return element.type === ZOTERO ? true : isInline(element);
+    return element.type === FOOTNOTE ? true : isInline(element);
   };
 
   editor.normalizeNode = (entry) => {
     const [node, path] = entry;
-    if (node.type === ZOTERO && !node.data?.uid) {
+    if (node.type === FOOTNOTE && !node.data?.uid) {
       Transforms.setNodes(
         editor,
         {
@@ -24,7 +24,6 @@ export const withZotero = (editor) => {
           at: path,
         },
       );
-      // console.log('set uid', node);
     }
     return normalizeNode(entry);
   };

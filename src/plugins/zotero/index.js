@@ -1,7 +1,6 @@
 import codeSVG from '@plone/volto/icons/code.svg';
-
-import FootnotesBlockView from './Blocks/Footnote/FootnotesBlockView';
 import FootnotesBlockEdit from './Blocks/Footnote/FootnotesBlockEdit';
+import FootnotesBlockView from './Blocks/Footnote/FootnotesBlockView';
 import { FOOTNOTE } from './constants';
 import installZoteroFootnoteEditor from './editor';
 import './less/editor.less';

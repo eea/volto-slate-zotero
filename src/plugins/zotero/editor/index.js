@@ -43,10 +43,10 @@ export default function install(config) {
 
   const { slate } = config.settings;
 
-  slate.toolbarButtons = [...(slate.toolbarButtons || []), 'footnote'];
+  slate.toolbarButtons = [...(slate.toolbarButtons || []), 'zotero'];
   slate.expandedToolbarButtons = [
     ...(slate.expandedToolbarButtons || []),
-    'footnote',
+    'zotero',
   ];
 
   // const PersistentHelper = (props) => <SidebarEditor {...props} {...opts} />;

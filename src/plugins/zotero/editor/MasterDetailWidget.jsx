@@ -10,7 +10,7 @@ import {
   Label,
   Loader,
   Menu,
-  Tab,
+  Tab
 } from 'semantic-ui-react';
 import openairePNG from '../images/openaire.png';
 import zoteroSVG from '../images/zotero.svg';
@@ -105,7 +105,22 @@ const makeList = (props, resultsType, handleClick, activeIndex) => (
           </li>
         ))
       ) : (
-        <li>No results...</li>
+        <li>
+          <p>No results, try one of the following:</p>
+          <p> * Reduce the number of words in the search</p>
+          <p>
+            {' '}
+            * Use the DOI if you know it (you may find the DOI via a Google
+            search)
+          </p>
+          <p> * Make sure there is no misspelling</p>
+          <p>
+            {' '}
+            * Browse the Zotero library manually If none of the above works,
+            then you have to add a new record in the Zotero library and after
+            that come back here to search again.
+          </p>
+        </li>
       )
     ) : null}
   </ul>
@@ -137,7 +152,8 @@ const panes = (
   {
     menuItem: (
       <Menu.Item key="all-tab">
-        All<Label>{props.allSearchResults.length}</Label>
+        All
+        <Label>{props.zoteroResultsNumber + props.openAireResultsNumber}</Label>
       </Menu.Item>
     ),
     render: () => (
@@ -155,7 +171,7 @@ const panes = (
   {
     menuItem: (
       <Menu.Item key="zotero-tab">
-        Zotero<Label>{props.zoteroSearchResults.length}</Label>
+        Zotero<Label>{props.zoteroResultsNumber}</Label>
       </Menu.Item>
     ),
     render: () => (
@@ -173,7 +189,7 @@ const panes = (
   {
     menuItem: (
       <Menu.Item key="openaire-tab">
-        OpenAire<Label>{props.openAireSearchResults.length}</Label>
+        OpenAire<Label>{props.openAireResultsNumber}</Label>
       </Menu.Item>
     ),
     render: () => (
@@ -222,10 +238,15 @@ const MasterDetailWidget = (props) => {
   const [listAllIndex, setAllListIndex] = useState(-1);
   const [listZoteroIndex, setZoteroListIndex] = useState(-1);
   const [listOpenAireIndex, setListOpenAireIndex] = useState(-1);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleAllIndexClick = (index) => {
     const newIndex = listAllIndex === index ? -1 : index;
     setAllListIndex(newIndex);
+  };
+  const handleTabChange = (e, { activeIndex }) => {
+    props.setActiveTabIndex(activeIndex);
+    setActiveIndex(activeIndex);
   };
 
   const handleZoteroIndexClick = (index) => {
@@ -270,8 +291,11 @@ const MasterDetailWidget = (props) => {
   };
 
   const onChange = (ev) => {
-    ev.preventDefault();
     setSearchTerm(ev.target.value);
+  };
+
+  const onKeyPress = (ev, data) => {
+    if (ev.key === 'Enter') handleInput(ev);
   };
 
   const collectionsList = () => (
@@ -359,7 +383,22 @@ const MasterDetailWidget = (props) => {
             </li>
           ))
         ) : (
-          <li>No results...</li>
+          <li>
+            <p>No results, try one of the following:</p>
+            <p> * Reduce the number of words in the search</p>
+            <p>
+              {' '}
+              * Use the DOI if you know it (you may find the DOI via a Google
+              search)
+            </p>
+            <p> * Make sure there is no misspelling</p>
+            <p>
+              {' '}
+              * Browse the Zotero library manually If none of the above works,
+              then you have to add a new record in the Zotero library and after
+              that come back here to search again.
+            </p>
+          </li>
         )
       ) : null}
     </ul>
@@ -367,6 +406,8 @@ const MasterDetailWidget = (props) => {
 
   const searchResultsList = () => (
     <Tab
+      activeIndex={activeIndex}
+      onTabChange={handleTabChange}
       panes={panes(
         props,
         handleAllIndexClick,
@@ -411,10 +452,9 @@ const MasterDetailWidget = (props) => {
                 onClick: handleInput,
               }}
               placeholder="Search..."
+              onKeyPress={onKeyPress}
               onChange={onChange}
             />
-            {/* <Input fluid icon="search" placeholder="Search. ff.." /> */}
-
             <div className="vertical divider" />
           </header>
 

@@ -126,7 +126,7 @@ const makeList = (props, resultsType, handleClick, activeIndex) => (
   </ul>
 );
 
-let openAireFilterList = ['publications'];
+let openAireFilterList = ['publications', 'rsd'];
 
 const makeOpenAireFilterList = (item) => {
   const itemIndex = openAireFilterList.indexOf(item);

@@ -27,6 +27,7 @@ export default function install(config) {
   };
 
   const opts = {
+    title: 'Citation',
     pluginId: ZOTERO,
     pluginEditor: ZoteroEditor,
     elementType: ZOTERO,

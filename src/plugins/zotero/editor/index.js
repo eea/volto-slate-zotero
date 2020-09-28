@@ -1,11 +1,11 @@
-import { makeInlineElementPlugin } from 'volto-slate/components/ElementEditor';
-import { ZoteroEditorSchema } from './schema';
-import { withZotero } from './extensions';
-import { ZOTERO } from '../constants';
-import { ZoteroElement } from './render';
-import { defineMessages } from 'react-intl'; // , defineMessages
 import tagSVG from '@plone/volto/icons/blog-entry.svg';
+import { defineMessages } from 'react-intl'; // , defineMessages
+import { makeInlineElementPlugin } from 'volto-slate/components/ElementEditor';
+import { FootnoteElement } from '../../../../../volto-slate-footnote/src/editor/render';
+import { ZOTERO } from '../constants';
+import { withZotero } from './extensions';
 import { zotero_editor, zotero_settings } from './reducers';
+import { ZoteroEditorSchema } from './schema';
 import ZoteroEditor from './ZoteroEditor';
 
 const messages = defineMessages({
@@ -30,7 +30,7 @@ export default function install(config) {
     pluginId: ZOTERO,
     pluginEditor: ZoteroEditor,
     elementType: ZOTERO,
-    element: ZoteroElement,
+    element: FootnoteElement,
     isInlineElement: true,
     editSchema: ZoteroEditorSchema,
     extensions: [withZotero],
@@ -48,10 +48,6 @@ export default function install(config) {
     ...(slate.expandedToolbarButtons || []),
     'zotero',
   ];
-
-  // const PersistentHelper = (props) => <SidebarEditor {...props} {...opts} />;
-
-  // slate.persistentHelpers.push(PersistentHelper);
 
   return config;
 }

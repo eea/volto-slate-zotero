@@ -18,7 +18,7 @@ export const formatCitation = (selectedItem) => {
   const { data } = selectedItem;
   const result = [];
 
-  const name = data.creators[0]
+  const name = data?.creators?.[0]
     ? data.creators[0]?.lastName && data.creators[0]?.firstName
       ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
       : data.creators[0]?.lastName

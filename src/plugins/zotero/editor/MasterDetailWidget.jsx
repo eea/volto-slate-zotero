@@ -10,7 +10,7 @@ import {
   Label,
   Loader,
   Menu,
-  Tab
+  Tab,
 } from 'semantic-ui-react';
 import openairePNG from '../images/openaire.png';
 import zoteroSVG from '../images/zotero.svg';
@@ -342,7 +342,7 @@ const MasterDetailWidget = (props) => {
                 <Card fluid>
                   <Card.Content>
                     <Card.Description>
-                      {item.data.title.slice(0, 50)}
+                      {item.data.title?.slice(0, 50) || ''}
                       <Button
                         circular
                         color="twitter"

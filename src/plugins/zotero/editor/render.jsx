@@ -21,7 +21,11 @@ export const ZoteroElement = ({ attributes, children, element, mode }) => {
         >
           <Popup
             position="bottom left"
-            trigger={<span {...attributes}>{children}</span>}
+            trigger={
+              <span {...attributes} className="citation-indice">
+                {children}
+              </span>
+            }
           >
             <Popup.Content>
               <div

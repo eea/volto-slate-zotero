@@ -1,25 +1,24 @@
 import { isEqual } from 'lodash';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { ReactEditor, useSlate } from 'slate-react';
-import { EDITOR } from './constants';
-import { ZoteroSchema } from './schema';
-import {
-  getActiveZotero,
-  insertZotero,
-  isActiveZotero,
-  unwrapZotero
-} from './utils';
+import { ReactEditor } from 'slate-react';
+import { EDITOR } from '../constants';
+import { ZoteroEditorSchema } from './schema';
 import ZoteroDataWrapper from './ZoteroDataWrapper';
 
 export default (props) => {
   const dispatch = useDispatch();
-  const editor = useSlate();
   const [formData, setFormData] = React.useState({});
-
-  const active = getActiveZotero(editor);
+  const {
+    editor,
+    getActiveElement,
+    isActiveElement,
+    insertElement,
+    unwrapElement,
+  } = props;
+  const active = getActiveElement(editor);
   const [zoteroNode] = active;
-  const isZotero = isActiveZotero(editor);
+  const isZotero = isActiveElement(editor);
 
   // Update the form data based on the current zotero
   const zoteroRef = React.useRef(null);
@@ -35,9 +34,9 @@ export default (props) => {
   const saveDataToEditor = React.useCallback(
     (formData) => {
       if (formData.footnote) {
-        insertZotero(editor, formData);
+        insertElement(editor, formData);
       } else {
-        unwrapZotero(editor);
+        unwrapElement(editor);
       }
     },
     [editor],
@@ -45,8 +44,8 @@ export default (props) => {
 
   return (
     <ZoteroDataWrapper
-      title={ZoteroSchema.title}
-      schema={ZoteroSchema}
+      title={ZoteroEditorSchema.title}
+      schema={ZoteroEditorSchema}
       formData={formData}
       submitHandler={(newFormData) => {
         saveDataToEditor(newFormData);

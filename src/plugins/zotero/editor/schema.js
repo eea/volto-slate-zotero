@@ -1,4 +1,4 @@
-export const ZoteroSchema = {
+export const ZoteroEditorSchema = {
   title: 'Zotero citation',
   fieldsets: [
     {

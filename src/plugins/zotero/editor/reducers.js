@@ -1,5 +1,5 @@
-import { EDITOR } from './constants';
-import { ZOTERO_SETTINGS } from './constants';
+import { EDITOR } from '../constants';
+import { ZOTERO_SETTINGS } from '../constants';
 
 const initialState = {};
 const zoteroSettings = {

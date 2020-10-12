@@ -2,7 +2,7 @@ import { isEqual } from 'lodash';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { ReactEditor } from 'slate-react';
-import { EDITOR } from '../constants';
+import { setPluginOptions } from 'volto-slate/actions';
 import { ZoteroEditorSchema } from './schema';
 import ZoteroDataWrapper from './ZoteroDataWrapper';
 
@@ -13,6 +13,7 @@ export default (props) => {
     editor,
     getActiveElement,
     isActiveElement,
+    pluginId,
     insertElement,
     unwrapElement,
   } = props;
@@ -49,11 +50,11 @@ export default (props) => {
       formData={formData}
       submitHandler={(newFormData) => {
         saveDataToEditor(newFormData);
-        dispatch({ type: EDITOR, show: false });
+        dispatch(setPluginOptions(pluginId, { show_sidebar_editor: false }));
         ReactEditor.focus(editor);
       }}
       clearHandler={() => {
-        dispatch({ type: EDITOR, show: false });
+        dispatch(setPluginOptions(pluginId, { show_sidebar_editor: false }));
         setFormData({});
         ReactEditor.focus(editor);
       }}

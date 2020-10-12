@@ -334,10 +334,19 @@ const MasterDetailWidget = (props) => {
                 className="list-button-md"
                 onClick={(ev) => {
                   ev.preventDefault();
-                  handleItemIndexClick(index);
+                  const callbackAction = isNaN(item.meta.numCollections)
+                    ? handleItemIndexClick
+                    : pushCollection;
+                  // handleItemIndexClick(index);
+                  // return pushCollection(index);
+                  console.log('item', item);
+                  callbackAction(index);
                 }}
               >
                 {item.citationTitle}
+                {isNaN(item.meta.numCollections) ? null : (
+                  <Icon name={rightArrowSVG} size="24px" />
+                )}
               </button>
 
               {listItemIndex === index ? (

@@ -36,6 +36,31 @@ export function fetchZoteroCollections(zoteroUrlBase, headers) {
       .catch((error) => dispatch(setZoteroCollectionsFail(error)));
   };
 }
+export function fetchZoteroSubCollections(zoteroUrlBase, headers) {
+  return (dispatch) => {
+    dispatch(setZoteroSubCollectionsPending());
+    return fetch(zoteroUrlBase, {
+      method: 'GET',
+      headers,
+    })
+      .then((response) => {
+        const totalResults = parseInt(
+          response.headers.get('Total-Results'),
+          10,
+        );
+        return new Promise((resolve, reject) => {
+          response
+            .json()
+            .then((results) => resolve({ results, totalResults }))
+            .catch((error) => reject(error));
+        });
+      })
+      .then((data) => {
+        return dispatch(setZoteroSubCollectionsSuccess(data));
+      })
+      .catch((error) => dispatch(setZoteroSubCollectionsFail(error)));
+  };
+}
 
 export function fetchZoteroItems(zoteroUrlBase, headers) {
   return (dispatch) => {
@@ -132,6 +157,26 @@ function setZoteroCollectionsSuccess(data) {
 function setZoteroCollectionsFail(data) {
   return {
     type: 'ZOTERO_COLLECTIONS_FAIL',
+    result: data,
+  };
+}
+function setZoteroSubCollectionsPending(data) {
+  return {
+    type: 'ZOTERO_SUB_COLLECTIONS_PENDING',
+    result: data,
+  };
+}
+
+function setZoteroSubCollectionsSuccess(data) {
+  return {
+    type: 'ZOTERO_SUB_COLLECTIONS_SUCCESS',
+    result: data,
+  };
+}
+
+function setZoteroSubCollectionsFail(data) {
+  return {
+    type: 'ZOTERO_SUB_COLLECTIONS_FAIL',
     result: data,
   };
 }

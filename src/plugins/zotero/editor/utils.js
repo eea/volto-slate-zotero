@@ -33,6 +33,8 @@ export const formatCitation = (selectedItem) => {
     ? ` ${data.title.slice(0, 40)}`
     : data.nameOfAct
     ? ` ${data.nameOfAct}`
+    : data.name
+    ? ` ${data.name}`
     : null;
   const publicationTitle = data.publicationTitle
     ? ` ${data.publicationTitle}`

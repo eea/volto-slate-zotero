@@ -10,7 +10,7 @@ import {
   Label,
   Loader,
   Menu,
-  Tab,
+  Tab
 } from 'semantic-ui-react';
 import openairePNG from '../images/openaire.png';
 import zoteroSVG from '../images/zotero.svg';
@@ -301,6 +301,8 @@ const MasterDetailWidget = (props) => {
     if (ev.key === 'Enter') handleInput(ev);
   };
 
+  console.log('props.items', props.items);
+
   const collectionsList = () => (
     <ul>
       {!props.loading
@@ -358,27 +360,33 @@ const MasterDetailWidget = (props) => {
                       <span className="result-type"> . </span>
                       <span className="result-type">
                         {' '}
-                        {item.data.itemType} . {item.data.date}{' '}
+                        {item.data?.itemType} . {item.data?.date}{' '}
                       </span>
                     </Card.Meta>
                     <Card.Meta>
                       <span>
-                        Author: {item.data.creators[0]?.firstName}{' '}
-                        {item.data.creators[0]?.lastName}{' '}
+                        Author:{' '}
+                        {item.data.creators
+                          ? item.data.creators[0]
+                            ? item.data.creators[0].name
+                              ? item.data.creators[0].name
+                              : `${item.data.creators[0].firstName} ${item.data.creators[0]?.lastName}`
+                            : null
+                          : null}{' '}
                       </span>
                     </Card.Meta>
                     <Card.Description>
                       <a
-                        href={`https://dx.doi.org/${item.data.DOI}`}
+                        href={`https://dx.doi.org/${item.data?.DOI}`}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        DOI: {item.data.DOI}
+                        DOI: {item.data?.DOI}
                       </a>
                     </Card.Description>
-                    <Card.Description>ISBN: {item.data.ISBN}</Card.Description>
+                    <Card.Description>ISBN: {item.data?.ISBN}</Card.Description>
                     <Card.Description>
-                      Publisher: {item.data.publicationTitle}
+                      Publisher: {item.data?.publicationTitle}
                     </Card.Description>
                   </Card.Content>
                 </Card>

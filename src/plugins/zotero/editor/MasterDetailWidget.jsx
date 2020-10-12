@@ -153,7 +153,10 @@ const panes = (
     menuItem: (
       <Menu.Item key="all-tab">
         All
-        <Label>{props.zoteroResultsNumber + props.openAireResultsNumber}</Label>
+        <Label>
+          {props.zoteroSearchItemsTotalResultsNumber +
+            props.openAireTotalResultsNumber}
+        </Label>
       </Menu.Item>
     ),
     render: () => (
@@ -171,7 +174,7 @@ const panes = (
   {
     menuItem: (
       <Menu.Item key="zotero-tab">
-        Zotero<Label>{props.zoteroResultsNumber}</Label>
+        Zotero<Label>{props.zoteroSearchItemsTotalResultsNumber}</Label>
       </Menu.Item>
     ),
     render: () => (
@@ -189,15 +192,15 @@ const panes = (
   {
     menuItem: (
       <Menu.Item key="openaire-tab">
-        OpenAire<Label>{props.openAireResultsNumber}</Label>
+        OpenAire<Label>{props.openAireTotalResultsNumber}</Label>
       </Menu.Item>
     ),
     render: () => (
       <Tab.Pane>
-        <Button.Group basic size="small">
+        <Button.Group size="small">
           <Button
-            primary
-            active={openAireFilterList.indexOf('publications') > -1}
+            primary={openAireFilterList.indexOf('publications') > -1}
+            secondary={openAireFilterList.indexOf('publications') < 0}
             onClick={(ev) => {
               ev.preventDefault();
               makeOpenAireFilterList('publications');
@@ -207,8 +210,8 @@ const panes = (
             Publications
           </Button>
           <Button
-            primary
-            active={openAireFilterList.indexOf('rsd') > -1}
+            primary={openAireFilterList.indexOf('rsd') > -1}
+            secondary={openAireFilterList.indexOf('rsd') < 0}
             onClick={(ev) => {
               ev.preventDefault();
               makeOpenAireFilterList('rsd');

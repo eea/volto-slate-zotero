@@ -4,7 +4,15 @@ import { makeInlineElementPlugin } from 'volto-slate/components/ElementEditor';
 import { FootnoteElement } from '../../../../../volto-slate-footnote/src/editor/render';
 import { ZOTERO } from '../constants';
 import { withZotero } from './extensions';
-import { zotero_editor, zotero_settings } from './reducers';
+import {
+  openaire_items_pub,
+  openaire_items_rsd,
+  zotero_collections,
+  zotero_editor,
+  zotero_items,
+  zotero_search_items,
+  zotero_settings
+} from './reducers';
 import { ZoteroEditorSchema } from './schema';
 import ZoteroEditor from './ZoteroEditor';
 
@@ -24,6 +32,11 @@ export default function install(config) {
     ...config.addonReducers,
     zotero_editor,
     zotero_settings,
+    zotero_collections,
+    zotero_items,
+    openaire_items_pub,
+    openaire_items_rsd,
+    zotero_search_items,
   };
 
   const opts = {

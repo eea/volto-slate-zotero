@@ -9,9 +9,23 @@ export const findDOI = (newStr) => {
   if (!newStr) {
     return;
   }
-  const match = doi().exec(newStr);
+  // const match = doi().exec(newStr);
+  // console.log('doi match', match);
 
-  return match ? match[0] : null;
+  const words = newStr.split(' ');
+  const results = [];
+  words.forEach((word) => {
+    const match = doi().exec(word);
+
+    if (match) {
+      results.push(match[0]);
+    }
+  });
+
+  console.log('doi results', results);
+
+  return results;
+  // return match ? match[0] : null;
 };
 
 export const formatCitation = (selectedItem) => {

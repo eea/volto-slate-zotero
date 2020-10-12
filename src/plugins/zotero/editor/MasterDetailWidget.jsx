@@ -283,11 +283,6 @@ const MasterDetailWidget = (props) => {
     props.pushCollection(selectedCollection);
   };
 
-  const pushItem = (selectedItem) => {
-    setHideCollection(true);
-    props.pushItem(selectedItem);
-  };
-
   const handleInput = (ev) => {
     ev.preventDefault();
     props.onChangeSearchTerm(searchTerm);

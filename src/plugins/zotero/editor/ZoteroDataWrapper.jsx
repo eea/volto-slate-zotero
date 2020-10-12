@@ -235,6 +235,7 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const pushItem = (selectedItem) => {
+    fetchItem(selectedItem.key);
     setSelectedItem(selectedItem);
     setfootnoteTitle(formatCitation(selectedItem));
     setItemIdRef(selectedItem.key);

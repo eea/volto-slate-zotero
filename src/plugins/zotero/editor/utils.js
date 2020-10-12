@@ -17,20 +17,27 @@ export const findDOI = (newStr) => {
 export const formatCitation = (selectedItem) => {
   const { data } = selectedItem;
   const result = [];
-
-  const name = data.creators[0]
-    ? data.creators[0]?.lastName && data.creators[0]?.firstName
-      ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
-      : data.creators[0]?.lastName
-      ? `${data.creators[0]?.lastName}`
-      : `${data.creators[0]?.firstName}`
-    : '';
-  const date = data.date ? ` ${data.date}` : '';
-  const title = data.title ? ` ${data.title.slice(0, 40)}` : '';
+  const name = data.creators
+    ? data?.creators[0]
+      ? data?.creators[0].name
+        ? `${data.creators[0]?.name}`
+        : data.creators[0]?.lastName && data.creators[0]?.firstName
+        ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
+        : data.creators[0]?.lastName
+        ? `${data.creators[0]?.lastName}`
+        : `${data.creators[0]?.firstName}`
+      : null
+    : null;
+  const date = data.date ? ` ${data.date}` : null;
+  const title = data.title
+    ? ` ${data.title.slice(0, 40)}`
+    : data.nameOfAct
+    ? ` ${data.nameOfAct}`
+    : null;
   const publicationTitle = data.publicationTitle
     ? ` ${data.publicationTitle}`
-    : '';
-  const place = data.place ? ` ${data.place}` : '';
+    : null;
+  const place = data.place ? ` ${data.place}` : null;
   if (name) result.push(name);
   if (date) result.push(date);
   if (title) result.push(title);

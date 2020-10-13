@@ -34,13 +34,14 @@ const ZoteroDataWrapper = (props) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [collections, setCollections] = useState([]);
-  const [subCollections, setSubCollections] = useState([]);
+  const [topCollections, setTopCollections] = useState([]);
   const [items, setItems] = useState([]);
   const [composedItems, setComposedItems] = useState([]);
   const [allSearchResults, setAllSearchResults] = useState([]);
   const [zoteroSearchResults, setZoteroSearchResults] = useState([]);
   const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [topCollectionFlag, setTopCollectionFlag] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
   const [newFormData, setNewFormData] = useState({});
   const [formData, setFormData] = useState({});
@@ -62,10 +63,6 @@ const ZoteroDataWrapper = (props) => {
   const [
     zoteroItemsTotalResultsNumber,
     setZoteroItemsTotalResultsNumber,
-  ] = useState(0);
-  const [
-    zoteroSubCollectionsTotalResultsNumber,
-    setZoteroSubCollectionsTotalResultsNumber,
   ] = useState(0);
   const [
     zoteroCollectionsTotalResultsNumber,
@@ -104,14 +101,15 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const zoteroBaseUrl = zotero_settings?.server;
-  // const zoteroCollectionsUrl = `${zoteroBaseUrl}/collections/top?v=3`;
+  const zoteroCollectionsTopUrl = `${zoteroBaseUrl}/collections/top/`;
   const zoteroCollectionsUrl = `${zoteroBaseUrl}/collections/`;
   const zoteroSearchUrl = `${zoteroBaseUrl}/items?q=`;
 
   const fetchCollections = (offset = 0) => {
-    const finalUrl = `${zoteroCollectionsUrl}?start=${offset}&limit=10`;
+    const finalUrl = `${zoteroCollectionsTopUrl}?start=${offset}&limit=10`;
 
     setLoading(true);
+    setTopCollectionFlag(true);
     dispatch(fetchZoteroCollections(finalUrl, headers));
   };
 
@@ -124,7 +122,6 @@ const ZoteroDataWrapper = (props) => {
 
   const fetchSubCollections = (collectionId, offset = 0) => {
     const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10`;
-    console.log('fetchSubCollections', finalUrl);
 
     setLoading(true);
     dispatch(fetchZoteroSubCollections(finalUrl, headers));
@@ -240,16 +237,20 @@ const ZoteroDataWrapper = (props) => {
 
   const pull = () => {
     setSelectedCollection(null);
+    setCollections(topCollections);
   };
 
   const pushCollection = (selectedCollection) => {
     const selectedCol = collections[selectedCollection];
-    console.log('selectedCol.numCollections', selectedCol.meta.numCollections);
+
+    setZoteroSearchItemsOffset(0);
+    setZoteroItemsOffset(0);
+    setCollections([]);
+
     if (selectedCol.meta.numCollections > 0) {
       fetchSubCollections(selectedCol.key);
-      setSubCollections([]);
     }
-    setZoteroItemsOffset(0);
+
     fetchItems(collections[selectedCollection].key);
     setSelectedCollection(selectedCollection);
   };
@@ -306,13 +307,15 @@ const ZoteroDataWrapper = (props) => {
 
   useEffect(() => {
     if (zotero_collections) {
-      console.log(zotero_collections);
       let mergedResult =
         zoteroCollectionsOffset > 0
           ? [...collections, ...zotero_collections.results]
           : zotero_collections.results;
 
       setCollections(mergedResult);
+
+      if (topCollectionFlag) setTopCollections(mergedResult);
+
       setZoteroCollectionsTotalResultsNumber(zotero_collections.totalResults);
       setLoading(false);
     }
@@ -320,19 +323,16 @@ const ZoteroDataWrapper = (props) => {
 
   useEffect(() => {
     if (zotero_sub_collections) {
-      console.log('zotero_sub_collections', zotero_sub_collections);
-      let mergedResult =
-        zoteroCollectionsOffset > 0
-          ? [...subCollections, ...zotero_sub_collections.results]
-          : zotero_sub_collections.results;
-      const formattedResults = mergedResult.map((item) => {
+      const formattedResults = zotero_sub_collections.results.map((item) => {
         const formattedItem = { ...item };
         formattedItem.citationTitle = formatCitation(item);
 
         return formattedItem;
       });
-      setSubCollections(formattedResults);
-      setZoteroSubCollectionsTotalResultsNumber(
+
+      setTopCollectionFlag(false);
+      setCollections(formattedResults);
+      setZoteroCollectionsTotalResultsNumber(
         zotero_sub_collections.totalResults,
       );
       setComposedItems([...formattedResults, ...items]);
@@ -342,7 +342,6 @@ const ZoteroDataWrapper = (props) => {
 
   useEffect(() => {
     if (zotero_items) {
-      console.log('zotero_items', zotero_items);
       let mergedResult =
         zoteroItemsOffset > 0
           ? [...items, ...zotero_items.results]
@@ -356,7 +355,7 @@ const ZoteroDataWrapper = (props) => {
 
       setItems(formattedResults);
       setZoteroItemsTotalResultsNumber(zotero_items.totalResults);
-      setComposedItems([...subCollections, ...formattedResults]);
+      setComposedItems([...collections, ...formattedResults]);
       setLoading(false);
     }
   }, [zotero_items]);

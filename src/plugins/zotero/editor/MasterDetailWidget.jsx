@@ -283,11 +283,6 @@ const MasterDetailWidget = (props) => {
     props.pushCollection(selectedCollection);
   };
 
-  const pushItem = (selectedItem) => {
-    setHideCollection(true);
-    props.pushItem(selectedItem);
-  };
-
   const handleInput = (ev) => {
     ev.preventDefault();
     props.onChangeSearchTerm(searchTerm);
@@ -300,8 +295,6 @@ const MasterDetailWidget = (props) => {
   const onKeyPress = (ev, data) => {
     if (ev.key === 'Enter') handleInput(ev);
   };
-
-  console.log('props.items', props.items);
 
   const collectionsList = () => (
     <ul>
@@ -337,9 +330,6 @@ const MasterDetailWidget = (props) => {
                   const callbackAction = isNaN(item.meta.numCollections)
                     ? handleItemIndexClick
                     : pushCollection;
-                  // handleItemIndexClick(index);
-                  // return pushCollection(index);
-                  console.log('item', item);
                   callbackAction(index);
                 }}
               >
@@ -493,7 +483,8 @@ const MasterDetailWidget = (props) => {
               <Icon name={backSVG} size="30px" />
             </button>
             <div className="vertical divider" />
-            <h2>{props.collections[props.selectedCollection]?.data?.name}</h2>
+            {/* <h2>{props.collections[props.selectedCollection]?.data?.name}</h2> */}
+            <h2>Back to library</h2>
           </header>
           <div className="pastanaga-menu-list">
             {props.loading ? loaderComp : itemsList()}

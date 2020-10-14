@@ -5,7 +5,8 @@ import {
   ZOTERO_COLLECTIONS,
   ZOTERO_ITEMS,
   ZOTERO_SEARCH_ITEMS,
-  ZOTERO_SETTINGS
+  ZOTERO_SETTINGS,
+  ZOTERO_SUB_COLLECTIONS
 } from '../constants';
 
 const initialState = {};
@@ -131,6 +132,47 @@ export function zotero_collections(state = zoteroCollections, action = {}) {
         },
       };
     case `${ZOTERO_COLLECTIONS}_FAIL`:
+      return {
+        ...state,
+        api: null,
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: action.error,
+        },
+      };
+    default:
+      return state;
+  }
+}
+
+export function zotero_sub_collections(state = zoteroCollections, action = {}) {
+  // console.log('reducer zotero_sub_collections', action);
+  switch (action.type) {
+    case `${ZOTERO_SUB_COLLECTIONS}_PENDING`:
+      return {
+        ...state,
+        api: null,
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: null,
+        },
+      };
+    case `${ZOTERO_SUB_COLLECTIONS}_SUCCESS`:
+      // console.log('reducer zotero_sub_collections', action);
+
+      return {
+        ...state,
+        api: { ...action.result },
+        totalResults: action.result.totalResults,
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: null,
+        },
+      };
+    case `${ZOTERO_SUB_COLLECTIONS}_FAIL`:
       return {
         ...state,
         api: null,

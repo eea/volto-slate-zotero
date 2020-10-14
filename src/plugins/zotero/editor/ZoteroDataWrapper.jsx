@@ -267,6 +267,7 @@ const ZoteroDataWrapper = (props) => {
   const showCollections = () => {
     setActiveTabIndexS(-1);
     setShowResults(false);
+    pull();
   };
 
   const pushItem = (selectedItem) => {
@@ -281,6 +282,7 @@ const ZoteroDataWrapper = (props) => {
     setfootnoteTitle(formatCitation(selectedItem));
 
     if (!selectedItem.isOpenAire) {
+      fetchItem(selectedItem.key);
       setItemIdRef(selectedItem.key);
     }
   };

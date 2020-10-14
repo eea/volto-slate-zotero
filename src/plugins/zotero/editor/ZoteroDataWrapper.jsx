@@ -33,6 +33,7 @@ const ZoteroDataWrapper = (props) => {
   const [itemIdRef, setItemIdRef] = useState(props.formData?.zoteroId);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [hasMultipleDOIs, setHasMultipleDOIs] = useState(false);
   const [collections, setCollections] = useState([]);
   const [topCollections, setTopCollections] = useState([]);
   const [items, setItems] = useState([]);
@@ -143,15 +144,21 @@ const ZoteroDataWrapper = (props) => {
     const filters = ['publications', 'rsd'];
     const resultUrl = makeOpenAireUrlObj(filters);
     const searchForDoi = findDOI(term);
-    const finalUrl = searchForDoi
-      ? `${resultUrl[0]}/?doi=${searchForDoi}&format=json&size=20&page=${openAirePage}`
-      : `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
-    const finalUrl1 = searchForDoi
-      ? `${resultUrl[1]}/?doi=${searchForDoi}&format=json&size=20&page=${openAirePage}`
-      : `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
 
-    dispatch(fetchOpenairePubSearchItems(finalUrl));
-    dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+    if (searchForDoi.length > 0) {
+      searchForDoi.forEach((doi) => {
+        setHasMultipleDOIs(true);
+        const finalUrl = `${resultUrl[0]}/?doi=${doi}&format=json`;
+        const finalUrl1 = `${resultUrl[1]}/?doi=${doi}&format=json`;
+        dispatch(fetchOpenairePubSearchItems(finalUrl));
+        dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+      });
+    } else {
+      const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      dispatch(fetchOpenairePubSearchItems(finalUrl));
+      dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+    }
   };
 
   const fetchItem = (zoteroId) => {
@@ -200,6 +207,7 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const handleLoadMore = () => {
+    setHasMultipleDOIs(false);
     if (showResults) {
       switch (activeTabIndexS) {
         case 0:
@@ -230,6 +238,7 @@ const ZoteroDataWrapper = (props) => {
     setSearchTerm(searchTerm);
     setZoteroSearchItemsOffset(0);
     setOpenAirePage(1);
+    setHasMultipleDOIs(false);
 
     fetchZoteroSearch(searchTerm);
     fetchAireSearch(searchTerm);
@@ -393,6 +402,8 @@ const ZoteroDataWrapper = (props) => {
       const publicationRestuls =
         openAirePage > 1
           ? [...openAirePublicationResults, ...formattedResults]
+          : hasMultipleDOIs
+          ? [...openAirePublicationResults, ...formattedResults]
           : formattedResults;
 
       const uniquePublicationRestuls = publicationRestuls.filter((result) => {
@@ -426,6 +437,8 @@ const ZoteroDataWrapper = (props) => {
       );
       const rsdRestuls =
         openAirePage > 1
+          ? [...openAireDataResults, ...formattedResults]
+          : hasMultipleDOIs
           ? [...openAireDataResults, ...formattedResults]
           : formattedResults;
       const uniqueRsdRestuls = rsdRestuls.filter((result) => {
@@ -562,11 +575,11 @@ const ZoteroDataWrapper = (props) => {
             Load more
           </Button>
         ) : null
-      ) : (
+      ) : allSearchResults.length < openAireTotalResultsNumber ? (
         <Button primary onClick={handleLoadMore}>
           Load more
         </Button>
-      )}
+      ) : null}
     </div>
   );
 };

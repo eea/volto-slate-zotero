@@ -11,7 +11,8 @@ import {
   zotero_editor,
   zotero_items,
   zotero_search_items,
-  zotero_settings
+  zotero_settings,
+  zotero_sub_collections
 } from './reducers';
 import { ZoteroEditorSchema } from './schema';
 import ZoteroEditor from './ZoteroEditor';
@@ -33,6 +34,7 @@ export default function install(config) {
     zotero_editor,
     zotero_settings,
     zotero_collections,
+    zotero_sub_collections,
     zotero_items,
     openaire_items_pub,
     openaire_items_rsd,

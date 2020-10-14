@@ -12,6 +12,7 @@ import {
   fetchZoteroCollections,
   fetchZoteroItems,
   fetchZoteroSearchItems,
+  fetchZoteroSubCollections,
   getZoteroSettings
 } from './actions';
 import InlineForm from './InlineForm';
@@ -32,12 +33,16 @@ const ZoteroDataWrapper = (props) => {
   const [itemIdRef, setItemIdRef] = useState(props.formData?.zoteroId);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [hasMultipleDOIs, setHasMultipleDOIs] = useState(false);
   const [collections, setCollections] = useState([]);
+  const [topCollections, setTopCollections] = useState([]);
   const [items, setItems] = useState([]);
+  const [composedItems, setComposedItems] = useState([]);
   const [allSearchResults, setAllSearchResults] = useState([]);
   const [zoteroSearchResults, setZoteroSearchResults] = useState([]);
   const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [topCollectionFlag, setTopCollectionFlag] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
   const [newFormData, setNewFormData] = useState({});
   const [formData, setFormData] = useState({});
@@ -78,6 +83,9 @@ const ZoteroDataWrapper = (props) => {
   const zotero_collections = useSelector(
     (state) => state?.zotero_collections?.api,
   );
+  const zotero_sub_collections = useSelector(
+    (state) => state?.zotero_sub_collections?.api,
+  );
   const zotero_items = useSelector((state) => state?.zotero_items?.api);
   const openaire_items_pub = useSelector((state) => state?.openaire_items_pub);
   const openaire_items_rsd = useSelector((state) => state?.openaire_items_rsd);
@@ -94,13 +102,15 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const zoteroBaseUrl = zotero_settings?.server;
+  const zoteroCollectionsTopUrl = `${zoteroBaseUrl}/collections/top/`;
   const zoteroCollectionsUrl = `${zoteroBaseUrl}/collections/`;
   const zoteroSearchUrl = `${zoteroBaseUrl}/items?q=`;
 
   const fetchCollections = (offset = 0) => {
-    const finalUrl = `${zoteroCollectionsUrl}?start=${offset}&limit=10`;
+    const finalUrl = `${zoteroCollectionsTopUrl}?start=${offset}&limit=10`;
 
     setLoading(true);
+    setTopCollectionFlag(true);
     dispatch(fetchZoteroCollections(finalUrl, headers));
   };
 
@@ -111,7 +121,14 @@ const ZoteroDataWrapper = (props) => {
     dispatch(fetchZoteroItems(finalUrl, headers));
   };
 
-  const fetchSearch = (term, offset = 0) => {
+  const fetchSubCollections = (collectionId, offset = 0) => {
+    const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10`;
+
+    setLoading(true);
+    dispatch(fetchZoteroSubCollections(finalUrl, headers));
+  };
+
+  const fetchZoteroSearch = (term, offset = 0) => {
     const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}`;
 
     setLoading(true);
@@ -127,15 +144,21 @@ const ZoteroDataWrapper = (props) => {
     const filters = ['publications', 'rsd'];
     const resultUrl = makeOpenAireUrlObj(filters);
     const searchForDoi = findDOI(term);
-    const finalUrl = searchForDoi
-      ? `${resultUrl[0]}/?doi=${searchForDoi}&format=json&size=20&page=${openAirePage}`
-      : `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
-    const finalUrl1 = searchForDoi
-      ? `${resultUrl[1]}/?doi=${searchForDoi}&format=json&size=20&page=${openAirePage}`
-      : `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
 
-    dispatch(fetchOpenairePubSearchItems(finalUrl));
-    dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+    if (searchForDoi.length > 0) {
+      searchForDoi.forEach((doi) => {
+        setHasMultipleDOIs(true);
+        const finalUrl = `${resultUrl[0]}/?doi=${doi}&format=json`;
+        const finalUrl1 = `${resultUrl[1]}/?doi=${doi}&format=json`;
+        dispatch(fetchOpenairePubSearchItems(finalUrl));
+        dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+      });
+    } else {
+      const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      dispatch(fetchOpenairePubSearchItems(finalUrl));
+      dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+    }
   };
 
   const fetchItem = (zoteroId) => {
@@ -184,15 +207,16 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const handleLoadMore = () => {
+    setHasMultipleDOIs(false);
     if (showResults) {
       switch (activeTabIndexS) {
         case 0:
           setOpenAirePage(openAirePage + 1);
-          fetchSearch(searchTerm, zoteroSearchResults.length);
+          fetchZoteroSearch(searchTerm, zoteroSearchResults.length);
           fetchAireSearch(searchTerm);
           break;
         case 1:
-          fetchSearch(searchTerm, zoteroSearchResults.length);
+          fetchZoteroSearch(searchTerm, zoteroSearchResults.length);
           break;
         case 2:
           setOpenAirePage(openAirePage + 1);
@@ -214,17 +238,28 @@ const ZoteroDataWrapper = (props) => {
     setSearchTerm(searchTerm);
     setZoteroSearchItemsOffset(0);
     setOpenAirePage(1);
+    setHasMultipleDOIs(false);
 
-    fetchSearch(searchTerm);
+    fetchZoteroSearch(searchTerm);
     fetchAireSearch(searchTerm);
   };
 
   const pull = () => {
     setSelectedCollection(null);
+    setCollections(topCollections);
   };
 
   const pushCollection = (selectedCollection) => {
+    const selectedCol = collections[selectedCollection];
+
+    setZoteroSearchItemsOffset(0);
     setZoteroItemsOffset(0);
+    setCollections([]);
+
+    if (selectedCol.meta.numCollections > 0) {
+      fetchSubCollections(selectedCol.key);
+    }
+
     fetchItems(collections[selectedCollection].key);
     setSelectedCollection(selectedCollection);
   };
@@ -232,6 +267,7 @@ const ZoteroDataWrapper = (props) => {
   const showCollections = () => {
     setActiveTabIndexS(-1);
     setShowResults(false);
+    pull();
   };
 
   const pushItem = (selectedItem) => {
@@ -246,6 +282,7 @@ const ZoteroDataWrapper = (props) => {
     setfootnoteTitle(formatCitation(selectedItem));
 
     if (!selectedItem.isOpenAire) {
+      fetchItem(selectedItem.key);
       setItemIdRef(selectedItem.key);
     }
   };
@@ -287,10 +324,32 @@ const ZoteroDataWrapper = (props) => {
           : zotero_collections.results;
 
       setCollections(mergedResult);
+
+      if (topCollectionFlag) setTopCollections(mergedResult);
+
       setZoteroCollectionsTotalResultsNumber(zotero_collections.totalResults);
       setLoading(false);
     }
   }, [zotero_collections]);
+
+  useEffect(() => {
+    if (zotero_sub_collections) {
+      const formattedResults = zotero_sub_collections.results.map((item) => {
+        const formattedItem = { ...item };
+        formattedItem.citationTitle = formatCitation(item);
+
+        return formattedItem;
+      });
+
+      setTopCollectionFlag(false);
+      setCollections(formattedResults);
+      setZoteroCollectionsTotalResultsNumber(
+        zotero_sub_collections.totalResults,
+      );
+      setComposedItems([...formattedResults, ...items]);
+      setLoading(false);
+    }
+  }, [zotero_sub_collections]);
 
   useEffect(() => {
     if (zotero_items) {
@@ -307,6 +366,7 @@ const ZoteroDataWrapper = (props) => {
 
       setItems(formattedResults);
       setZoteroItemsTotalResultsNumber(zotero_items.totalResults);
+      setComposedItems([...collections, ...formattedResults]);
       setLoading(false);
     }
   }, [zotero_items]);
@@ -344,6 +404,8 @@ const ZoteroDataWrapper = (props) => {
       const publicationRestuls =
         openAirePage > 1
           ? [...openAirePublicationResults, ...formattedResults]
+          : hasMultipleDOIs
+          ? [...openAirePublicationResults, ...formattedResults]
           : formattedResults;
 
       const uniquePublicationRestuls = publicationRestuls.filter((result) => {
@@ -377,6 +439,8 @@ const ZoteroDataWrapper = (props) => {
       );
       const rsdRestuls =
         openAirePage > 1
+          ? [...openAireDataResults, ...formattedResults]
+          : hasMultipleDOIs
           ? [...openAireDataResults, ...formattedResults]
           : formattedResults;
       const uniqueRsdRestuls = rsdRestuls.filter((result) => {
@@ -483,7 +547,7 @@ const ZoteroDataWrapper = (props) => {
         pull={pull}
         pushCollection={pushCollection}
         pushItem={pushItem}
-        items={items}
+        items={composedItems}
         collections={collections}
         loading={loading}
         selectedCollection={selectedCollection}
@@ -513,11 +577,11 @@ const ZoteroDataWrapper = (props) => {
             Load more
           </Button>
         ) : null
-      ) : (
+      ) : allSearchResults.length < openAireTotalResultsNumber ? (
         <Button primary onClick={handleLoadMore}>
           Load more
         </Button>
-      )}
+      ) : null}
     </div>
   );
 };

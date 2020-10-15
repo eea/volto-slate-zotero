@@ -32,7 +32,7 @@ const ZoteroDataWrapper = (props) => {
   );
   const [itemIdRef, setItemIdRef] = useState(props.formData?.zoteroId);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const [hasMultipleDOIs, setHasMultipleDOIs] = useState(false);
   const [collections, setCollections] = useState([]);
   const [topCollections, setTopCollections] = useState([]);
@@ -69,6 +69,10 @@ const ZoteroDataWrapper = (props) => {
     zoteroCollectionsTotalResultsNumber,
     setZoteroCollectionsTotalResultsNumber,
   ] = useState(0);
+  const [
+    zoteroTopCollectionsTotalResultsNumber,
+    setZoteroTopCollectionsTotalResultsNumber,
+  ] = useState(0);
   const [zoteroItemsOffset, setZoteroItemsOffset] = useState(0);
   const [zoteroSearchItemsOffset, setZoteroSearchItemsOffset] = useState(0);
   const [zoteroCollectionsOffset, setZoteroCollectionsOffset] = useState(0);
@@ -100,14 +104,13 @@ const ZoteroDataWrapper = (props) => {
     Authorization: 'Bearer ' + zotero_settings?.password,
     'Content-Type': 'application/json',
   };
-
   const zoteroBaseUrl = zotero_settings?.server;
   const zoteroCollectionsTopUrl = `${zoteroBaseUrl}/collections/top/`;
   const zoteroCollectionsUrl = `${zoteroBaseUrl}/collections/`;
   const zoteroSearchUrl = `${zoteroBaseUrl}/items?q=`;
 
   const fetchCollections = (offset = 0) => {
-    const finalUrl = `${zoteroCollectionsTopUrl}?start=${offset}&limit=10`;
+    const finalUrl = `${zoteroCollectionsTopUrl}?start=${offset}&limit=10&sort=title`;
 
     setLoading(true);
     setTopCollectionFlag(true);
@@ -115,31 +118,31 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const fetchItems = (collectionId, offset = 0) => {
-    const finalUrl = `${zoteroCollectionsUrl}${collectionId}/items/?start=${offset}&limit=10`;
+    const finalUrl = `${zoteroCollectionsUrl}${collectionId}/items/?start=${offset}&limit=10&sort=title`;
 
     setLoading(true);
     dispatch(fetchZoteroItems(finalUrl, headers));
   };
 
   const fetchSubCollections = (collectionId, offset = 0) => {
-    const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10`;
+    const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10&sort=title`;
 
     setLoading(true);
     dispatch(fetchZoteroSubCollections(finalUrl, headers));
   };
 
   const fetchZoteroSearch = (term, offset = 0) => {
-    const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}`;
+    const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}&sort=title`;
 
     setLoading(true);
-    setShowResults(true);
+    setShowSearchResults(true);
     setZoteroSearchItemsOffset(offset);
     dispatch(fetchZoteroSearchItems(finalUrl, headers));
   };
 
   const fetchAireSearch = (term = searchTerm) => {
     setLoading(true);
-    setShowResults(true);
+    setShowSearchResults(true);
 
     const filters = ['publications', 'rsd'];
     const resultUrl = makeOpenAireUrlObj(filters);
@@ -207,8 +210,9 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const handleLoadMore = () => {
+    // load search rezults
     setHasMultipleDOIs(false);
-    if (showResults) {
+    if (showSearchResults) {
       switch (activeTabIndexS) {
         case 0:
           setOpenAirePage(openAirePage + 1);
@@ -225,12 +229,20 @@ const ZoteroDataWrapper = (props) => {
         default:
           break;
       }
-    } else if (selectedCollection === null) {
+    }
+    // load more collections and items
+    else {
       setZoteroCollectionsOffset(collections.length);
-      fetchCollections(collections.length);
-    } else {
       setZoteroItemsOffset(items.length);
-      fetchItems(collections[selectedCollection].key, items.length);
+
+      if (topCollectionFlag) {
+        // load more top collections
+        fetchCollections(collections.length);
+      } else {
+        // load more sub-collections and items
+        fetchSubCollections(selectedCollection, collections.length);
+        fetchItems(selectedCollection, items.length);
+      }
     }
   };
 
@@ -246,27 +258,33 @@ const ZoteroDataWrapper = (props) => {
 
   const pull = () => {
     setSelectedCollection(null);
+    setTopCollectionFlag(true);
     setCollections(topCollections);
+    setZoteroCollectionsTotalResultsNumber(
+      zoteroTopCollectionsTotalResultsNumber,
+    );
   };
 
-  const pushCollection = (selectedCollection) => {
-    const selectedCol = collections[selectedCollection];
+  const pushCollection = (selectedCollectionIndex) => {
+    const selectedCol = collections[selectedCollectionIndex];
 
     setZoteroSearchItemsOffset(0);
     setZoteroItemsOffset(0);
     setCollections([]);
+    setZoteroCollectionsTotalResultsNumber(0);
+    setTopCollectionFlag(false);
 
     if (selectedCol.meta.numCollections > 0) {
       fetchSubCollections(selectedCol.key);
     }
 
-    fetchItems(collections[selectedCollection].key);
-    setSelectedCollection(selectedCollection);
+    fetchItems(selectedCol.key);
+    setSelectedCollection(selectedCol.key);
   };
 
   const showCollections = () => {
     setActiveTabIndexS(-1);
-    setShowResults(false);
+    setShowSearchResults(false);
     pull();
   };
 
@@ -328,20 +346,26 @@ const ZoteroDataWrapper = (props) => {
       if (topCollectionFlag) setTopCollections(mergedResult);
 
       setZoteroCollectionsTotalResultsNumber(zotero_collections.totalResults);
+      setZoteroTopCollectionsTotalResultsNumber(
+        zotero_collections.totalResults,
+      );
       setLoading(false);
     }
   }, [zotero_collections]);
 
   useEffect(() => {
     if (zotero_sub_collections) {
-      const formattedResults = zotero_sub_collections.results.map((item) => {
+      let mergedResult =
+        zoteroCollectionsOffset > 0
+          ? [...collections, ...zotero_sub_collections.results]
+          : zotero_sub_collections.results;
+      const formattedResults = mergedResult.map((item) => {
         const formattedItem = { ...item };
         formattedItem.citationTitle = formatCitation(item);
 
         return formattedItem;
       });
 
-      setTopCollectionFlag(false);
       setCollections(formattedResults);
       setZoteroCollectionsTotalResultsNumber(
         zotero_sub_collections.totalResults,
@@ -552,7 +576,7 @@ const ZoteroDataWrapper = (props) => {
         loading={loading}
         selectedCollection={selectedCollection}
         onChangeSearchTerm={onChangeSearchTerm}
-        showResults={showResults}
+        showSearchResults={showSearchResults}
         allSearchResults={allSearchResults}
         zoteroSearchResults={zoteroSearchResults}
         openAireSearchResults={openAireSearchResults}
@@ -565,19 +589,20 @@ const ZoteroDataWrapper = (props) => {
         }
         openAireTotalResultsNumber={openAireTotalResultsNumber}
       ></MasterDetailWidget>
-      {!showResults ? (
-        selectedCollection === null ? (
-          collections.length < zoteroCollectionsTotalResultsNumber ? (
-            <Button primary onClick={handleLoadMore}>
-              Load more
-            </Button>
-          ) : null
-        ) : items.length < zoteroItemsTotalResultsNumber ? (
+      {showSearchResults ? (
+        allSearchResults.length < openAireTotalResultsNumber ? (
           <Button primary onClick={handleLoadMore}>
             Load more
           </Button>
         ) : null
-      ) : allSearchResults.length < openAireTotalResultsNumber ? (
+      ) : topCollectionFlag ? (
+        zoteroCollectionsTotalResultsNumber > collections.length ? (
+          <Button primary onClick={handleLoadMore}>
+            Load more
+          </Button>
+        ) : null
+      ) : zoteroCollectionsTotalResultsNumber + zoteroItemsTotalResultsNumber >
+        composedItems.length ? (
         <Button primary onClick={handleLoadMore}>
           Load more
         </Button>

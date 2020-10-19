@@ -452,7 +452,7 @@ const MasterDetailWidget = (props) => {
       >
         <div className={collectionsClass}>
           <header className="header pulled">
-            <Button onClick={onClick} primary={!!props.showResults}>
+            <Button onClick={onClick} primary={!!props.showSearchResults}>
               Show Library
             </Button>
             <Input
@@ -472,7 +472,11 @@ const MasterDetailWidget = (props) => {
             {props.loading ? (
               loaderComp
             ) : (
-              <>{props.showResults ? searchResultsList() : collectionsList()}</>
+              <>
+                {props.showSearchResults
+                  ? searchResultsList()
+                  : collectionsList()}
+              </>
             )}
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import { ZOTERO_SETTINGS } from '../constants';
 
 export function getZoteroSettings() {
@@ -10,6 +11,15 @@ export function getZoteroSettings() {
   };
 }
 
+const handleErrors = (response, component) => {
+  if (!response.ok) {
+    console.error('handleErrors', response.statusText);
+    toast.error(`Error ${component}: ${response.statusText}`);
+    throw Error(response.statusText);
+  }
+  return response;
+};
+
 // ZOTERO
 export function fetchZoteroCollections(zoteroUrlBase, headers) {
   return (dispatch) => {
@@ -18,6 +28,7 @@ export function fetchZoteroCollections(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
+      .then((response) => handleErrors(response, 'Zotero Collections'))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -33,7 +44,9 @@ export function fetchZoteroCollections(zoteroUrlBase, headers) {
       .then((data) => {
         return dispatch(setZoteroCollectionsSuccess(data));
       })
-      .catch((error) => dispatch(setZoteroCollectionsFail(error)));
+      .catch((error) => {
+        dispatch(setZoteroCollectionsFail(error));
+      });
   };
 }
 export function fetchZoteroSubCollections(zoteroUrlBase, headers) {
@@ -43,6 +56,7 @@ export function fetchZoteroSubCollections(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
+      .then((response) => handleErrors(response, 'Zotero SubCollections'))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -69,6 +83,7 @@ export function fetchZoteroItems(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
+      .then((response) => handleErrors(response, 'Zotero Items'))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -93,6 +108,7 @@ export function fetchZoteroSearchItems(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
+      .then((response) => handleErrors(response, 'Zotero Search Items'))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -118,6 +134,9 @@ export function fetchOpenairePubSearchItems(openairePubUrlBase) {
     return fetch(openairePubUrlBase, {
       method: 'GET',
     })
+      .then((response) =>
+        handleErrors(response, 'Openaire Publications Search Items'),
+      )
       .then((response) => response.json())
       .then((result) => {
         dispatch(setOpenairePubSearchItemsSuccess(result));
@@ -131,11 +150,44 @@ export function fetchOpenaireRsdSearchItems(openaireRsdUrlBase) {
     return fetch(openaireRsdUrlBase, {
       method: 'GET',
     })
+      .then((response) => handleErrors(response, 'Openaire Rsd Search Items'))
       .then((response) => response.json())
       .then((result) => {
         dispatch(setOpenaireRsdSearchItemsSuccess(result));
       })
       .catch((error) => dispatch(setOpenaireRsdSearchItemsFail(error)));
+  };
+}
+export function fetchZoteroItemCitation(zoteroUrlBase, headers) {
+  return (dispatch) => {
+    dispatch(setZoteroItemCitationPending());
+    return fetch(zoteroUrlBase, {
+      method: 'GET',
+      headers,
+    })
+      .then((response) => handleErrors(response, 'Zotero Item Citation'))
+      .then((response) => response.text())
+      .then((result) => {
+        dispatch(setZoteroItemCitationSuccess({ result }));
+      })
+      .catch((error) => dispatch(setZoteroItemCitationFail(error)));
+  };
+}
+
+export function saveItemToZotero(zoteroUrlBase, headers, body) {
+  return (dispatch) => {
+    dispatch(saveItemToZoteroPending());
+    return fetch(zoteroUrlBase, {
+      method: 'POST',
+      headers,
+      body,
+    })
+      .then((response) => handleErrors(response, 'Save Item to Zotero'))
+      .then((response) => response.json())
+      .then((result) => {
+        dispatch(saveItemToZoteroSuccess(result));
+      })
+      .catch((error) => dispatch(saveItemToZoteroFail(error)));
   };
 }
 
@@ -146,41 +198,79 @@ function setZoteroCollectionsPending(data) {
     result: data,
   };
 }
-
 function setZoteroCollectionsSuccess(data) {
   return {
     type: 'ZOTERO_COLLECTIONS_SUCCESS',
     result: data,
   };
 }
-
 function setZoteroCollectionsFail(data) {
   return {
     type: 'ZOTERO_COLLECTIONS_FAIL',
     result: data,
   };
 }
+
 function setZoteroSubCollectionsPending(data) {
   return {
     type: 'ZOTERO_SUB_COLLECTIONS_PENDING',
     result: data,
   };
 }
-
 function setZoteroSubCollectionsSuccess(data) {
   return {
     type: 'ZOTERO_SUB_COLLECTIONS_SUCCESS',
     result: data,
   };
 }
-
 function setZoteroSubCollectionsFail(data) {
   return {
     type: 'ZOTERO_SUB_COLLECTIONS_FAIL',
     result: data,
   };
 }
+
 // ITEMS
+function saveItemToZoteroPending(data) {
+  return {
+    type: 'ZOTERO_ITEM_SAVED_PENDING',
+    result: data,
+  };
+}
+
+function saveItemToZoteroSuccess(data) {
+  return {
+    type: 'ZOTERO_ITEM_SAVED_SUCCESS',
+    result: data,
+  };
+}
+
+function saveItemToZoteroFail(data) {
+  return {
+    type: 'ZOTERO_ITEM_SAVED_FAIL',
+    result: data,
+  };
+}
+
+function setZoteroItemCitationPending(data) {
+  return {
+    type: 'ZOTERO_ITEM_CITATION_PENDING',
+    result: data,
+  };
+}
+function setZoteroItemCitationSuccess(data) {
+  return {
+    type: 'ZOTERO_ITEM_CITATION_SUCCESS',
+    result: data,
+  };
+}
+function setZoteroItemCitationFail(data) {
+  return {
+    type: 'ZOTERO_ITEM_CITATION_FAIL',
+    result: data,
+  };
+}
+
 function setZoteroItemsPending(data) {
   return {
     type: 'ZOTERO_ITEMS_PENDING',

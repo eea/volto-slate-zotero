@@ -10,6 +10,8 @@ import {
   zotero_collections,
   zotero_editor,
   zotero_items,
+  zotero_item_citation,
+  zotero_item_saved,
   zotero_search_items,
   zotero_settings,
   zotero_sub_collections
@@ -36,6 +38,8 @@ export default function install(config) {
     zotero_collections,
     zotero_sub_collections,
     zotero_items,
+    zotero_item_citation,
+    zotero_item_saved,
     openaire_items_pub,
     openaire_items_rsd,
     zotero_search_items,

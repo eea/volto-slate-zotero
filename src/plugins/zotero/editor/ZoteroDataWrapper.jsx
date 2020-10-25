@@ -1,4 +1,4 @@
-import { Icon as VoltoIcon, Toast } from '@plone/volto/components';
+import { Icon as VoltoIcon } from '@plone/volto/components';
 import briefcaseSVG from '@plone/volto/icons/briefcase.svg';
 import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
@@ -10,10 +10,12 @@ import {
   fetchOpenairePubSearchItems,
   fetchOpenaireRsdSearchItems,
   fetchZoteroCollections,
+  fetchZoteroItemCitation,
   fetchZoteroItems,
   fetchZoteroSearchItems,
   fetchZoteroSubCollections,
-  getZoteroSettings
+  getZoteroSettings,
+  saveItemToZotero
 } from './actions';
 import InlineForm from './InlineForm';
 import MasterDetailWidget from './MasterDetailWidget';
@@ -91,6 +93,12 @@ const ZoteroDataWrapper = (props) => {
     (state) => state?.zotero_sub_collections?.api,
   );
   const zotero_items = useSelector((state) => state?.zotero_items?.api);
+  const zotero_item_citation = useSelector(
+    (state) => state?.zotero_item_citation?.api,
+  );
+  const zotero_item_saved = useSelector(
+    (state) => state?.zotero_item_saved?.api,
+  );
   const openaire_items_pub = useSelector((state) => state?.openaire_items_pub);
   const openaire_items_rsd = useSelector((state) => state?.openaire_items_rsd);
   const [activeTabIndexS, setActiveTabIndexS] = useState(0);
@@ -105,11 +113,13 @@ const ZoteroDataWrapper = (props) => {
     'Content-Type': 'application/json',
   };
   const zoteroBaseUrl = zotero_settings?.server;
+  // const zoteroCollectionsTopUrl = `${zoteroBaseUrl}/collections/tops/`;
   const zoteroCollectionsTopUrl = `${zoteroBaseUrl}/collections/top/`;
   const zoteroCollectionsUrl = `${zoteroBaseUrl}/collections/`;
   const zoteroSearchUrl = `${zoteroBaseUrl}/items?q=`;
 
   const fetchCollections = (offset = 0) => {
+    // const finalUrl = `${zoteroCollectionsTopUrl}?st=${offset}&limit=10&sort=lol`;
     const finalUrl = `${zoteroCollectionsTopUrl}?start=${offset}&limit=10&sort=title`;
 
     setLoading(true);
@@ -119,6 +129,7 @@ const ZoteroDataWrapper = (props) => {
 
   const fetchItems = (collectionId, offset = 0) => {
     const finalUrl = `${zoteroCollectionsUrl}${collectionId}/items/?start=${offset}&limit=10&sort=title`;
+    // const finalUrl = `${zoteroCollectionsUrl}${collectionId}/items/?start=${offset}&limit=10&sort=lol`;
 
     setLoading(true);
     dispatch(fetchZoteroItems(finalUrl, headers));
@@ -126,12 +137,14 @@ const ZoteroDataWrapper = (props) => {
 
   const fetchSubCollections = (collectionId, offset = 0) => {
     const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10&sort=title`;
+    // const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10&sort=lol`;
 
     setLoading(true);
     dispatch(fetchZoteroSubCollections(finalUrl, headers));
   };
 
   const fetchZoteroSearch = (term, offset = 0) => {
+    // const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}&sort=lol`;
     const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}&sort=title`;
 
     setLoading(true);
@@ -157,57 +170,51 @@ const ZoteroDataWrapper = (props) => {
         dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
       });
     } else {
+      // const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=0`;
       const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      // const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=0`;
       const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
       dispatch(fetchOpenairePubSearchItems(finalUrl));
       dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
     }
   };
 
-  const fetchItem = (zoteroId) => {
-    const testUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${zotero_settings?.style}`;
-    return new Promise((resolve, reject) => {
-      setLoading(true);
+  const fetchItemCitation = (zoteroId) => {
+    const finalUrl = `${zoteroBaseUrl}/items/${zoteroId}?format=bib&style=${zotero_settings?.style}`;
 
-      fetch(testUrl, {
-        method: 'GET',
-        headers,
-      })
-        .then((response) => response.text())
-        .then((results) => {
-          setFootnoteRef(results);
-          setLoading(false);
-          resolve(results);
-        })
-        .catch((error) => {
-          setLoading(false);
-          reject();
-        });
-    });
+    dispatch(fetchZoteroItemCitation(finalUrl, headers));
   };
 
-  const saveItemToZotero = (itemToSave) => {
-    const testUrl = `${zoteroBaseUrl}/items/`;
+  const handleSaveItemToZotero = (itemToSave) => {
+    const finalUrl = `${zoteroBaseUrl}/items/`;
+    const body = JSON.stringify([itemToSave.data]);
 
     setLoading(true);
-
-    return new Promise((resolve, reject) => {
-      fetch(testUrl, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify([itemToSave.data]), // body data type must match "Content-Type" header
-      })
-        .then((response) => response.json())
-        .then((results) => {
-          const itemId = results.success[0];
-          resolve(itemId);
-        })
-        .catch((error) => {
-          setLoading(false);
-          reject();
-        });
-    });
+    dispatch(saveItemToZotero(finalUrl, headers, body));
   };
+
+  // const handleSaveItemToZotero = (itemToSave) => {
+  //   const testUrl = `${zoteroBaseUrl}/items/`;
+
+  //   setLoading(true);
+
+  //   return new Promise((resolve, reject) => {
+  //     fetch(testUrl, {
+  //       method: 'POST',
+  //       headers,
+  //       body: JSON.stringify([itemToSave.data]), // body data type must match "Content-Type" header
+  //     })
+  //       .then((response) => response.json())
+  //       .then((results) => {
+  //         const itemId = results.success[0];
+  //         resolve(itemId);
+  //       })
+  //       .catch((error) => {
+  //         setLoading(false);
+  //         reject();
+  //       });
+  //   });
+  // };
 
   const handleLoadMore = () => {
     // load search rezults
@@ -289,7 +296,7 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const pushItem = (selectedItem) => {
-    fetchItem(selectedItem.key);
+    fetchItemCitation(selectedItem.key);
     setSelectedItem(selectedItem);
     setfootnoteTitle(formatCitation(selectedItem));
     setItemIdRef(selectedItem.key);
@@ -300,7 +307,7 @@ const ZoteroDataWrapper = (props) => {
     setfootnoteTitle(formatCitation(selectedItem));
 
     if (!selectedItem.isOpenAire) {
-      fetchItem(selectedItem.key);
+      fetchItemCitation(selectedItem.key);
       setItemIdRef(selectedItem.key);
     }
   };
@@ -394,6 +401,36 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
     }
   }, [zotero_items]);
+
+  useEffect(() => {
+    if (zotero_item_citation) {
+      setFootnoteRef(zotero_item_citation.result);
+      setLoading(false);
+
+      if (selectedItem && selectedItem.isOpenAire) {
+        const formData = {
+          ...props.formData,
+          ...{
+            footnote: zotero_item_citation.result,
+            zoteroId: itemIdRef,
+            footnoteTitle,
+          },
+        };
+        props.submitHandler(formData);
+      }
+    }
+  }, [zotero_item_citation]);
+
+  useEffect(() => {
+    if (zotero_item_saved) {
+      const itemId = zotero_item_saved.success[0];
+      toast.success('Successfully added to Zotero Library');
+
+      setLoading(false);
+      setItemIdRef(itemId);
+      fetchItemCitation(itemId);
+    }
+  }, [zotero_item_saved]);
 
   useEffect(() => {
     if (zotero_search_items) {
@@ -531,29 +568,7 @@ const ZoteroDataWrapper = (props) => {
             <button
               onClick={(id, value) => {
                 if (selectedItem && selectedItem.isOpenAire) {
-                  saveItemToZotero(selectedItem).then((itemId) => {
-                    setItemIdRef(itemId);
-                    fetchItem(itemId)
-                      .then((results) => {
-                        const formData = {
-                          ...props.formData,
-                          ...{
-                            footnote: results,
-                            zoteroId: itemId,
-                            footnoteTitle,
-                          },
-                        };
-                        toast.success(
-                          <Toast
-                            success
-                            title="Success"
-                            content="Successfully added to Zotero Library"
-                          />,
-                        );
-                        props.submitHandler(formData);
-                      })
-                      .catch((error) => {});
-                  });
+                  handleSaveItemToZotero(selectedItem);
                 } else {
                   props.submitHandler(formData1);
                 }

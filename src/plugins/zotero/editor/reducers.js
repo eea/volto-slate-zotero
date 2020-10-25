@@ -4,6 +4,8 @@ import {
   OPENAIRE_ITEMS_RSD,
   ZOTERO_COLLECTIONS,
   ZOTERO_ITEMS,
+  ZOTERO_ITEM_CITATION,
+  ZOTERO_ITEM_SAVED,
   ZOTERO_SEARCH_ITEMS,
   ZOTERO_SETTINGS,
   ZOTERO_SUB_COLLECTIONS
@@ -11,6 +13,22 @@ import {
 
 const initialState = {};
 const zoteroSettings = {
+  api: null,
+  get: {
+    loading: false,
+    loaded: false,
+    error: null,
+  },
+};
+const zoteroItemCitation = {
+  api: null,
+  get: {
+    loading: false,
+    loaded: false,
+    error: null,
+  },
+};
+const zoteroItemSaved = {
   api: null,
   get: {
     loading: false,
@@ -71,6 +89,43 @@ export function zotero_editor(state = initialState, action = {}) {
   }
 }
 
+export function zotero_item_citation(state = zoteroItemCitation, action = {}) {
+  switch (action.type) {
+    case `${ZOTERO_ITEM_CITATION}_PENDING`:
+      return {
+        ...state,
+        api: null,
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: null,
+        },
+      };
+    case `${ZOTERO_ITEM_CITATION}_SUCCESS`:
+      return {
+        ...state,
+        api: { ...action.result },
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: null,
+        },
+      };
+    case `${ZOTERO_ITEM_CITATION}_FAIL`:
+      return {
+        ...state,
+        api: null,
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: action.error,
+        },
+      };
+    default:
+      return state;
+  }
+}
+
 export function zotero_settings(state = zoteroSettings, action = {}) {
   switch (action.type) {
     case `${ZOTERO_SETTINGS}_PENDING`:
@@ -94,6 +149,43 @@ export function zotero_settings(state = zoteroSettings, action = {}) {
         },
       };
     case `${ZOTERO_SETTINGS}_FAIL`:
+      return {
+        ...state,
+        api: null,
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: action.error,
+        },
+      };
+    default:
+      return state;
+  }
+}
+
+export function zotero_item_saved(state = zoteroItemSaved, action = {}) {
+  switch (action.type) {
+    case `${ZOTERO_ITEM_SAVED}_PENDING`:
+      return {
+        ...state,
+        api: null,
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: null,
+        },
+      };
+    case `${ZOTERO_ITEM_SAVED}_SUCCESS`:
+      return {
+        ...state,
+        api: { ...action.result },
+        [getRequestKey(action.type)]: {
+          loading: true,
+          loaded: false,
+          error: null,
+        },
+      };
+    case `${ZOTERO_ITEM_SAVED}_FAIL`:
       return {
         ...state,
         api: null,

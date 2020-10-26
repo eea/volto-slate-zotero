@@ -4,7 +4,6 @@ import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import { Button } from 'semantic-ui-react';
 import {
   fetchOpenairePubSearchItems,
@@ -97,7 +96,7 @@ const ZoteroDataWrapper = (props) => {
     (state) => state?.zotero_item_citation?.api,
   );
   const zotero_item_saved = useSelector(
-    (state) => state?.zotero_item_saved?.api,
+    (state) => state?.zotero_item_saved,
   );
   const openaire_items_pub = useSelector((state) => state?.openaire_items_pub);
   const openaire_items_rsd = useSelector((state) => state?.openaire_items_rsd);
@@ -113,13 +112,11 @@ const ZoteroDataWrapper = (props) => {
     'Content-Type': 'application/json',
   };
   const zoteroBaseUrl = zotero_settings?.server;
-  // const zoteroCollectionsTopUrl = `${zoteroBaseUrl}/collections/tops/`;
   const zoteroCollectionsTopUrl = `${zoteroBaseUrl}/collections/top/`;
   const zoteroCollectionsUrl = `${zoteroBaseUrl}/collections/`;
   const zoteroSearchUrl = `${zoteroBaseUrl}/items?q=`;
 
   const fetchCollections = (offset = 0) => {
-    // const finalUrl = `${zoteroCollectionsTopUrl}?st=${offset}&limit=10&sort=lol`;
     const finalUrl = `${zoteroCollectionsTopUrl}?start=${offset}&limit=10&sort=title`;
 
     setLoading(true);
@@ -129,7 +126,6 @@ const ZoteroDataWrapper = (props) => {
 
   const fetchItems = (collectionId, offset = 0) => {
     const finalUrl = `${zoteroCollectionsUrl}${collectionId}/items/?start=${offset}&limit=10&sort=title`;
-    // const finalUrl = `${zoteroCollectionsUrl}${collectionId}/items/?start=${offset}&limit=10&sort=lol`;
 
     setLoading(true);
     dispatch(fetchZoteroItems(finalUrl, headers));
@@ -137,14 +133,12 @@ const ZoteroDataWrapper = (props) => {
 
   const fetchSubCollections = (collectionId, offset = 0) => {
     const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10&sort=title`;
-    // const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10&sort=lol`;
 
     setLoading(true);
     dispatch(fetchZoteroSubCollections(finalUrl, headers));
   };
 
   const fetchZoteroSearch = (term, offset = 0) => {
-    // const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}&sort=lol`;
     const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}&sort=title`;
 
     setLoading(true);
@@ -170,9 +164,7 @@ const ZoteroDataWrapper = (props) => {
         dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
       });
     } else {
-      // const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=0`;
       const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
-      // const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=0`;
       const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
       dispatch(fetchOpenairePubSearchItems(finalUrl));
       dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
@@ -187,34 +179,11 @@ const ZoteroDataWrapper = (props) => {
 
   const handleSaveItemToZotero = (itemToSave) => {
     const finalUrl = `${zoteroBaseUrl}/items/`;
-    const body = JSON.stringify([itemToSave.data]);
+    const body = JSON.stringify([{item: 'test'}]);
 
     setLoading(true);
     dispatch(saveItemToZotero(finalUrl, headers, body));
   };
-
-  // const handleSaveItemToZotero = (itemToSave) => {
-  //   const testUrl = `${zoteroBaseUrl}/items/`;
-
-  //   setLoading(true);
-
-  //   return new Promise((resolve, reject) => {
-  //     fetch(testUrl, {
-  //       method: 'POST',
-  //       headers,
-  //       body: JSON.stringify([itemToSave.data]), // body data type must match "Content-Type" header
-  //     })
-  //       .then((response) => response.json())
-  //       .then((results) => {
-  //         const itemId = results.success[0];
-  //         resolve(itemId);
-  //       })
-  //       .catch((error) => {
-  //         setLoading(false);
-  //         reject();
-  //       });
-  //   });
-  // };
 
   const handleLoadMore = () => {
     // load search rezults
@@ -422,13 +391,16 @@ const ZoteroDataWrapper = (props) => {
   }, [zotero_item_citation]);
 
   useEffect(() => {
-    if (zotero_item_saved) {
+    if (zotero_item_saved.api) {
       const itemId = zotero_item_saved.success[0];
       toast.success('Successfully added to Zotero Library');
 
       setLoading(false);
       setItemIdRef(itemId);
       fetchItemCitation(itemId);
+    }
+    if (zotero_item_saved?.zotero?.error) {
+      setLoading(false);
     }
   }, [zotero_item_saved]);
 

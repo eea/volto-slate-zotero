@@ -192,7 +192,7 @@ export function zotero_item_saved(state = zoteroItemSaved, action = {}) {
         [getRequestKey(action.type)]: {
           loading: true,
           loaded: false,
-          error: action.error,
+          error: action.result,
         },
       };
     default:
@@ -239,7 +239,6 @@ export function zotero_collections(state = zoteroCollections, action = {}) {
 }
 
 export function zotero_sub_collections(state = zoteroCollections, action = {}) {
-  // console.log('reducer zotero_sub_collections', action);
   switch (action.type) {
     case `${ZOTERO_SUB_COLLECTIONS}_PENDING`:
       return {
@@ -252,8 +251,6 @@ export function zotero_sub_collections(state = zoteroCollections, action = {}) {
         },
       };
     case `${ZOTERO_SUB_COLLECTIONS}_SUCCESS`:
-      // console.log('reducer zotero_sub_collections', action);
-
       return {
         ...state,
         api: { ...action.result },

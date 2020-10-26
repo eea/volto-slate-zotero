@@ -20,6 +20,15 @@ const handleErrors = (response, component) => {
   return response;
 };
 
+const handleSilentErrors = (response, component) => {
+  if (Object.keys(response.failed).length > 0) {
+    console.error('handleSilentErrors', response.failed[0].message);
+    toast.error(`Error ${component}`);
+    throw Error(response.failed[0].message);
+  }
+  return response;
+};
+
 // ZOTERO
 export function fetchZoteroCollections(zoteroUrlBase, headers) {
   return (dispatch) => {
@@ -175,6 +184,7 @@ export function fetchZoteroItemCitation(zoteroUrlBase, headers) {
 }
 
 export function saveItemToZotero(zoteroUrlBase, headers, body) {
+  console.error('saveItemToZotero', body);
   return (dispatch) => {
     dispatch(saveItemToZoteroPending());
     return fetch(zoteroUrlBase, {
@@ -185,6 +195,7 @@ export function saveItemToZotero(zoteroUrlBase, headers, body) {
       .then((response) => handleErrors(response, 'Save Item to Zotero'))
       .then((response) => response.json())
       .then((result) => {
+        handleSilentErrors(result, 'Save Item to Zotero')
         dispatch(saveItemToZoteroSuccess(result));
       })
       .catch((error) => dispatch(saveItemToZoteroFail(error)));

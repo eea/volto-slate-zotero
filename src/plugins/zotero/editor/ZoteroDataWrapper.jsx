@@ -4,6 +4,7 @@ import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { Button } from 'semantic-ui-react';
 import {
   fetchOpenairePubSearchItems,
@@ -392,7 +393,7 @@ const ZoteroDataWrapper = (props) => {
 
   useEffect(() => {
     if (zotero_item_saved.api) {
-      const itemId = zotero_item_saved.success[0];
+      const itemId = zotero_item_saved.api.success[0];
       toast.success('Successfully added to Zotero Library');
 
       setLoading(false);

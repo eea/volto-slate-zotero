@@ -179,7 +179,7 @@ const ZoteroDataWrapper = (props) => {
 
   const handleSaveItemToZotero = (itemToSave) => {
     const finalUrl = `${zoteroBaseUrl}/items/`;
-    const body = JSON.stringify([{item: 'test'}]);
+    const body = JSON.stringify([itemToSave.data]);
 
     setLoading(true);
     dispatch(saveItemToZotero(finalUrl, headers, body));

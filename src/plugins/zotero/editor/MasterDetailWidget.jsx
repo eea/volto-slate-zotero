@@ -280,6 +280,7 @@ const MasterDetailWidget = (props) => {
   const pushCollection = (selectedCollection) => {
     setMoveMenu(-1);
     setHideCollection(true);
+    setListItemIndex(-1);
     props.pushCollection(selectedCollection);
   };
 

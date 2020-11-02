@@ -1,6 +1,6 @@
 {
   "name": "@eeacms/volto-slate-zotero",
-  "version": "0.1.2",
+  "version": "0.2.6",
   "description": "Zotero integration with Volto Slate Footnotes",
   "main": "src/index.js",
   "repository": "https://github.com/eea/volto-slate-zotero",

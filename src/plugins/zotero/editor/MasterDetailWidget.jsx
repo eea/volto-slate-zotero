@@ -280,6 +280,7 @@ const MasterDetailWidget = (props) => {
   const pushCollection = (selectedCollection) => {
     setMoveMenu(-1);
     setHideCollection(true);
+    setListItemIndex(-1);
     props.pushCollection(selectedCollection);
   };
 
@@ -455,16 +456,7 @@ const MasterDetailWidget = (props) => {
             <Button onClick={onClick} primary={!!props.showSearchResults}>
               Show Library
             </Button>
-            <Input
-              fluid
-              action={{
-                icon: 'search',
-                onClick: handleInput,
-              }}
-              placeholder="Search..."
-              onKeyPress={onKeyPress}
-              onChange={onChange}
-            />
+            <Input fluid action={{ onClick: handleInput }} icon='search' placeholder='Search...' onKeyPress={onKeyPress} onChange={onChange}/>
             <div className="vertical divider" />
           </header>
 
@@ -487,7 +479,6 @@ const MasterDetailWidget = (props) => {
               <Icon name={backSVG} size="30px" />
             </button>
             <div className="vertical divider" />
-            {/* <h2>{props.collections[props.selectedCollection]?.data?.name}</h2> */}
             <h2>Back to library</h2>
           </header>
           <div className="pastanaga-menu-list">

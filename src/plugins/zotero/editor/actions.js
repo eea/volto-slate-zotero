@@ -13,8 +13,9 @@ export function getZoteroSettings() {
 
 const handleErrors = (response, component) => {
   if (!response.ok) {
-    console.error('handleErrors', response.statusText);
-    toast.error(`Error ${component}: ${response.statusText}`);
+    console.error('handleErrors', response.statusText); // add the url
+    // toast.error(`Error ${component}: ${response.statusText}`);
+    toast.error(`Sorry an error has occurred. We have been notified and are looking into it. Please come back later and if the issue persists please contact the site administrator.`);
     throw Error(response.statusText);
   }
   return response;
@@ -23,7 +24,7 @@ const handleErrors = (response, component) => {
 const handleSilentErrors = (response, component) => {
   if (Object.keys(response.failed).length > 0) {
     console.error('handleSilentErrors', response.failed[0].message);
-    toast.error(`Error ${component}`);
+    toast.error(`Sorry an error has occurred. We have been notified and are looking into it. Please come back later and if the issue persists please contact the site administrator.`);
     throw Error(response.failed[0].message);
   }
   return response;

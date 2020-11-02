@@ -44,6 +44,7 @@ const ZoteroDataWrapper = (props) => {
   const [zoteroSearchResults, setZoteroSearchResults] = useState([]);
   const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [topCollectionFlag, setTopCollectionFlag] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
   const [newFormData, setNewFormData] = useState({});
@@ -120,7 +121,6 @@ const ZoteroDataWrapper = (props) => {
   const fetchCollections = (offset = 0) => {
     const finalUrl = `${zoteroCollectionsTopUrl}?start=${offset}&limit=10&sort=title`;
 
-    setLoading(true);
     setTopCollectionFlag(true);
     dispatch(fetchZoteroCollections(finalUrl, headers));
   };
@@ -128,28 +128,24 @@ const ZoteroDataWrapper = (props) => {
   const fetchItems = (collectionId, offset = 0) => {
     const finalUrl = `${zoteroCollectionsUrl}${collectionId}/items/?start=${offset}&limit=10&sort=title`;
 
-    setLoading(true);
     dispatch(fetchZoteroItems(finalUrl, headers));
   };
 
   const fetchSubCollections = (collectionId, offset = 0) => {
     const finalUrl = `${zoteroCollectionsUrl}${collectionId}/collections/?start=${offset}&limit=10&sort=title`;
 
-    setLoading(true);
     dispatch(fetchZoteroSubCollections(finalUrl, headers));
   };
 
   const fetchZoteroSearch = (term, offset = 0) => {
     const finalUrl = `${zoteroSearchUrl}${term}&limit=10&start=${offset}&sort=title`;
 
-    setLoading(true);
     setShowSearchResults(true);
     setZoteroSearchItemsOffset(offset);
     dispatch(fetchZoteroSearchItems(finalUrl, headers));
   };
 
   const fetchAireSearch = (term = searchTerm) => {
-    setLoading(true);
     setShowSearchResults(true);
 
     const filters = ['publications', 'rsd'];
@@ -182,12 +178,12 @@ const ZoteroDataWrapper = (props) => {
     const finalUrl = `${zoteroBaseUrl}/items/`;
     const body = JSON.stringify([itemToSave.data]);
 
-    setLoading(true);
     dispatch(saveItemToZotero(finalUrl, headers, body));
   };
 
   const handleLoadMore = () => {
     // load search rezults
+    setLoadingMore(true);
     setHasMultipleDOIs(false);
     if (showSearchResults) {
       switch (activeTabIndexS) {
@@ -224,6 +220,7 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const onChangeSearchTerm = (searchTerm) => {
+    setLoading(true);
     setSearchTerm(searchTerm);
     setZoteroSearchItemsOffset(0);
     setOpenAirePage(1);
@@ -245,6 +242,7 @@ const ZoteroDataWrapper = (props) => {
   const pushCollection = (selectedCollectionIndex) => {
     const selectedCol = collections[selectedCollectionIndex];
 
+    setLoading(true);
     setZoteroSearchItemsOffset(0);
     setZoteroItemsOffset(0);
     setCollections([]);
@@ -307,6 +305,7 @@ const ZoteroDataWrapper = (props) => {
 
   useEffect(() => {
     if (zotero_settings) {
+      setLoading(true);
       fetchCollections();
     }
   }, [zotero_settings]);
@@ -327,6 +326,7 @@ const ZoteroDataWrapper = (props) => {
         zotero_collections.totalResults,
       );
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [zotero_collections]);
 
@@ -349,6 +349,7 @@ const ZoteroDataWrapper = (props) => {
       );
       setComposedItems([...formattedResults, ...items]);
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [zotero_sub_collections]);
 
@@ -369,6 +370,7 @@ const ZoteroDataWrapper = (props) => {
       setZoteroItemsTotalResultsNumber(zotero_items.totalResults);
       setComposedItems([...collections, ...formattedResults]);
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [zotero_items]);
 
@@ -376,6 +378,7 @@ const ZoteroDataWrapper = (props) => {
     if (zotero_item_citation) {
       setFootnoteRef(zotero_item_citation.result);
       setLoading(false);
+      setLoadingMore(false);
 
       if (selectedItem && selectedItem.isOpenAire) {
         const formData = {
@@ -402,6 +405,7 @@ const ZoteroDataWrapper = (props) => {
     }
     if (zotero_item_saved?.zotero?.error) {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [zotero_item_saved]);
 
@@ -427,6 +431,7 @@ const ZoteroDataWrapper = (props) => {
         ...openAireDataResults,
       ]);
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [zotero_search_items]);
 
@@ -463,6 +468,7 @@ const ZoteroDataWrapper = (props) => {
         ...openAireDataResults,
       ]);
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [openaire_items_pub]);
 
@@ -498,6 +504,7 @@ const ZoteroDataWrapper = (props) => {
         ...uniqueRsdRestuls,
       ]);
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [openaire_items_rsd]);
 
@@ -528,6 +535,11 @@ const ZoteroDataWrapper = (props) => {
     ...props.formData,
     ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
   };
+  const loadMoreButton = (
+    <Button primary loading={loadingMore} onClick={handleLoadMore}>
+      Load more
+    </Button>
+  )
 
   return (
     <div id="zotero-comp">
@@ -578,23 +590,11 @@ const ZoteroDataWrapper = (props) => {
         openAireTotalResultsNumber={openAireTotalResultsNumber}
       ></MasterDetailWidget>
       {showSearchResults ? (
-        allSearchResults.length < openAireTotalResultsNumber ? (
-          <Button primary onClick={handleLoadMore}>
-            Load more
-          </Button>
-        ) : null
+        allSearchResults.length < openAireTotalResultsNumber ? loadMoreButton : null
       ) : topCollectionFlag ? (
-        zoteroCollectionsTotalResultsNumber > collections.length ? (
-          <Button primary onClick={handleLoadMore}>
-            Load more
-          </Button>
-        ) : null
+        zoteroCollectionsTotalResultsNumber > collections.length ? loadMoreButton : null
       ) : zoteroCollectionsTotalResultsNumber + zoteroItemsTotalResultsNumber >
-        composedItems.length ? (
-        <Button primary onClick={handleLoadMore}>
-          Load more
-        </Button>
-      ) : null}
+        composedItems.length ? loadMoreButton : null }
     </div>
   );
 };

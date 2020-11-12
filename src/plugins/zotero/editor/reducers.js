@@ -8,7 +8,7 @@ import {
   ZOTERO_ITEM_SAVED,
   ZOTERO_SEARCH_ITEMS,
   ZOTERO_SETTINGS,
-  ZOTERO_SUB_COLLECTIONS
+  ZOTERO_SUB_COLLECTIONS,
 } from '../constants';
 
 const initialState = {};

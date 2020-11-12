@@ -15,7 +15,7 @@ import {
   fetchZoteroSearchItems,
   fetchZoteroSubCollections,
   getZoteroSettings,
-  saveItemToZotero
+  saveItemToZotero,
 } from './actions';
 import InlineForm from './InlineForm';
 import MasterDetailWidget from './MasterDetailWidget';
@@ -23,7 +23,7 @@ import {
   findDOI,
   formatCitation,
   formatOpenAire,
-  makeOpenAireUrlObj
+  makeOpenAireUrlObj,
 } from './utils';
 
 const ZoteroDataWrapper = (props) => {
@@ -97,9 +97,7 @@ const ZoteroDataWrapper = (props) => {
   const zotero_item_citation = useSelector(
     (state) => state?.zotero_item_citation?.api,
   );
-  const zotero_item_saved = useSelector(
-    (state) => state?.zotero_item_saved,
-  );
+  const zotero_item_saved = useSelector((state) => state?.zotero_item_saved);
   const openaire_items_pub = useSelector((state) => state?.openaire_items_pub);
   const openaire_items_rsd = useSelector((state) => state?.openaire_items_rsd);
   const [activeTabIndexS, setActiveTabIndexS] = useState(0);
@@ -539,7 +537,7 @@ const ZoteroDataWrapper = (props) => {
     <Button primary loading={loadingMore} onClick={handleLoadMore}>
       Load more
     </Button>
-  )
+  );
 
   return (
     <div id="zotero-comp">
@@ -589,12 +587,18 @@ const ZoteroDataWrapper = (props) => {
         }
         openAireTotalResultsNumber={openAireTotalResultsNumber}
       ></MasterDetailWidget>
-      {showSearchResults ? (
-        allSearchResults.length < openAireTotalResultsNumber ? loadMoreButton : null
-      ) : topCollectionFlag ? (
-        zoteroCollectionsTotalResultsNumber > collections.length ? loadMoreButton : null
-      ) : zoteroCollectionsTotalResultsNumber + zoteroItemsTotalResultsNumber >
-        composedItems.length ? loadMoreButton : null }
+      {showSearchResults
+        ? allSearchResults.length < openAireTotalResultsNumber
+          ? loadMoreButton
+          : null
+        : topCollectionFlag
+        ? zoteroCollectionsTotalResultsNumber > collections.length
+          ? loadMoreButton
+          : null
+        : zoteroCollectionsTotalResultsNumber + zoteroItemsTotalResultsNumber >
+          composedItems.length
+        ? loadMoreButton
+        : null}
     </div>
   );
 };

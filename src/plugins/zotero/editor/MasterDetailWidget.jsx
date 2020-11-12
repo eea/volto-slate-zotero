@@ -10,7 +10,7 @@ import {
   Label,
   Loader,
   Menu,
-  Tab
+  Tab,
 } from 'semantic-ui-react';
 import openairePNG from '../images/openaire.png';
 import zoteroSVG from '../images/zotero.svg';
@@ -456,7 +456,14 @@ const MasterDetailWidget = (props) => {
             <Button onClick={onClick} primary={!!props.showSearchResults}>
               Show Library
             </Button>
-            <Input fluid action={{ onClick: handleInput }} icon='search' placeholder='Search...' onKeyPress={onKeyPress} onChange={onChange}/>
+            <Input
+              fluid
+              action={{ onClick: handleInput }}
+              icon="search"
+              placeholder="Search..."
+              onKeyPress={onKeyPress}
+              onChange={onChange}
+            />
             <div className="vertical divider" />
           </header>
 

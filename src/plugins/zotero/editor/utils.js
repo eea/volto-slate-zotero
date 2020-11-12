@@ -71,7 +71,7 @@ export const makeOpenAireUrlObj = (filterList) => {
 };
 
 export const formatOpenAire = (item, label, parentCollection) => {
-console.log('item', item)
+  console.log('item', item);
   const entry = item.metadata['oaf:entity']['oaf:result'];
   const result = {
     data: {},
@@ -92,7 +92,11 @@ console.log('item', item)
     : null;
 
   result.data = {
-    title: entry.title? entry.title[0] ? entry.title[0]['$'] : entry.title['$'] : '',
+    title: entry.title
+      ? entry.title[0]
+        ? entry.title[0]['$']
+        : entry.title['$']
+      : '',
     itemType: 'journalArticle',
     DOI: hasDoi ? hasDoi['$'] : null,
     creators: Array.isArray(entry.creator)

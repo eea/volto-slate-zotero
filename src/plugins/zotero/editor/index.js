@@ -14,7 +14,7 @@ import {
   zotero_item_saved,
   zotero_search_items,
   zotero_settings,
-  zotero_sub_collections
+  zotero_sub_collections,
 } from './reducers';
 import { ZoteroEditorSchema } from './schema';
 import ZoteroEditor from './ZoteroEditor';

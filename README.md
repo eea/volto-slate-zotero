@@ -1,6 +1,7 @@
 # volto-slate-zotero
-
 [![Releases](https://img.shields.io/github/v/release/eea/volto-slate-zotero)](https://github.com/eea/volto-slate-zotero/releases)
+[![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-slate-zotero%2Fmaster&subject=master)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-slate-zotero/job/master/display/redirect)
+[![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-slate-zotero%2Fdevelop&subject=develop)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-slate-zotero/job/develop/display/redirect)
 
 [Zotero](https://www.zotero.org/) integration with [Volto Slate](https://github.com/eea/volto-slate/tree/develop) [Volto](https://github.com/plone/volto) add-on
 

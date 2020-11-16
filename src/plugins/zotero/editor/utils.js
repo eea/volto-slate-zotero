@@ -71,7 +71,7 @@ export const makeOpenAireUrlObj = (filterList) => {
 };
 
 export const formatOpenAire = (item, label, parentCollection) => {
-  console.log('item', item);
+  // console.log('item', item);
   const entry = item.metadata['oaf:entity']['oaf:result'];
   const result = {
     data: {},

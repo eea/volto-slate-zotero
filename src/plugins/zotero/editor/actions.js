@@ -1,3 +1,4 @@
+/* eslint no-console: ["error", { allow: ["error"] }] */
 import { toast } from 'react-toastify';
 import { ZOTERO_SETTINGS } from '../constants';
 

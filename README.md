@@ -14,23 +14,24 @@
 1. Create new volto project if you don't already have one:
 
    ```
-   $ npm install -g @plone/create-volto-app
-   $ create-volto-app my-volto-project
+   $ npm install -g yo @plone/generator-volto
+      $ yo @plone/volto my-volto-project \
+                     --addon volto-slate:asDefault \
+                     --addon @eeacms/volto-slate-zotero
+
    $ cd my-volto-project
+   $ yarn add -W @eeacms/volto-slate-zotero
    ```
 
-1. Update `package.json`:
+1. If you already have a volto project, just update `package.json`:
 
    ```JSON
    "addons": [
-       "volto-slate:asDefault",
        "@eeacms/volto-slate-zotero"
    ],
 
    "dependencies": {
-       "@plone/volto": "github:eea/volto#7.11.1-beta.1",
-       "volto-slate": "github:eea/volto-slate#0.5.3",
-       "@eeacms/volto-slate-zotero": "github:eea/volto-slate-zotero#0.1.0"
+       "@eeacms/volto-slate-zotero": "^1.0.0"
    }
    ```
 
@@ -44,6 +45,7 @@
 1. Go to http://localhost:3000
 
 1. Happy editing!
+
 
 ## Dependencies
 

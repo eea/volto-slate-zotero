@@ -5,7 +5,7 @@ pipeline {
         GIT_NAME = "volto-slate-zotero"
         NAMESPACE = "@eeacms"
         SONARQUBE_TAGS = "volto.eea.europa.eu"
-        DEPENDENCIES = "volto-slate"
+        DEPENDENCIES = "volto-slate @eeacms/volto-slate-footnote"
     }
 
   stages {

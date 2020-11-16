@@ -23,7 +23,8 @@
     "url": "git@github.com:eea/volto-slate-zotero.git"
   },
   "dependencies": {
-    "volto-slate": "^1.0.0"
+    "volto-slate": "^1.0.0",
+    "@eeacms/volto-slate-footnote": "^1.0.0"
   },
   "scripts": {
     "release": "release-it",

@@ -61,7 +61,7 @@ const makeList = (props, resultsType, handleClick, activeIndex) => (
               <Card fluid>
                 <Card.Content>
                   <Card.Description>
-                    {item.data.title.slice(0, 50)}
+                    {item?.data?.title?.slice(0, 50) || ''}
                     <Button
                       circular
                       color="twitter"

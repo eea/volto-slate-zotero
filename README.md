@@ -32,7 +32,7 @@
    ],
 
    "dependencies": {
-       "@eeacms/volto-slate-zotero": "^1.0.0"
+       "@eeacms/volto-slate-zotero": "^2.0.0"
    }
    ```
 

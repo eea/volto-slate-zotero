@@ -40,7 +40,7 @@ export default (props) => {
         unwrapElement(editor);
       }
     },
-    [editor],
+    [editor], // eslint-disable-line
   );
 
   return (

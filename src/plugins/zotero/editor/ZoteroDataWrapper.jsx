@@ -47,8 +47,8 @@ const ZoteroDataWrapper = (props) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [topCollectionFlag, setTopCollectionFlag] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
-  const [newFormData, setNewFormData] = useState({});
-  const [formData, setFormData] = useState({});
+  const [newFormData, setNewFormData] = useState({}); // eslint-disable-line
+  const [formData, setFormData] = useState({}); // eslint-disable-line
   const [
     zoteroSearchItemsTotalResultsNumber,
     setZoteroSearchItemsTotalResultsNumber,
@@ -299,14 +299,16 @@ const ZoteroDataWrapper = (props) => {
   // used only once at mount
   useEffect(() => {
     dispatch(getZoteroSettings());
-  }, []); // to be used only once at mount
+    // to be used only once at mount
+  }, []); // eslint-disable-line
+
 
   useEffect(() => {
     if (zotero_settings) {
       setLoading(true);
       fetchCollections();
     }
-  }, [zotero_settings]);
+  }, [zotero_settings]); // eslint-disable-line
 
   useEffect(() => {
     if (zotero_collections) {
@@ -326,7 +328,7 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [zotero_collections]);
+  }, [zotero_collections]); // eslint-disable-line
 
   useEffect(() => {
     if (zotero_sub_collections) {
@@ -349,7 +351,7 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [zotero_sub_collections]);
+  }, [zotero_sub_collections]); // eslint-disable-line
 
   useEffect(() => {
     if (zotero_items) {
@@ -370,7 +372,7 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [zotero_items]);
+  }, [zotero_items]); // eslint-disable-line
 
   useEffect(() => {
     if (zotero_item_citation) {
@@ -390,7 +392,7 @@ const ZoteroDataWrapper = (props) => {
         props.submitHandler(formData);
       }
     }
-  }, [zotero_item_citation]);
+  }, [zotero_item_citation]); // eslint-disable-line
 
   useEffect(() => {
     if (zotero_item_saved.api) {
@@ -405,7 +407,7 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [zotero_item_saved]);
+  }, [zotero_item_saved]); // eslint-disable-line
 
   useEffect(() => {
     if (zotero_search_items) {
@@ -431,7 +433,7 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [zotero_search_items]);
+  }, [zotero_search_items]); // eslint-disable-line
 
   useEffect(() => {
     if (openaire_items_pub.api) {
@@ -468,7 +470,7 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [openaire_items_pub]);
+  }, [openaire_items_pub]); // eslint-disable-line
 
   useEffect(() => {
     if (openaire_items_rsd.api) {
@@ -504,7 +506,7 @@ const ZoteroDataWrapper = (props) => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [openaire_items_rsd]);
+  }, [openaire_items_rsd]); // eslint-disable-line
 
   useEffect(() => {
     setfootnoteTitle(props.formData?.footnoteTitle);
@@ -518,7 +520,7 @@ const ZoteroDataWrapper = (props) => {
       ...props.formData,
       ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
     });
-  }, [
+  }, [ // eslint-disable-line
     props.formData,
     props.formData?.footnote,
     props.formData?.footnoteTitle,

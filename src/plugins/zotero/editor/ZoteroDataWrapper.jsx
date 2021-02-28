@@ -302,7 +302,6 @@ const ZoteroDataWrapper = (props) => {
     // to be used only once at mount
   }, []); // eslint-disable-line
 
-
   useEffect(() => {
     if (zotero_settings) {
       setLoading(true);
@@ -520,13 +519,15 @@ const ZoteroDataWrapper = (props) => {
       ...props.formData,
       ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
     });
-  }, [ // eslint-disable-line
+    /* eslint-disable */
+  }, [
     props.formData,
     props.formData?.footnote,
     props.formData?.footnoteTitle,
     props.formData?.zoteroId,
   ]);
 
+  /* eslint-enable */
   const newFormData1 = {
     ...props.formData,
     ...{ footnoteTitle },

@@ -14,8 +14,9 @@ Before starting make sure your development environment is properly set. See [Vol
 
         $ yo @plone/volto my-volto-project \
                           --workspace src/addons/volto-slate-zotero \
-                          --addon volto-slate:asDefault \
-                          --addon @eeacms/volto-slate-zotero
+                          --addon @eeacms/volto-slate-zotero \
+                          --no-interactive \
+                          --skip-install
         $ cd my-volto-project
 
 1.  Add the following to `mrs.developer.json`:

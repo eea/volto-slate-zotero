@@ -22,6 +22,10 @@
     "type": "git",
     "url": "git@github.com:eea/volto-slate-zotero.git"
   },
+  "addons": [
+    "volto-slate",
+    "@eeacms/volto-slate-footnote"
+  ],
   "dependencies": {
     "volto-slate": "^2.0.0",
     "@eeacms/volto-slate-footnote": "^2.0.0"

@@ -43,6 +43,12 @@ export default (props) => {
     [editor], // eslint-disable-line
   );
 
+  const checkForCancel = () => {
+    if (!zoteroNode.data.footnote) {
+      unwrapElement(editor);
+    }
+  };
+
   return (
     <ZoteroDataWrapper
       title={ZoteroEditorSchema.title}
@@ -51,11 +57,14 @@ export default (props) => {
       submitHandler={(newFormData) => {
         saveDataToEditor(newFormData);
         dispatch(setPluginOptions(pluginId, { show_sidebar_editor: false }));
+
         ReactEditor.focus(editor);
       }}
       clearHandler={() => {
-        dispatch(setPluginOptions(pluginId, { show_sidebar_editor: false }));
         setFormData({});
+        checkForCancel();
+        dispatch(setPluginOptions(pluginId, { show_sidebar_editor: false }));
+
         ReactEditor.focus(editor);
       }}
     ></ZoteroDataWrapper>

@@ -190,7 +190,6 @@ export function fetchZoteroItemCitation(zoteroUrlBase, headers) {
 }
 
 export function saveItemToZotero(zoteroUrlBase, headers, body) {
-  console.error('saveItemToZotero', body);
   return (dispatch) => {
     dispatch(saveItemToZoteroPending());
     return fetch(zoteroUrlBase, {

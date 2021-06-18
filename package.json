@@ -27,8 +27,8 @@
     "@eeacms/volto-slate-footnote"
   ],
   "dependencies": {
-    "volto-slate": "^2.0.0",
-    "@eeacms/volto-slate-footnote": "^2.0.0"
+    "volto-slate": ">=2.7.1",
+    "@eeacms/volto-slate-footnote": ">=2.3.0"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.9.5",

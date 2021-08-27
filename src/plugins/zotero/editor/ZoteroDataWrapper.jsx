@@ -148,22 +148,24 @@ const ZoteroDataWrapper = (props) => {
     setShowSearchResults(true);
 
     const filters = ['publications', 'rsd'];
-    const resultUrl = makeOpenAireUrlObj(filters);
+    const objectTypeUrl = makeOpenAireUrlObj(filters);
     const searchForDoi = findDOI(term);
 
     if (searchForDoi.length > 0) {
       searchForDoi.forEach((doi) => {
         setHasMultipleDOIs(true);
-        const finalUrl = `${resultUrl[0]}/?doi=${doi}&format=json`;
-        const finalUrl1 = `${resultUrl[1]}/?doi=${doi}&format=json`;
-        dispatch(fetchOpenairePubSearchItems(finalUrl));
-        dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+        const finalPubUrl = `${objectTypeUrl[0]}/?doi=${doi}&format=json`;
+        const finalRsdUrl = `${objectTypeUrl[1]}/?doi=${doi}&format=json`;
+
+        dispatch(fetchOpenairePubSearchItems(finalPubUrl));
+        dispatch(fetchOpenaireRsdSearchItems(finalRsdUrl));
       });
     } else {
-      const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
-      const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
-      dispatch(fetchOpenairePubSearchItems(finalUrl));
-      dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+      const finalTitlePubUrl = `${objectTypeUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalTitleRsdUrl = `${objectTypeUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+
+      dispatch(fetchOpenairePubSearchItems(finalTitlePubUrl));
+      dispatch(fetchOpenaireRsdSearchItems(finalTitleRsdUrl));
     }
   };
 

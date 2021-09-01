@@ -442,7 +442,7 @@ const ZoteroDataWrapper = (props) => {
   useEffect(() => {
     if (openaire_items_pub.api) {
       const formattedResults = openaire_items_pub.api.map((item) =>
-        formatOpenAire(item, 'publications', zotero_settings.default),
+        formatOpenAire(item, 'publications', zotero_settings?.default),
       );
       const publicationRestuls =
         openAirePage > 1
@@ -479,7 +479,7 @@ const ZoteroDataWrapper = (props) => {
   useEffect(() => {
     if (openaire_items_rsd.api) {
       const formattedResults = openaire_items_rsd.api.map((item) =>
-        formatOpenAire(item, 'rsd', zotero_settings.default),
+        formatOpenAire(item, 'rsd', zotero_settings?.default),
       );
       const rsdRestuls =
         openAirePage > 1

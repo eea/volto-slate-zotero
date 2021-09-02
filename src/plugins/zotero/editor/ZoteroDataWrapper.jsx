@@ -157,15 +157,21 @@ const ZoteroDataWrapper = (props) => {
         const finalPubUrl = `${objectTypeUrl[0]}/?doi=${doi}&format=json`;
         const finalRsdUrl = `${objectTypeUrl[1]}/?doi=${doi}&format=json`;
 
-        dispatch(fetchOpenairePubSearchItems(finalPubUrl));
-        dispatch(fetchOpenaireRsdSearchItems(finalRsdUrl));
+        dispatch(fetchOpenairePubSearchItems([finalPubUrl]));
+        dispatch(fetchOpenaireRsdSearchItems([finalRsdUrl]));
       });
     } else {
       const finalTitlePubUrl = `${objectTypeUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalAuthorPubUrl = `${objectTypeUrl[0]}/?author=${term}&format=json&size=20&page=${openAirePage}`;
       const finalTitleRsdUrl = `${objectTypeUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalAuthorRsdUrl = `${objectTypeUrl[1]}/?author=${term}&format=json&size=20&page=${openAirePage}`;
 
-      dispatch(fetchOpenairePubSearchItems(finalTitlePubUrl));
-      dispatch(fetchOpenaireRsdSearchItems(finalTitleRsdUrl));
+      dispatch(
+        fetchOpenairePubSearchItems([finalTitlePubUrl, finalAuthorPubUrl]),
+      );
+      dispatch(
+        fetchOpenaireRsdSearchItems([finalTitleRsdUrl, finalAuthorRsdUrl]),
+      );
     }
   };
 

@@ -2,7 +2,7 @@ import { keys } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Card, Message, Segment } from 'semantic-ui-react';
+import { Card, Message, Segment, List, Button, Icon } from 'semantic-ui-react';
 
 const messages = defineMessages({
   editValues: {
@@ -23,10 +23,11 @@ const InlineForm = ({
   description,
   error, // Such as {message: "It's not good"}
   errors = {},
-  formData,
+  updatedFormData,
   title,
   icon,
   headerActions,
+  deleteItem,
   intl,
 }) => {
   const _ = intl.formatMessage;
@@ -67,7 +68,38 @@ const InlineForm = ({
           <Card fluid>
             <Card.Content>
               <Card.Header>Citation</Card.Header>
-              <Card.Description>{formData.footnoteTitle}</Card.Description>
+              <Card.Description>
+                {updatedFormData && (
+                  <List divided relaxed>
+                    {/* saved footnotes*/}
+                    <List.Item>
+                      <List.Content>
+                        <List.Header>
+                          {updatedFormData.footnoteTitle}{' '}
+                          <Button icon onClick={() => deleteItem(-1)}>
+                            <Icon name="trash alternate outline" />
+                          </Button>
+                        </List.Header>
+                      </List.Content>
+                    </List.Item>
+
+                    {/* new footnotes*/}
+                    {updatedFormData.extra &&
+                      updatedFormData.extra.map((item, index) => (
+                        <List.Item>
+                          <List.Content>
+                            <List.Header>
+                              {item.footnoteTitle}{' '}
+                              <Button icon onClick={() => deleteItem(index)}>
+                                <Icon name="trash alternate outline" />
+                              </Button>
+                            </List.Header>
+                          </List.Content>
+                        </List.Item>
+                      ))}
+                  </List>
+                )}
+              </Card.Description>
             </Card.Content>
           </Card>
         </Segment>

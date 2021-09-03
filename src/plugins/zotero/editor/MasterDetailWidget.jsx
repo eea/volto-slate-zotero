@@ -147,7 +147,6 @@ const panes = (
   listAllIndex,
   listZoteroIndex,
   listOpenAireIndex,
-  pushItem,
 ) => [
   {
     menuItem: (
@@ -161,13 +160,7 @@ const panes = (
     ),
     render: () => (
       <Tab.Pane>
-        {makeList(
-          props,
-          'allSearchResults',
-          handleAllIndexClick,
-          listAllIndex,
-          pushItem,
-        )}
+        {makeList(props, 'allSearchResults', handleAllIndexClick, listAllIndex)}
       </Tab.Pane>
     ),
   },
@@ -184,7 +177,6 @@ const panes = (
           'zoteroSearchResults',
           handleZoteroIndexClick,
           listZoteroIndex,
-          pushItem,
         )}
       </Tab.Pane>
     ),
@@ -226,7 +218,6 @@ const panes = (
           'openAireSearchResults',
           handleOpenAireIndexClick,
           listOpenAireIndex,
-          pushItem,
         )}
       </Tab.Pane>
     ),

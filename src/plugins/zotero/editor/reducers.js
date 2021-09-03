@@ -368,12 +368,18 @@ export function openaire_items_pub(state = openaireItems, action = {}) {
         },
       };
     case `${OPENAIRE_ITEMS_PUB}_SUCCESS`:
+      const api = action.result.reduce((accumulator, currentValue) => {
+        const x = currentValue.response?.results?.result || [];
+        return [...accumulator, ...x];
+      }, []);
+      const totalResults = action.result.reduce((accumulator, currentValue) => {
+        const x = currentValue.response?.header?.total?.$ || 0;
+        return accumulator + x;
+      }, 0);
       return {
         ...state,
-        api: action.result.response.results
-          ? [...action.result.response.results.result]
-          : [],
-        totalResults: action?.result?.response?.header?.total?.$,
+        api,
+        totalResults,
         [getRequestKey(action.type)]: {
           loading: true,
           loaded: false,
@@ -410,12 +416,18 @@ export function openaire_items_rsd(state = openaireItems, action = {}) {
         },
       };
     case `${OPENAIRE_ITEMS_RSD}_SUCCESS`:
+      const api = action.result.reduce((accumulator, currentValue) => {
+        const x = currentValue.response?.results?.result || [];
+        return [...accumulator, ...x];
+      }, []);
+      const totalResults = action.result.reduce((accumulator, currentValue) => {
+        const x = currentValue.response?.header?.total?.$ || 0;
+        return accumulator + x;
+      }, 0);
       return {
         ...state,
-        api: action.result.response.results
-          ? [...action.result.response.results.result]
-          : [],
-        totalResults: action?.result?.response?.header?.total?.$,
+        api,
+        totalResults,
         [getRequestKey(action.type)]: {
           loading: true,
           loaded: false,

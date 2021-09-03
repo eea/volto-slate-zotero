@@ -5,7 +5,7 @@ import clearSVG from '@plone/volto/icons/clear.svg';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { Button } from 'semantic-ui-react';
+import { Button, Loader } from 'semantic-ui-react';
 import {
   fetchOpenairePubSearchItems,
   fetchOpenaireRsdSearchItems,
@@ -29,7 +29,7 @@ import {
 const ZoteroDataWrapper = (props) => {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [footnote, setFootnoteRef] = useState(props.formData?.footnote);
-  const [footnoteTitle, setfootnoteTitle] = useState(
+  const [footnoteTitle, setFootnoteTitle] = useState(
     props.formData?.footnoteTitle,
   );
   const [itemIdRef, setItemIdRef] = useState(props.formData?.zoteroId);
@@ -44,6 +44,7 @@ const ZoteroDataWrapper = (props) => {
   const [zoteroSearchResults, setZoteroSearchResults] = useState([]);
   const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [citationLoading, setCitationLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [topCollectionFlag, setTopCollectionFlag] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
@@ -147,22 +148,30 @@ const ZoteroDataWrapper = (props) => {
     setShowSearchResults(true);
 
     const filters = ['publications', 'rsd'];
-    const resultUrl = makeOpenAireUrlObj(filters);
+    const objectTypeUrl = makeOpenAireUrlObj(filters);
     const searchForDoi = findDOI(term);
 
     if (searchForDoi.length > 0) {
       searchForDoi.forEach((doi) => {
         setHasMultipleDOIs(true);
-        const finalUrl = `${resultUrl[0]}/?doi=${doi}&format=json`;
-        const finalUrl1 = `${resultUrl[1]}/?doi=${doi}&format=json`;
-        dispatch(fetchOpenairePubSearchItems(finalUrl));
-        dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+        const finalPubUrl = `${objectTypeUrl[0]}/?doi=${doi}&format=json`;
+        const finalRsdUrl = `${objectTypeUrl[1]}/?doi=${doi}&format=json`;
+
+        dispatch(fetchOpenairePubSearchItems([finalPubUrl]));
+        dispatch(fetchOpenaireRsdSearchItems([finalRsdUrl]));
       });
     } else {
-      const finalUrl = `${resultUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
-      const finalUrl1 = `${resultUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
-      dispatch(fetchOpenairePubSearchItems(finalUrl));
-      dispatch(fetchOpenaireRsdSearchItems(finalUrl1));
+      const finalTitlePubUrl = `${objectTypeUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalAuthorPubUrl = `${objectTypeUrl[0]}/?author=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalTitleRsdUrl = `${objectTypeUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalAuthorRsdUrl = `${objectTypeUrl[1]}/?author=${term}&format=json&size=20&page=${openAirePage}`;
+
+      dispatch(
+        fetchOpenairePubSearchItems([finalTitlePubUrl, finalAuthorPubUrl]),
+      );
+      dispatch(
+        fetchOpenaireRsdSearchItems([finalTitleRsdUrl, finalAuthorRsdUrl]),
+      );
     }
   };
 
@@ -262,15 +271,16 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const pushItem = (selectedItem) => {
+    setCitationLoading(true);
     fetchItemCitation(selectedItem.key);
     setSelectedItem(selectedItem);
-    setfootnoteTitle(formatCitation(selectedItem));
+    setFootnoteTitle(formatCitation(selectedItem));
     setItemIdRef(selectedItem.key);
   };
 
   const pushSearchItem = (selectedItem) => {
     setSelectedItem(selectedItem);
-    setfootnoteTitle(formatCitation(selectedItem));
+    setFootnoteTitle(formatCitation(selectedItem));
 
     if (!selectedItem.isOpenAire) {
       fetchItemCitation(selectedItem.key);
@@ -378,6 +388,7 @@ const ZoteroDataWrapper = (props) => {
       setFootnoteRef(zotero_item_citation.result);
       setLoading(false);
       setLoadingMore(false);
+      setCitationLoading(false);
 
       if (selectedItem && selectedItem.isOpenAire) {
         const formData = {
@@ -437,7 +448,7 @@ const ZoteroDataWrapper = (props) => {
   useEffect(() => {
     if (openaire_items_pub.api) {
       const formattedResults = openaire_items_pub.api.map((item) =>
-        formatOpenAire(item, 'publications', zotero_settings.default),
+        formatOpenAire(item, 'publications', zotero_settings?.default),
       );
       const publicationRestuls =
         openAirePage > 1
@@ -474,7 +485,7 @@ const ZoteroDataWrapper = (props) => {
   useEffect(() => {
     if (openaire_items_rsd.api) {
       const formattedResults = openaire_items_rsd.api.map((item) =>
-        formatOpenAire(item, 'rsd', zotero_settings.default),
+        formatOpenAire(item, 'rsd', zotero_settings?.default),
       );
       const rsdRestuls =
         openAirePage > 1
@@ -508,7 +519,7 @@ const ZoteroDataWrapper = (props) => {
   }, [openaire_items_rsd]); // eslint-disable-line
 
   useEffect(() => {
-    setfootnoteTitle(props.formData?.footnoteTitle);
+    setFootnoteTitle(props.formData?.footnoteTitle);
     setFootnoteRef(props.formData?.footnote);
     setItemIdRef(props.formData?.zoteroId);
     setNewFormData({
@@ -532,10 +543,6 @@ const ZoteroDataWrapper = (props) => {
     ...props.formData,
     ...{ footnoteTitle },
   };
-  const formData1 = {
-    ...props.formData,
-    ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
-  };
   const loadMoreButton = (
     <Button primary loading={loadingMore} onClick={handleLoadMore}>
       Load more
@@ -553,6 +560,10 @@ const ZoteroDataWrapper = (props) => {
           <>
             <button
               onClick={(id, value) => {
+                const formData1 = {
+                  ...props.formData,
+                  ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
+                };
                 if (selectedItem && selectedItem.isOpenAire) {
                   handleSaveItemToZotero(selectedItem);
                 } else {
@@ -560,7 +571,11 @@ const ZoteroDataWrapper = (props) => {
                 }
               }}
             >
-              <VoltoIcon size="24px" name={checkSVG} />
+              {!citationLoading ? (
+                <VoltoIcon size="24px" name={checkSVG} />
+              ) : (
+                <Loader active inline size="small" />
+              )}
             </button>
             <button onClick={props.clearHandler}>
               <VoltoIcon size="24px" name={clearSVG} />

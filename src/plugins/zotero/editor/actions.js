@@ -12,24 +12,29 @@ export function getZoteroSettings() {
   };
 }
 
-const handleErrors = (response, component) => {
+const testForErrors = (response) => {
   if (!response.ok) {
-    console.error('handleErrors', response.statusText); // add the url
-    // toast.error(`Error ${component}: ${response.statusText}`);
-    toast.error(
-      `Sorry an error has occurred. We have been notified and are looking into it. Please come back later and if the issue persists please contact the site administrator.`,
-    );
     throw Error(response.statusText);
   }
+  return response;
+};
+
+const handleErrors = (response, component) => {
+  console.error(
+    'handleErrors',
+    response.statusText || response.message,
+    component,
+  );
+  toast.error(
+    `Sorry an error has occurred. We have been notified and are looking into it. Please come back later and if the issue persists please contact the site administrator.`,
+  );
   return response;
 };
 
 const handleSilentErrors = (response, component) => {
   if (Object.keys(response.failed).length > 0) {
     console.error('handleSilentErrors', response.failed[0].message);
-    toast.error(
-      `Sorry an error has occurred. We have been notified and are looking into it. Please come back later and if the issue persists please contact the site administrator.`,
-    );
+
     throw Error(response.failed[0].message);
   }
   return response;
@@ -43,7 +48,7 @@ export function fetchZoteroCollections(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
-      .then((response) => handleErrors(response, 'Zotero Collections'))
+      .then((response) => testForErrors(response))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -60,6 +65,7 @@ export function fetchZoteroCollections(zoteroUrlBase, headers) {
         return dispatch(setZoteroCollectionsSuccess(data));
       })
       .catch((error) => {
+        handleErrors(error, 'Zotero Collections');
         dispatch(setZoteroCollectionsFail(error));
       });
   };
@@ -71,7 +77,7 @@ export function fetchZoteroSubCollections(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
-      .then((response) => handleErrors(response, 'Zotero SubCollections'))
+      .then((response) => testForErrors(response))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -87,7 +93,10 @@ export function fetchZoteroSubCollections(zoteroUrlBase, headers) {
       .then((data) => {
         return dispatch(setZoteroSubCollectionsSuccess(data));
       })
-      .catch((error) => dispatch(setZoteroSubCollectionsFail(error)));
+      .catch((error) => {
+        handleErrors(error, 'Zotero SubCollections');
+        dispatch(setZoteroSubCollectionsFail(error));
+      });
   };
 }
 
@@ -98,7 +107,7 @@ export function fetchZoteroItems(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
-      .then((response) => handleErrors(response, 'Zotero Items'))
+      .then((response) => testForErrors(response))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -112,7 +121,10 @@ export function fetchZoteroItems(zoteroUrlBase, headers) {
         });
       })
       .then((data) => dispatch(setZoteroItemsSuccess(data)))
-      .catch((error) => dispatch(setZoteroItemsFail(error)));
+      .catch((error) => {
+        handleErrors(error, 'Zotero Items');
+        dispatch(setZoteroItemsFail(error));
+      });
   };
 }
 
@@ -123,7 +135,7 @@ export function fetchZoteroSearchItems(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
-      .then((response) => handleErrors(response, 'Zotero Search Items'))
+      .then((response) => testForErrors(response))
       .then((response) => {
         const totalResults = parseInt(
           response.headers.get('Total-Results'),
@@ -139,40 +151,114 @@ export function fetchZoteroSearchItems(zoteroUrlBase, headers) {
       .then((result) => {
         dispatch(setZoteroSearchItemsSuccess(result));
       })
-      .catch((error) => dispatch(setZoteroSearchItemsFail(error)));
+      .catch((error) => {
+        handleErrors(error, 'Zotero Search Items');
+        dispatch(setZoteroSearchItemsFail(error));
+      });
   };
 }
 
-export function fetchOpenairePubSearchItems(openairePubUrlBase) {
-  return (dispatch) => {
-    dispatch(setOpenairePubSearchItemsPending());
-    return fetch(openairePubUrlBase, {
+// OPENAIRE
+/**
+ * Will request data for all received urls and try to repare illegal JSON if parse fails
+ * @param {Object[]} openaireUrls - list of urls for openaire to fetch
+ * @param {string} openaireUrls[] - urls for openaire ex: for autho or title
+ * @param {Function} dispatch - dispatch function
+ * @param {Object} actionObjectToDispatch - object conatining all action creators to call in case of pending, succes and fail
+ * @param {Function} actionObjectToDispatch.pending - action to dispatch call in case of pending
+ * @param {Function} actionObjectToDispatch.success - action to dispatch call in case of succes
+ * @param {Function} actionObjectToDispatch.fail - action to dispatch call in case of fail
+ * @param {string} errorText - text to send to sentry to indicate where the error happened
+ */
+const getOpenaireSearchItems = async (
+  openaireUrls,
+  dispatch,
+  actionObjectToDispatch,
+  errorText,
+) => {
+  dispatch(actionObjectToDispatch.pending());
+
+  const fetchPromises = openaireUrls.map((url) =>
+    fetch(url, {
       method: 'GET',
-    })
-      .then((response) =>
-        handleErrors(response, 'Openaire Publications Search Items'),
-      )
-      .then((response) => response.json())
-      .then((result) => {
-        dispatch(setOpenairePubSearchItemsSuccess(result));
-      })
-      .catch((error) => dispatch(setOpenairePubSearchItemsFail(error)));
+    }),
+  );
+
+  try {
+    const fetchResponses = await Promise.all(fetchPromises);
+    const testResponses = fetchResponses.map((response) =>
+      testForErrors(response),
+    );
+    const textPromises = testResponses.map((response) => response.text());
+    const responseTextList = await Promise.all(textPromises);
+    // Sometimes the result contains zero starting numbers like $: 0022324234
+    // which make the JSON.parse give errors
+    // if the response is parseable we will do the usual process
+    // if not, we will replace the $ property to try and stringify the number
+    const result = [];
+
+    responseTextList.forEach((textResponse) => {
+      try {
+        const text = JSON.parse(textResponse);
+        result.push(text);
+      } catch (errorParse) {
+        // apparently regex will not direclty identify "$" so we replace the value
+        const searchInitialId = '$';
+        const replaceWithNew = '__id_z';
+        const chunkZ = textResponse.replaceAll(searchInitialId, replaceWithNew);
+
+        const fixCode = /"__id_z" : (0[0-9]+) /g;
+        const resultText = chunkZ.replaceAll(fixCode, (match, code) => {
+          return '"__id_z": "' + code + '"';
+        });
+
+        // change it back to "$" to not modify the existing code and formatting
+        const searchNewId = '__id_z';
+        const replaceWithInitial = '$';
+        const resultParsed = JSON.parse(
+          resultText.replaceAll(searchNewId, replaceWithInitial),
+        );
+        result.push(resultParsed);
+      }
+    });
+    dispatch(actionObjectToDispatch.success(result));
+  } catch (error) {
+    handleErrors(error, errorText);
+    dispatch(actionObjectToDispatch.fail(error));
+  }
+};
+
+export function fetchOpenairePubSearchItems(openairePubUrls) {
+  return (dispatch) => {
+    getOpenaireSearchItems(
+      openairePubUrls,
+      dispatch,
+      {
+        pending: setOpenairePubSearchItemsPending,
+        success: setOpenairePubSearchItemsSuccess,
+        fail: setOpenairePubSearchItemsFail,
+      },
+      'Openaire Publications Search Items',
+    );
   };
 }
-export function fetchOpenaireRsdSearchItems(openaireRsdUrlBase) {
+
+export function fetchOpenaireRsdSearchItems(openaireRsdUrls) {
   return (dispatch) => {
     dispatch(setOpenaireRsdSearchItemsPending());
-    return fetch(openaireRsdUrlBase, {
-      method: 'GET',
-    })
-      .then((response) => handleErrors(response, 'Openaire Rsd Search Items'))
-      .then((response) => response.json())
-      .then((result) => {
-        dispatch(setOpenaireRsdSearchItemsSuccess(result));
-      })
-      .catch((error) => dispatch(setOpenaireRsdSearchItemsFail(error)));
+    getOpenaireSearchItems(
+      openaireRsdUrls,
+      dispatch,
+      {
+        pending: setOpenaireRsdSearchItemsPending,
+        success: setOpenaireRsdSearchItemsSuccess,
+        fail: setOpenaireRsdSearchItemsFail,
+      },
+      'Openaire Rsd Search Items',
+    );
   };
 }
+
 export function fetchZoteroItemCitation(zoteroUrlBase, headers) {
   return (dispatch) => {
     dispatch(setZoteroItemCitationPending());
@@ -180,12 +266,15 @@ export function fetchZoteroItemCitation(zoteroUrlBase, headers) {
       method: 'GET',
       headers,
     })
-      .then((response) => handleErrors(response, 'Zotero Item Citation'))
+      .then((response) => testForErrors(response))
       .then((response) => response.text())
       .then((result) => {
         dispatch(setZoteroItemCitationSuccess({ result }));
       })
-      .catch((error) => dispatch(setZoteroItemCitationFail(error)));
+      .catch((error) => {
+        handleErrors(error, 'Zotero Item Citation');
+        dispatch(setZoteroItemCitationFail(error));
+      });
   };
 }
 
@@ -197,13 +286,16 @@ export function saveItemToZotero(zoteroUrlBase, headers, body) {
       headers,
       body,
     })
-      .then((response) => handleErrors(response, 'Save Item to Zotero'))
+      .then((response) => testForErrors(response))
       .then((response) => response.json())
       .then((result) => {
         handleSilentErrors(result, 'Save Item to Zotero');
         dispatch(saveItemToZoteroSuccess(result));
       })
-      .catch((error) => dispatch(saveItemToZoteroFail(error)));
+      .catch((error) => {
+        handleErrors(error, 'Save Item to Zotero');
+        dispatch(saveItemToZoteroFail(error));
+      });
   };
 }
 

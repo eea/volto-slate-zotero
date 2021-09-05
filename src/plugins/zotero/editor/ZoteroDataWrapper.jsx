@@ -25,7 +25,6 @@ import {
   formatOpenAire,
   makeOpenAireUrlObj,
 } from './utils';
-import { nanoid } from 'volto-slate/utils';
 
 const ZoteroDataWrapper = (props) => {
   const [selectedCollection, setSelectedCollection] = useState(null);
@@ -272,6 +271,7 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const pushSearchItem = (receivedItem) => {
+    setCitationLoading(true);
     setSelectedItem(receivedItem);
     if (!receivedItem.isOpenAire) {
       fetchItemCitation(receivedItem.key);
@@ -392,7 +392,6 @@ const ZoteroDataWrapper = (props) => {
                   footnote,
                   zoteroId: selectedItem.key,
                   footnoteTitle: formatCitation(selectedItem),
-                  uid: nanoid(5),
                 },
               ],
             }

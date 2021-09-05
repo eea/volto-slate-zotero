@@ -71,7 +71,7 @@ const InlineForm = ({
             <Card.Content>
               <Card.Header>Citation</Card.Header>
               <Card.Description>
-                {updatedFormData && (
+                {updatedFormData && updatedFormData.footnoteTitle && (
                   <List divided relaxed className="button-wrapper">
                     {/* saved footnotes*/}
                     <List.Item>

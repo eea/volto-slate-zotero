@@ -2,10 +2,9 @@ import { keys } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Card, Message, Segment, List, Button, Icon } from 'semantic-ui-react';
+import { Card, Message, Segment, List, Button } from 'semantic-ui-react';
 import clearSVG from '@plone/volto/icons/delete.svg';
-import codeSVG from '@plone/volto/icons/code.svg';
-import { Icon as IconX } from '@plone/volto/components';
+import { Icon } from '@plone/volto/components';
 
 const messages = defineMessages({
   editValues: {
@@ -81,7 +80,7 @@ const InlineForm = ({
                           as="a"
                           size="tiny"
                           className="ui compact icon toggle button"
-                          icon={<IconX name={clearSVG} size="24px" />}
+                          icon={<Icon name={clearSVG} size="24px" />}
                           onClick={() => deleteItem(-1)}
                         ></Button>
                       </List.Content>
@@ -101,7 +100,7 @@ const InlineForm = ({
                               as="a"
                               size="tiny"
                               className="ui compact icon toggle button"
-                              icon={<IconX name={clearSVG} size="24px" />}
+                              icon={<Icon name={clearSVG} size="24px" />}
                               onClick={() => deleteItem(index)}
                             ></Button>
                           </List.Content>

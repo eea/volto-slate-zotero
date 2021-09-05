@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Card, Message, Segment, List, Button, Icon } from 'semantic-ui-react';
+import clearSVG from '@plone/volto/icons/delete.svg';
+import codeSVG from '@plone/volto/icons/code.svg';
+import { Icon as IconX } from '@plone/volto/components';
 
 const messages = defineMessages({
   editValues: {
@@ -64,21 +67,27 @@ const InlineForm = ({
       )}
 
       <div id={`blockform-fieldset-default`}>
-        <Segment className="attached">
+        <Segment className="attached slate-toolbar">
           <Card fluid>
             <Card.Content>
               <Card.Header>Citation</Card.Header>
               <Card.Description>
                 {updatedFormData && (
-                  <List divided relaxed>
+                  <List divided relaxed className="button-wrapper">
                     {/* saved footnotes*/}
                     <List.Item>
+                      <List.Content floated="right">
+                        <Button
+                          as="a"
+                          size="tiny"
+                          className="ui compact icon toggle button"
+                          icon={<IconX name={clearSVG} size="24px" />}
+                          onClick={() => deleteItem(-1)}
+                        ></Button>
+                      </List.Content>
                       <List.Content>
                         <List.Header>
                           {updatedFormData.footnoteTitle}{' '}
-                          <Button icon onClick={() => deleteItem(-1)}>
-                            <Icon name="trash alternate outline" />
-                          </Button>
                         </List.Header>
                       </List.Content>
                     </List.Item>
@@ -87,13 +96,17 @@ const InlineForm = ({
                     {updatedFormData.extra &&
                       updatedFormData.extra.map((item, index) => (
                         <List.Item>
+                          <List.Content floated="right">
+                            <Button
+                              as="a"
+                              size="tiny"
+                              className="ui compact icon toggle button"
+                              icon={<IconX name={clearSVG} size="24px" />}
+                              onClick={() => deleteItem(index)}
+                            ></Button>
+                          </List.Content>
                           <List.Content>
-                            <List.Header>
-                              {item.footnoteTitle}{' '}
-                              <Button icon onClick={() => deleteItem(index)}>
-                                <Icon name="trash alternate outline" />
-                              </Button>
-                            </List.Header>
+                            <List.Header>{item.footnoteTitle} </List.Header>
                           </List.Content>
                         </List.Item>
                       ))}

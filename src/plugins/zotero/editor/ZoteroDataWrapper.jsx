@@ -152,15 +152,21 @@ const ZoteroDataWrapper = (props) => {
         const finalPubUrl = `${objectTypeUrl[0]}/?doi=${doi}&format=json`;
         const finalRsdUrl = `${objectTypeUrl[1]}/?doi=${doi}&format=json`;
 
-        dispatch(fetchOpenairePubSearchItems(finalPubUrl));
-        dispatch(fetchOpenaireRsdSearchItems(finalRsdUrl));
+        dispatch(fetchOpenairePubSearchItems([finalPubUrl]));
+        dispatch(fetchOpenaireRsdSearchItems([finalRsdUrl]));
       });
     } else {
       const finalTitlePubUrl = `${objectTypeUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalAuthorPubUrl = `${objectTypeUrl[0]}/?author=${term}&format=json&size=20&page=${openAirePage}`;
       const finalTitleRsdUrl = `${objectTypeUrl[1]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
+      const finalAuthorRsdUrl = `${objectTypeUrl[1]}/?author=${term}&format=json&size=20&page=${openAirePage}`;
 
-      dispatch(fetchOpenairePubSearchItems(finalTitlePubUrl));
-      dispatch(fetchOpenaireRsdSearchItems(finalTitleRsdUrl));
+      dispatch(
+        fetchOpenairePubSearchItems([finalTitlePubUrl, finalAuthorPubUrl]),
+      );
+      dispatch(
+        fetchOpenaireRsdSearchItems([finalTitleRsdUrl, finalAuthorRsdUrl]),
+      );
     }
   };
 
@@ -445,7 +451,7 @@ const ZoteroDataWrapper = (props) => {
   useEffect(() => {
     if (openaire_items_pub.api) {
       const formattedResults = openaire_items_pub.api.map((item) =>
-        formatOpenAire(item, 'publications', zotero_settings.default),
+        formatOpenAire(item, 'publications', zotero_settings?.default),
       );
       const publicationRestuls =
         openAirePage > 1
@@ -482,7 +488,7 @@ const ZoteroDataWrapper = (props) => {
   useEffect(() => {
     if (openaire_items_rsd.api) {
       const formattedResults = openaire_items_rsd.api.map((item) =>
-        formatOpenAire(item, 'rsd', zotero_settings.default),
+        formatOpenAire(item, 'rsd', zotero_settings?.default),
       );
       const rsdRestuls =
         openAirePage > 1

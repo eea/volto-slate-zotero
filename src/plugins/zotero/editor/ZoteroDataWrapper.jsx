@@ -28,11 +28,6 @@ import {
 
 const ZoteroDataWrapper = (props) => {
   const [selectedCollection, setSelectedCollection] = useState(null);
-  const [footnote, setFootnoteRef] = useState(props.formData?.footnote);
-  const [footnoteTitle, setFootnoteTitle] = useState(
-    props.formData?.footnoteTitle,
-  );
-  const [itemIdRef, setItemIdRef] = useState(props.formData?.zoteroId);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [hasMultipleDOIs, setHasMultipleDOIs] = useState(false);
@@ -48,8 +43,7 @@ const ZoteroDataWrapper = (props) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [topCollectionFlag, setTopCollectionFlag] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
-  const [newFormData, setNewFormData] = useState({}); // eslint-disable-line
-  const [formData, setFormData] = useState({}); // eslint-disable-line
+  const [updatedFormData, setUpdatedFormData] = useState(props.formData); // eslint-disable-line
   const [
     zoteroSearchItemsTotalResultsNumber,
     setZoteroSearchItemsTotalResultsNumber,
@@ -270,21 +264,19 @@ const ZoteroDataWrapper = (props) => {
     pull();
   };
 
-  const pushItem = (selectedItem) => {
+  const pushItem = (receivedItem) => {
     setCitationLoading(true);
-    fetchItemCitation(selectedItem.key);
-    setSelectedItem(selectedItem);
-    setFootnoteTitle(formatCitation(selectedItem));
-    setItemIdRef(selectedItem.key);
+    fetchItemCitation(receivedItem.key);
+    setSelectedItem(receivedItem);
   };
 
-  const pushSearchItem = (selectedItem) => {
-    setSelectedItem(selectedItem);
-    setFootnoteTitle(formatCitation(selectedItem));
-
-    if (!selectedItem.isOpenAire) {
-      fetchItemCitation(selectedItem.key);
-      setItemIdRef(selectedItem.key);
+  const pushSearchItem = (receivedItem) => {
+    setCitationLoading(true);
+    setSelectedItem(receivedItem);
+    if (!receivedItem.isOpenAire) {
+      fetchItemCitation(receivedItem.key);
+    } else {
+      handleSaveItemToZotero(receivedItem);
     }
   };
 
@@ -384,23 +376,34 @@ const ZoteroDataWrapper = (props) => {
   }, [zotero_items]); // eslint-disable-line
 
   useEffect(() => {
-    if (zotero_item_citation) {
-      setFootnoteRef(zotero_item_citation.result);
+    if (zotero_item_citation && selectedItem) {
       setLoading(false);
       setLoadingMore(false);
       setCitationLoading(false);
+      const footnote = zotero_item_citation.result;
 
-      if (selectedItem && selectedItem.isOpenAire) {
-        const formData = {
-          ...props.formData,
-          ...{
-            footnote: zotero_item_citation.result,
-            zoteroId: itemIdRef,
-            footnoteTitle,
-          },
-        };
-        props.submitHandler(formData);
-      }
+      setUpdatedFormData(
+        updatedFormData.footnote
+          ? {
+              ...updatedFormData,
+              extra: [
+                ...(updatedFormData.extra || []),
+                {
+                  footnote,
+                  zoteroId: selectedItem.key,
+                  footnoteTitle: formatCitation(selectedItem),
+                },
+              ],
+            }
+          : {
+              ...updatedFormData,
+              ...{
+                footnote,
+                zoteroId: selectedItem.key,
+                footnoteTitle: formatCitation(selectedItem),
+              },
+            },
+      );
     }
   }, [zotero_item_citation]); // eslint-disable-line
 
@@ -410,7 +413,6 @@ const ZoteroDataWrapper = (props) => {
       toast.success('Successfully added to Zotero Library');
 
       setLoading(false);
-      setItemIdRef(itemId);
       fetchItemCitation(itemId);
     }
     if (zotero_item_saved?.zotero?.error) {
@@ -519,16 +521,8 @@ const ZoteroDataWrapper = (props) => {
   }, [openaire_items_rsd]); // eslint-disable-line
 
   useEffect(() => {
-    setFootnoteTitle(props.formData?.footnoteTitle);
-    setFootnoteRef(props.formData?.footnote);
-    setItemIdRef(props.formData?.zoteroId);
-    setNewFormData({
+    setUpdatedFormData({
       ...props.formData,
-      ...{ footnoteTitle },
-    });
-    setFormData({
-      ...props.formData,
-      ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
     });
     /* eslint-disable */
   }, [
@@ -538,11 +532,39 @@ const ZoteroDataWrapper = (props) => {
     props.formData?.zoteroId,
   ]);
 
-  /* eslint-enable */
-  const newFormData1 = {
-    ...props.formData,
-    ...{ footnoteTitle },
+  const deleteItem = (index) => {
+    let formDataAfterDelete = null;
+
+    if (index > -1 && updatedFormData.extra) {
+      formDataAfterDelete = {
+        ...updatedFormData,
+        extra: [
+          ...updatedFormData.extra.slice(0, index),
+          ...updatedFormData.extra.slice(index + 1),
+        ],
+      };
+    } else if (
+      index === -1 &&
+      (!updatedFormData.extra || updatedFormData.extra.length === 0)
+    ) {
+      formDataAfterDelete = { uid: updatedFormData.uid };
+    } else if (
+      index === -1 &&
+      updatedFormData.extra &&
+      updatedFormData.extra.length > 0
+    ) {
+      const firstExtraCitation = updatedFormData.extra.slice(0, 1)[0];
+      const { footnote, footnoteTitle, zoteroId } = firstExtraCitation;
+
+      formDataAfterDelete = {
+        ...updatedFormData,
+        ...{ footnote, footnoteTitle, zoteroId },
+        extra: [...updatedFormData.extra.slice(1)],
+      };
+    }
+    setUpdatedFormData(formDataAfterDelete);
   };
+
   const loadMoreButton = (
     <Button primary loading={loadingMore} onClick={handleLoadMore}>
       Load more
@@ -555,20 +577,13 @@ const ZoteroDataWrapper = (props) => {
         schema={props.schema}
         title={props.title}
         icon={<VoltoIcon size="24px" name={briefcaseSVG} />}
-        formData={newFormData1}
+        updatedFormData={updatedFormData}
+        deleteItem={deleteItem}
         headerActions={
           <>
             <button
               onClick={(id, value) => {
-                const formData1 = {
-                  ...props.formData,
-                  ...{ footnote, zoteroId: itemIdRef, footnoteTitle },
-                };
-                if (selectedItem && selectedItem.isOpenAire) {
-                  handleSaveItemToZotero(selectedItem);
-                } else {
-                  props.submitHandler(formData1);
-                }
+                props.submitHandler(updatedFormData);
               }}
             >
               {!citationLoading ? (

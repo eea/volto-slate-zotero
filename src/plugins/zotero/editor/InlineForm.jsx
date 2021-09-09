@@ -2,7 +2,9 @@ import { keys } from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Card, Message, Segment } from 'semantic-ui-react';
+import { Card, Message, Segment, List, Button } from 'semantic-ui-react';
+import clearSVG from '@plone/volto/icons/delete.svg';
+import { Icon } from '@plone/volto/components';
 
 const messages = defineMessages({
   editValues: {
@@ -23,10 +25,11 @@ const InlineForm = ({
   description,
   error, // Such as {message: "It's not good"}
   errors = {},
-  formData,
+  updatedFormData,
   title,
   icon,
   headerActions,
+  deleteItem,
   intl,
 }) => {
   const _ = intl.formatMessage;
@@ -63,11 +66,52 @@ const InlineForm = ({
       )}
 
       <div id={`blockform-fieldset-default`}>
-        <Segment className="attached">
+        <Segment className="attached slate-toolbar">
           <Card fluid>
             <Card.Content>
               <Card.Header>Citation</Card.Header>
-              <Card.Description>{formData.footnoteTitle}</Card.Description>
+              <Card.Description>
+                {updatedFormData && updatedFormData.footnoteTitle && (
+                  <List divided relaxed className="button-wrapper">
+                    {/* saved footnotes*/}
+                    <List.Item>
+                      <List.Content floated="right">
+                        <Button
+                          as="a"
+                          size="tiny"
+                          className="ui compact icon toggle button"
+                          icon={<Icon name={clearSVG} size="24px" />}
+                          onClick={() => deleteItem(-1)}
+                        ></Button>
+                      </List.Content>
+                      <List.Content>
+                        <List.Header>
+                          {updatedFormData.footnoteTitle}{' '}
+                        </List.Header>
+                      </List.Content>
+                    </List.Item>
+
+                    {/* new footnotes*/}
+                    {updatedFormData.extra &&
+                      updatedFormData.extra.map((item, index) => (
+                        <List.Item>
+                          <List.Content floated="right">
+                            <Button
+                              as="a"
+                              size="tiny"
+                              className="ui compact icon toggle button"
+                              icon={<Icon name={clearSVG} size="24px" />}
+                              onClick={() => deleteItem(index)}
+                            ></Button>
+                          </List.Content>
+                          <List.Content>
+                            <List.Header>{item.footnoteTitle} </List.Header>
+                          </List.Content>
+                        </List.Item>
+                      ))}
+                  </List>
+                )}
+              </Card.Description>
             </Card.Content>
           </Card>
         </Segment>

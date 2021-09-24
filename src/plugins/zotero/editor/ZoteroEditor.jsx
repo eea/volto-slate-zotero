@@ -20,6 +20,7 @@ export default (props) => {
   const active = getActiveElement(editor);
   const [zoteroNode] = active;
   const isZotero = isActiveElement(editor);
+  const pid = `${editor.uid}-${pluginId}`;
 
   // Update the form data based on the current zotero
   const zoteroRef = React.useRef(null);
@@ -56,14 +57,14 @@ export default (props) => {
       formData={formData}
       submitHandler={(newFormData) => {
         saveDataToEditor(newFormData);
-        dispatch(setPluginOptions(pluginId, { show_sidebar_editor: false }));
+        dispatch(setPluginOptions(pid, { show_sidebar_editor: false }));
 
         ReactEditor.focus(editor);
       }}
       clearHandler={() => {
         setFormData({});
         checkForCancel();
-        dispatch(setPluginOptions(pluginId, { show_sidebar_editor: false }));
+        dispatch(setPluginOptions(pid, { show_sidebar_editor: false }));
 
         ReactEditor.focus(editor);
       }}

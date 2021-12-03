@@ -5,7 +5,7 @@ pipeline {
         GIT_NAME = "volto-slate-zotero"
         NAMESPACE = "@eeacms"
         SONARQUBE_TAGS = "volto.eea.europa.eu,www.eea.europa.eu-ims,climate-energy.eea.europa.eu,sustainability.eionet.europa.eu,forest.eea.europa.eu,biodiversity.europa.eu,clms.land.copernicus.eu,industry.eea.europa.eu"
-        DEPENDENCIES = ""
+        DEPENDENCIES = "volto-slate"
     }
 
   stages {
@@ -23,7 +23,7 @@ pipeline {
 
           "ES lint": {
             node(label: 'docker') {
-              sh '''docker run -i --rm --name="$BUILD_TAG-eslint" -e NAMESPACE="$NAMESPACE" -e GIT_NAME=$GIT_NAME -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" plone/volto-addon-ci eslint'''
+              sh '''docker run -i --rm --name="$BUILD_TAG-eslint" -e NAMESPACE="$NAMESPACE" -e GIT_NAME=$GIT_NAME -e GIT_BRANCH="$BRANCH_NAME" -e DEPENDENCIES="$DEPENDENCIES" -e GIT_CHANGE_ID="$CHANGE_ID" plone/volto-addon-ci eslint'''
             }
           },
 
@@ -58,7 +58,7 @@ pipeline {
               script {
                 try {
                   sh '''docker pull plone/volto-addon-ci'''
-                  sh '''docker run -i --name="$BUILD_TAG-volto" -e NAMESPACE="$NAMESPACE" -e GIT_NAME=$GIT_NAME -e GIT_BRANCH="$BRANCH_NAME" -e GIT_CHANGE_ID="$CHANGE_ID" plone/volto-addon-ci'''
+                  sh '''docker run -i --name="$BUILD_TAG-volto" -e NAMESPACE="$NAMESPACE" -e GIT_NAME=$GIT_NAME -e GIT_BRANCH="$BRANCH_NAME" -e DEPENDENCIES="$DEPENDENCIES" -e GIT_CHANGE_ID="$CHANGE_ID" plone/volto-addon-ci'''
                   sh '''rm -rf xunit-reports'''
                   sh '''mkdir -p xunit-reports'''
                   sh '''docker cp $BUILD_TAG-volto:/opt/frontend/my-volto-project/coverage xunit-reports/'''

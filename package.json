@@ -27,9 +27,7 @@
     "@eeacms/volto-slate-footnote"
   ],
   "peerDependencies": {
-    "volto-slate": "*"
-  },
-  "dependencies": {
+    "volto-slate": "*",
     "@eeacms/volto-slate-footnote": "*"
   },
   "devDependencies": {

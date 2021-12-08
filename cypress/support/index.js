@@ -15,7 +15,6 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands';
-
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
@@ -24,7 +23,7 @@ import './commands';
 import '@cypress/code-coverage/support';
 coverage-end */
 
-export const setupBeforeEach = () => {
+export const slateBeforeEach = (contentType = 'Document') => {
   cy.autologin();
   cy.createContent({
     contentType: 'Folder',
@@ -32,7 +31,7 @@ export const setupBeforeEach = () => {
     contentTitle: 'Cypress',
   });
   cy.createContent({
-    contentType: 'Document',
+    contentType: contentType,
     contentId: 'my-page',
     contentTitle: 'My Page',
     path: 'cypress',
@@ -44,10 +43,9 @@ export const setupBeforeEach = () => {
   cy.waitForResourceToLoad('@types');
   cy.waitForResourceToLoad('my-page');
   cy.navigate('/cypress/my-page/edit');
-  cy.get(`.block.title [data-contents]`);
 };
 
-export const tearDownAfterEach = () => {
+export const slateAfterEach = () => {
   cy.autologin();
   cy.removeContent('cypress');
 };

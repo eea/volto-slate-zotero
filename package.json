@@ -45,6 +45,6 @@
     "lint": "../../../node_modules/eslint/bin/eslint.js --max-warnings=0 'src/**/*.{js,jsx}'",
     "lint:fix": "../../../node_modules/eslint/bin/eslint.js --fix 'src/**/*.{js,jsx}'",
     "cypress:run": "../../../node_modules/cypress/bin/cypress run",
-    "cypress:open": "../../../node_modules/cypress/bin/cypress open"
+    "cypress:open": "if [ -d ./project ]; then ./project/node_modules/cypress/bin/cypress open; else ../../../node_modules/cypress/bin/cypress open; fi"
   }
 }

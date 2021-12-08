@@ -1,6 +1,7 @@
 {
   "baseUrl": "http://localhost:3000",
   "viewportWidth": 1280,
+  "viewportHeight": 1000,
   "defaultCommandTimeout": 15000,
   "reporter": "junit",
   "video": true,

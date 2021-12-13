@@ -184,6 +184,7 @@ describe('Slate citations', () => {
     cy.get('.slate-editor.selected [contenteditable=true]')
       .find('span[id^="cite_ref"]')
       .first()
+      .click()
       .click();
     cy.get('.slate-inline-toolbar.slate-toolbar')
       .find('a[title^="Edit citation"]')

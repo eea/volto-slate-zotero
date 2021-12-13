@@ -182,6 +182,7 @@ describe('Slate citations', () => {
 
     // Delete citation from multiple set
     cy.get('.slate-editor.selected [contenteditable=true]')
+      .click()
       .find('span[id^="cite_ref"]')
       .first()
       .click()

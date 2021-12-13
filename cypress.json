@@ -6,7 +6,7 @@
   "reporter": "junit",
   "video": true,
   "retries": {
-    "runMode": 8,
+    "runMode": 3,
     "openMode": 0
   },
   "reporterOptions": {

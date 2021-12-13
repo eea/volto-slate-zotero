@@ -380,7 +380,7 @@ Cypress.Commands.add('getSlateEditorAndType', (type) => {
   cy.get('.content-area .slate-editor [contenteditable=true]')
     .focus()
     .click()
-    .wait(1000)
+    .wait(3000)
     .type(type);
 });
 
@@ -388,6 +388,7 @@ Cypress.Commands.add('setSlateSelection', (subject, query, endQuery) => {
   cy.get('.slate-editor.selected [contenteditable=true]')
     .focus()
     .click()
+    .wait(3000)
     .setSelection(subject, query, endQuery)
     .wait(1000);
 });

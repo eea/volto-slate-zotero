@@ -181,12 +181,7 @@ describe('Slate citations', () => {
       .contains('b');
 
     // Delete citation from multiple set
-    cy.get('.slate-editor.selected [contenteditable=true]')
-      .click()
-      .find('span[id^="cite_ref"]')
-      .first()
-      .click()
-      .click();
+    cy.setSlateSelection('Luck', 'failure');
     cy.get('.slate-inline-toolbar.slate-toolbar')
       .find('a[title^="Edit citation"]')
       .click();

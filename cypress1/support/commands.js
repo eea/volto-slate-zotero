@@ -125,100 +125,6 @@ Cypress.Commands.add(
   },
 );
 
-// --- Add DX Content-Type ----------------------------------------------------------
-Cypress.Commands.add('addContentType', (name) => {
-  let api_url, auth;
-  api_url = Cypress.env('API_PATH') || 'http://localhost:8080/Plone';
-  auth = {
-    user: 'admin',
-    pass: 'admin',
-  };
-  return cy
-    .request({
-      method: 'POST',
-      url: `${api_url}/@controlpanels/dexterity-types/${name}`,
-      headers: {
-        Accept: 'application/json',
-      },
-      auth: auth,
-      body: {
-        title: name,
-      },
-    })
-    .then(() => console.log(`${name} content-type added.`));
-});
-
-// --- Remove DX behavior ----------------------------------------------------------
-Cypress.Commands.add('removeContentType', (name) => {
-  let api_url, auth;
-  api_url = Cypress.env('API_PATH') || 'http://localhost:8080/Plone';
-  auth = {
-    user: 'admin',
-    pass: 'admin',
-  };
-  return cy
-    .request({
-      method: 'DELETE',
-      url: `${api_url}/@controlpanels/dexterity-types/${name}`,
-      headers: {
-        Accept: 'application/json',
-      },
-      auth: auth,
-      body: {},
-    })
-    .then(() => console.log(`${name} content-type removed.`));
-});
-
-// --- Add DX field ----------------------------------------------------------
-Cypress.Commands.add('addSlateJSONField', (type, name) => {
-  let api_url, auth;
-  api_url = Cypress.env('API_PATH') || 'http://localhost:8080/Plone';
-  auth = {
-    user: 'admin',
-    pass: 'admin',
-  };
-  return cy
-    .request({
-      method: 'POST',
-      url: `${api_url}/@types/${type}`,
-      headers: {
-        Accept: 'application/json',
-      },
-      auth: auth,
-      body: {
-        id: name,
-        title: name,
-        description: 'Slate JSON Field',
-        factory: 'SlateJSONField',
-        required: false,
-      },
-    })
-    .then(() => console.log(`${name} SlateJSONField field added to ${type}`));
-});
-
-// --- Remove DX field ----------------------------------------------------------
-Cypress.Commands.add('removeSlateJSONField', (type, name) => {
-  let api_url, auth;
-  api_url = Cypress.env('API_PATH') || 'http://localhost:8080/Plone';
-  auth = {
-    user: 'admin',
-    pass: 'admin',
-  };
-  return cy
-    .request({
-      method: 'DELETE',
-      url: `${api_url}/@types/${type}/${name}`,
-      headers: {
-        Accept: 'application/json',
-      },
-      auth: auth,
-      body: {},
-    })
-    .then(() =>
-      console.log(`${name} SlateJSONField field removed from ${type}`),
-    );
-});
-
 // --- REMOVE CONTENT --------------------------------------------------------
 Cypress.Commands.add('removeContent', (path) => {
   let api_url, auth;
@@ -239,82 +145,6 @@ Cypress.Commands.add('removeContent', (path) => {
     })
     .then(() => console.log(`${path} removed`));
 });
-
-Cypress.Commands.add('typeInSlate', { prevSubject: true }, (subject, text) => {
-  return (
-    cy
-      .wrap(subject)
-      .then((subject) => {
-        subject[0].dispatchEvent(
-          new InputEvent('beforeinput', {
-            inputType: 'insertText',
-            data: text,
-          }),
-        );
-        return subject;
-      })
-      // TODO: do this only for Electron-based browser which does not understand instantaneously
-      // that the user inserted some text in the block
-      .wait(1000)
-  );
-});
-
-Cypress.Commands.add('lineBreakInSlate', { prevSubject: true }, (subject) => {
-  return (
-    cy
-      .wrap(subject)
-      .then((subject) => {
-        subject[0].dispatchEvent(
-          new InputEvent('beforeinput', { inputType: 'insertLineBreak' }),
-        );
-        return subject;
-      })
-      // TODO: do this only for Electron-based browser which does not understand instantaneously
-      // that the block was split
-      .wait(1000)
-  );
-});
-
-// --- SET WORKFLOW ----------------------------------------------------------
-Cypress.Commands.add(
-  'setWorkflow',
-  ({
-    path = '/',
-    actor = 'admin',
-    review_state = 'publish',
-    time = '1995-07-31T18:30:00',
-    title = '',
-    comment = '',
-    effective = '2018-01-21T08:00:00',
-    expires = '2019-01-21T08:00:00',
-    include_children = true,
-  }) => {
-    let api_url, auth;
-    api_url = Cypress.env('API_PATH') || 'http://localhost:8080/Plone';
-    auth = {
-      user: 'admin',
-      pass: 'admin',
-    };
-    return cy.request({
-      method: 'POST',
-      url: `${api_url}/${path}/@workflow/${review_state}`,
-      headers: {
-        Accept: 'application/json',
-      },
-      auth: auth,
-      body: {
-        actor: actor,
-        review_state: review_state,
-        time: time,
-        title: title,
-        comment: comment,
-        effective: effective,
-        expires: expires,
-        include_children: include_children,
-      },
-    });
-  },
-);
 
 // --- waitForResourceToLoad ----------------------------------------------------------
 Cypress.Commands.add('waitForResourceToLoad', (fileName, type) => {
@@ -349,6 +179,7 @@ Cypress.Commands.add('selection', { prevSubject: true }, (subject, fn) => {
   return cy.wrap(subject);
 });
 
+// will select the received query
 Cypress.Commands.add(
   'setSelection',
   { prevSubject: true },
@@ -375,7 +206,7 @@ Cypress.Commands.add(
     });
   },
 );
-
+// will type in the existing slate field
 Cypress.Commands.add('getSlateEditorAndType', (type) => {
   cy.get('.content-area .slate-editor [contenteditable=true]')
     .focus()
@@ -383,7 +214,7 @@ Cypress.Commands.add('getSlateEditorAndType', (type) => {
     .wait(1000)
     .type(type);
 });
-
+// will select based on query the selected slate field
 Cypress.Commands.add('setSlateSelection', (subject, query, endQuery) => {
   cy.get('.slate-editor.selected [contenteditable=true]')
     .focus()
@@ -392,64 +223,9 @@ Cypress.Commands.add('setSlateSelection', (subject, query, endQuery) => {
     .wait(1000);
 });
 
-Cypress.Commands.add('setSlateCursor', (subject, query, endQuery) => {
-  cy.get('.slate-editor.selected [contenteditable=true]')
-    .focus()
-    .click()
-    .setCursor(subject, query, endQuery)
-    .wait(1000);
-});
-
 Cypress.Commands.add('clickSlateButton', (button) => {
   cy.get(`.slate-inline-toolbar .button-wrapper a[title="${button}"]`).click();
 });
-
-Cypress.Commands.add('toolbarSave', () => {
-  cy.wait(1000);
-
-  // Save
-  cy.get('#toolbar-save').click();
-  cy.waitForResourceToLoad('@navigation');
-  cy.waitForResourceToLoad('@breadcrumbs');
-  cy.waitForResourceToLoad('@actions');
-  cy.waitForResourceToLoad('@types');
-  cy.waitForResourceToLoad('my-page');
-  cy.url().should('eq', Cypress.config().baseUrl + '/cypress/my-page');
-});
-
-// Low level command reused by `setCursorBefore` and `setCursorAfter`, equal to `setCursorAfter`
-Cypress.Commands.add(
-  'setCursor',
-  { prevSubject: true },
-  (subject, query, atStart) => {
-    return cy.wrap(subject).selection(($el) => {
-      const node = getTextNode($el[0], query);
-      const offset =
-        node.wholeText.indexOf(query) + (atStart ? 0 : query.length);
-      const document = node.ownerDocument;
-      document.getSelection().removeAllRanges();
-      document.getSelection().collapse(node, offset);
-    });
-    // Depending on what you're testing, you may need to chain a `.click()` here to ensure
-    // further commands are picked up by whatever you're testing (this was required for Slate, for example).
-  },
-);
-
-Cypress.Commands.add(
-  'setCursorBefore',
-  { prevSubject: true },
-  (subject, query) => {
-    cy.wrap(subject).setCursor(query, true);
-  },
-);
-
-Cypress.Commands.add(
-  'setCursorAfter',
-  { prevSubject: true },
-  (subject, query) => {
-    cy.wrap(subject).setCursor(query);
-  },
-);
 
 // Helper functions
 function getTextNode(el, match) {
@@ -474,12 +250,4 @@ function setBaseAndExtent(...args) {
 
 Cypress.Commands.add('navigate', (route = '') => {
   return cy.window().its('appHistory').invoke('push', route);
-});
-
-Cypress.Commands.add('store', () => {
-  return cy.window().its('store').invoke('getStore', '');
-});
-
-Cypress.Commands.add('settings', (key, value) => {
-  return cy.window().its('settings');
 });

@@ -19,7 +19,7 @@ describe('Slate citations', () => {
 
     // Save Zotero without citation
     cy.get('.sidebar-container #zotero-comp .form .header button:first-of-type')
-      .wait(1000)
+      .wait(2000)
       .click();
 
     // element is not slate Zotero
@@ -40,7 +40,7 @@ describe('Slate citations', () => {
     cy.get(
       '.sidebar-container #zotero-comp .form .header button:nth-of-type(2)',
     )
-      .wait(1000)
+      .wait(2000)
       .click();
 
     // element is not slate Zotero
@@ -91,11 +91,11 @@ describe('Slate citations', () => {
     cy.clickSlateButton('Citation');
 
     // select first Zotero collection
-    cy.get('.pastanaga-menu-list ul>li button').first().click().wait(1000);
+    cy.get('.pastanaga-menu-list ul>li button').first().click().wait(2000);
 
     // select first item from the Zotero collection
     cy.get('.items.pastanaga-menu .pastanaga-menu-list ul li')
-      .wait(1000)
+      .wait(2000)
       .first()
       .click();
 
@@ -103,11 +103,11 @@ describe('Slate citations', () => {
     cy.get('.ui.fluid.card .content .description button')
       .first()
       .click()
-      .wait(1000);
+      .wait(2000);
 
     // select second item from the Zotero collection
     cy.get('.items.pastanaga-menu .pastanaga-menu-list ul li')
-      .wait(1000)
+      .wait(2000)
       .first()
       .next()
       .click();
@@ -117,7 +117,7 @@ describe('Slate citations', () => {
 
     // save Zotero citation
     cy.get('.sidebar-container #zotero-comp .form .header button:first-of-type')
-      .wait(11000)
+      .wait(2000)
       .click();
 
     // element is Zotero element and multiple citations works
@@ -140,15 +140,16 @@ describe('Slate citations', () => {
     cy.get('.content-area .slate-editor [contenteditable=true]')
       .first()
       .focus()
+      .click()
       .setSlateSelection('failed');
     cy.clickSlateButton('Citation');
 
     // select first Zotero collection
-    cy.get('.pastanaga-menu-list ul>li button').wait(1000).first().click();
+    cy.get('.pastanaga-menu-list ul>li button').wait(2000).first().click();
 
     // select first item from the Zotero collection
     cy.get('.items.pastanaga-menu .pastanaga-menu-list ul li')
-      .wait(1000)
+      .wait(2000)
       .first()
       .click();
 
@@ -157,7 +158,7 @@ describe('Slate citations', () => {
 
     // save Zotero citation
     cy.get('.sidebar-container #zotero-comp .form .header button:first-of-type')
-      .wait(11000)
+      .wait(2000)
       .click();
 
     // element is Zotero element and multiple citations works
@@ -197,7 +198,7 @@ describe('Slate citations', () => {
 
     // save Zotero citation
     cy.get('.sidebar-container #zotero-comp .form .header button:first-of-type')
-      .wait(11000)
+      .wait(2000)
       .click();
 
     // Footnotes block contains one reference

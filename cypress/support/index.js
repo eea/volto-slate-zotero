@@ -43,6 +43,7 @@ export const slateBeforeEach = (contentType = 'Document') => {
   cy.waitForResourceToLoad('@types');
   cy.waitForResourceToLoad('my-page');
   cy.navigate('/cypress/my-page/edit');
+  cy.get(`.block.title h1`);
 
   // intercept requests to simulate response and not use real credentials
   cy.fixture('../fixtures/credentials.json').then((credentialsResp) => {

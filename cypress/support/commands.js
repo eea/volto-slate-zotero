@@ -212,7 +212,6 @@ Cypress.Commands.add('getSlateEditorAndType', (type) => {
     .focus()
     .click()
     .wait(2000)
-    .wait(1000)
     .type(type);
 });
 // will select based on query the selected slate field
@@ -222,7 +221,7 @@ Cypress.Commands.add('setSlateSelection', (subject, query, endQuery) => {
     .click()
     .wait(2000)
     .setSelection(subject, query, endQuery)
-    .wait(1000);
+    .wait(2000);
 });
 
 Cypress.Commands.add('clickSlateButton', (button) => {

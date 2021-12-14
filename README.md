@@ -1,7 +1,18 @@
 # volto-slate-zotero
 [![Releases](https://img.shields.io/github/v/release/eea/volto-slate-zotero)](https://github.com/eea/volto-slate-zotero/releases)
+
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-slate-zotero%2Fmaster&subject=master)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-slate-zotero/job/master/display/redirect)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-master&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-master)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-master&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-master)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-master&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-master)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-master&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-master)
+
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-slate-zotero%2Fdevelop&subject=develop)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-slate-zotero/job/develop/display/redirect)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-develop)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-develop)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-develop&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-develop)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-slate-zotero-develop&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-slate-zotero-develop)
+
 
 [Zotero](https://www.zotero.org/) integration with [Volto Slate](https://github.com/eea/volto-slate/tree/develop) [Volto](https://github.com/plone/volto) add-on
 

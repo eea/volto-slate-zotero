@@ -92,7 +92,7 @@ Cypress.Commands.add(
             title: contentTitle,
             blocks: {
               'd3f1c443-583f-4e8e-a682-3bf25752a300': { '@type': 'title' },
-              '7624cf59-05d0-4055-8f55-5fd6597d84b0': { '@type': 'text' },
+              '7624cf59-05d0-4055-8f55-5fd6597d84b0': { '@type': 'slate' },
             },
             blocks_layout: {
               items: [
@@ -146,47 +146,6 @@ Cypress.Commands.add('removeContent', (path) => {
     .then(() => console.log(`${path} removed`));
 });
 
-// --- SET WORKFLOW ----------------------------------------------------------
-Cypress.Commands.add(
-  'setWorkflow',
-  ({
-    path = '/',
-    actor = 'admin',
-    review_state = 'publish',
-    time = '1995-07-31T18:30:00',
-    title = '',
-    comment = '',
-    effective = '2018-01-21T08:00:00',
-    expires = '2019-01-21T08:00:00',
-    include_children = true,
-  }) => {
-    let api_url, auth;
-    api_url = Cypress.env('API_PATH') || 'http://localhost:8080/Plone';
-    auth = {
-      user: 'admin',
-      pass: 'admin',
-    };
-    return cy.request({
-      method: 'POST',
-      url: `${api_url}/${path}/@workflow/${review_state}`,
-      headers: {
-        Accept: 'application/json',
-      },
-      auth: auth,
-      body: {
-        actor: actor,
-        review_state: review_state,
-        time: time,
-        title: title,
-        comment: comment,
-        effective: effective,
-        expires: expires,
-        include_children: include_children,
-      },
-    });
-  },
-);
-
 // --- waitForResourceToLoad ----------------------------------------------------------
 Cypress.Commands.add('waitForResourceToLoad', (fileName, type) => {
   const resourceCheckInterval = 40;
@@ -220,6 +179,7 @@ Cypress.Commands.add('selection', { prevSubject: true }, (subject, fn) => {
   return cy.wrap(subject);
 });
 
+// will select the received query
 Cypress.Commands.add(
   'setSelection',
   { prevSubject: true },
@@ -246,40 +206,27 @@ Cypress.Commands.add(
     });
   },
 );
+// will type in the existing slate field
+Cypress.Commands.add('getSlateEditorAndType', (type) => {
+  cy.get('.content-area .slate-editor [contenteditable=true]')
+    .focus()
+    .click()
+    .wait(2000)
+    .type(type);
+});
+// will select based on query the selected slate field
+Cypress.Commands.add('setSlateSelection', (subject, query, endQuery) => {
+  cy.get('.slate-editor.selected [contenteditable=true]')
+    .focus()
+    .click()
+    .wait(2000)
+    .setSelection(subject, query, endQuery)
+    .wait(2000);
+});
 
-// Low level command reused by `setCursorBefore` and `setCursorAfter`, equal to `setCursorAfter`
-Cypress.Commands.add(
-  'setCursor',
-  { prevSubject: true },
-  (subject, query, atStart) => {
-    return cy.wrap(subject).selection(($el) => {
-      const node = getTextNode($el[0], query);
-      const offset =
-        node.wholeText.indexOf(query) + (atStart ? 0 : query.length);
-      const document = node.ownerDocument;
-      document.getSelection().removeAllRanges();
-      document.getSelection().collapse(node, offset);
-    });
-    // Depending on what you're testing, you may need to chain a `.click()` here to ensure
-    // further commands are picked up by whatever you're testing (this was required for Slate, for example).
-  },
-);
-
-Cypress.Commands.add(
-  'setCursorBefore',
-  { prevSubject: true },
-  (subject, query) => {
-    cy.wrap(subject).setCursor(query, true);
-  },
-);
-
-Cypress.Commands.add(
-  'setCursorAfter',
-  { prevSubject: true },
-  (subject, query) => {
-    cy.wrap(subject).setCursor(query);
-  },
-);
+Cypress.Commands.add('clickSlateButton', (button) => {
+  cy.get(`.slate-inline-toolbar .button-wrapper a[title="${button}"]`).click();
+});
 
 // Helper functions
 function getTextNode(el, match) {
@@ -304,12 +251,4 @@ function setBaseAndExtent(...args) {
 
 Cypress.Commands.add('navigate', (route = '') => {
   return cy.window().its('appHistory').invoke('push', route);
-});
-
-Cypress.Commands.add('store', () => {
-  return cy.window().its('store').invoke('getStore', '');
-});
-
-Cypress.Commands.add('settings', (key, value) => {
-  return cy.window().its('settings');
 });

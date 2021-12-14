@@ -1,6 +1,6 @@
 {
   "name": "@eeacms/volto-slate-zotero",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Zotero integration with Volto Slate Footnotes",
   "main": "src/index.js",
   "author": "European Environment Agency: IDM2 A-Team",
@@ -45,6 +45,6 @@
     "lint": "../../../node_modules/eslint/bin/eslint.js --max-warnings=0 'src/**/*.{js,jsx}'",
     "lint:fix": "../../../node_modules/eslint/bin/eslint.js --fix 'src/**/*.{js,jsx}'",
     "cypress:run": "../../../node_modules/cypress/bin/cypress run",
-    "cypress:open": "../../../node_modules/cypress/bin/cypress open"
+    "cypress:open": "if [ -d ./project ]; then ./project/node_modules/cypress/bin/cypress open; else ../../../node_modules/cypress/bin/cypress open; fi"
   }
 }

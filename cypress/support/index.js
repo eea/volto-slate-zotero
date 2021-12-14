@@ -15,7 +15,6 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands';
-
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
@@ -24,7 +23,7 @@ import './commands';
 import '@cypress/code-coverage/support';
 coverage-end */
 
-export const setupBeforeEach = () => {
+export const slateBeforeEach = (contentType = 'Document') => {
   cy.autologin();
   cy.createContent({
     contentType: 'Folder',
@@ -32,7 +31,7 @@ export const setupBeforeEach = () => {
     contentTitle: 'Cypress',
   });
   cy.createContent({
-    contentType: 'Document',
+    contentType: contentType,
     contentId: 'my-page',
     contentTitle: 'My Page',
     path: 'cypress',
@@ -45,9 +44,29 @@ export const setupBeforeEach = () => {
   cy.waitForResourceToLoad('my-page');
   cy.navigate('/cypress/my-page/edit');
   cy.get(`.block.title h1`);
+
+  // intercept requests to simulate response and not use real credentials
+  cy.fixture('../fixtures/credentials.json').then((credentialsResp) => {
+    const { body, statusCode, headers } = credentialsResp;
+
+    cy.intercept('GET', '**/@zotero', { body, statusCode, headers }).as(
+      'credentialsResp',
+    );
+  });
+
+  // intercept the top two collections
+  cy.fixture('../fixtures/collections.json').then((collectionsResp) => {
+    const { body, statusCode, headers } = collectionsResp;
+
+    cy.intercept(
+      'GET',
+      'https://api.zotero.org/users/6732/collections/top/?start=0&limit=10&sort=title',
+      { body, statusCode, headers },
+    ).as('collectionsResp');
+  });
 };
 
-export const tearDownAfterEach = () => {
+export const slateAfterEach = () => {
   cy.autologin();
   cy.removeContent('cypress');
 };

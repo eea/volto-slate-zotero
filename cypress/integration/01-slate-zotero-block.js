@@ -4,7 +4,7 @@ describe('Slate citations', () => {
   beforeEach(slateBeforeEach);
   afterEach(slateAfterEach);
 
-  it('Saving Zotero without selecting citation removes citation element', () => {
+  it('Removes citation element when saving Zotero without selecting citation ', () => {
     // Enter text in slate field
     cy.getSlateEditorAndType('Luck is failure that failed.');
 
@@ -49,7 +49,7 @@ describe('Slate citations', () => {
     );
   });
 
-  it('Add Zotero citations', () => {
+  it('Adds Zotero single and multiple citations and correctly indicates it even when deleting citations', () => {
     // intercept the two items in the first collection
     cy.fixture('../fixtures/items.json').then((itemsResp) => {
       const { body, statusCode, headers } = itemsResp;
@@ -83,7 +83,7 @@ describe('Slate citations', () => {
       ).as('item2Resp');
     });
 
-    // Complete chained commands
+    // Enter text in slate input
     cy.getSlateEditorAndType('Luck is failure that failed.');
 
     // Zotero
@@ -221,5 +221,218 @@ describe('Slate citations', () => {
     // then the page view should contain our changes
     cy.get('span.citation-item').first().contains('Luck is failure');
     cy.contains('Luck is failure that failed.');
+  });
+
+  it('Determines if collection has subCollections and requests that data', () => {
+    // intercept Zotero subcollections response
+    cy.fixture('../fixtures/subCollections.json').then((subCollections) => {
+      const { body, statusCode, headers } = subCollections;
+
+      cy.intercept(
+        'GET',
+        'https://api.zotero.org/users/6732/collections/TFU5D/collections/?start=0&limit=10&sort=title',
+        { body, statusCode, headers },
+      ).as('subCollections');
+    });
+
+    // intercept Zotero items response
+    cy.fixture('../fixtures/items3.json').then((items3) => {
+      const { body, statusCode, headers } = items3;
+
+      cy.intercept(
+        'GET',
+        'https://api.zotero.org/users/6732/collections/TFU5D/items/?start=0&limit=10&sort=title',
+        { body, statusCode, headers },
+      ).as('items3');
+    });
+
+    // intercept Zotero subcollection items response
+    cy.fixture('../fixtures/items2.json').then((items2) => {
+      const { body, statusCode, headers } = items2;
+
+      cy.intercept(
+        'GET',
+        'https://api.zotero.org/users/6732/collections/JGTEPMWE/items/?start=0&limit=10&sort=title',
+        { body, statusCode, headers },
+      ).as('items2');
+    });
+
+    // intercept xml citation response for item
+    cy.fixture('../fixtures/item3.json').then((item3Resp) => {
+      const { body, statusCode, headers } = item3Resp;
+
+      cy.intercept(
+        'GET',
+        'https://api.zotero.org/users/6732/items/STUJEJKU?format=bib&style=https://www.eea.europa.eu/zotero/eea.csl',
+        { body, statusCode, headers },
+      ).as('item3Resp');
+    });
+
+    // Enter text in slate input
+    cy.getSlateEditorAndType('Luck is failure that failed.');
+
+    // Zotero
+    cy.setSlateSelection('Luck', 'failure');
+    cy.clickSlateButton('Citation');
+
+    // select third Zotero collection (because it has a subCollection)
+    cy.get('.pastanaga-menu-list ul>li:nth-of-type(3) button')
+      .wait(2000)
+      .click()
+      .wait(2000);
+
+    // select first Zotero subCollection
+    cy.get('.items.pastanaga-menu .pastanaga-menu-list ul>li button')
+      .first()
+      .wait(2000)
+      .click()
+      .wait(2000);
+
+    // select first item from the Zotero collection
+    cy.get('.items.pastanaga-menu .pastanaga-menu-list ul li')
+      .wait(2000)
+      .first()
+      .click();
+
+    // click preview button to get the citation
+    cy.get('.ui.fluid.card .content .description button').first().click();
+
+    // save Zotero citation
+    cy.get('.sidebar-container #zotero-comp .form .header button:first-of-type')
+      .wait(2000)
+      .click();
+
+    // element is Zotero element and multiple citations works
+    cy.get('.slate-editor.selected [contenteditable=true]')
+      .find('span[id^="cite_ref"]')
+      .should('have.attr', 'data-footnote-indice', '[1]');
+  });
+
+  it('Searches for Openaire results Pub and RSD and Zotero results and adds them', () => {
+    // intercept Zotero response for search term "forest"
+    cy.fixture('../fixtures/subCollections.json').then((subCollections) => {
+      const { body, statusCode, headers } = subCollections;
+
+      cy.intercept(
+        'GET',
+        'https://api.zotero.org/users/6732/items?q=forest&limit=10&start=0&sort=title',
+        { body, statusCode, headers },
+      ).as('subCollections');
+    });
+
+    // intercept Openaire publications author response for search term "forest"
+    cy.fixture('../fixtures/openaireSearchResultsPub.json').then(
+      (openaireSearchResultsPub) => {
+        const { body, statusCode, headers } = openaireSearchResultsPub;
+
+        cy.intercept(
+          'GET',
+          'https://api.openaire.eu/search/publications/?author=forest&format=json&size=20&page=1',
+          { body, statusCode, headers },
+        ).as('openaireSearchResultsPub');
+      },
+    );
+
+    // intercept Openaire publications title response for search term "forest"
+    cy.fixture('../fixtures/openaireSearchResultsPub.json').then(
+      (openaireSearchResultsPub) => {
+        const { body, statusCode, headers } = openaireSearchResultsPub;
+
+        cy.intercept(
+          'GET',
+          'https://api.openaire.eu/search/publications/?title=forest&format=json&size=20&page=1',
+          { body, statusCode, headers },
+        ).as('openaireSearchResultsPub');
+      },
+    );
+
+    // intercept Openaire datasets author response for search term "forest"
+    cy.fixture('../fixtures/openaireSearchResultsRSD.json').then(
+      (openaireSearchResultsRSD) => {
+        const { body, statusCode, headers } = openaireSearchResultsRSD;
+
+        cy.intercept(
+          'GET',
+          'https://api.openaire.eu/search/datasets/?author=forest&format=json&size=20&page=1',
+          { body, statusCode, headers },
+        ).as('openaireSearchResultsRSD');
+      },
+    );
+
+    // intercept Openaire datasets title response for search term "forest"
+    cy.fixture('../fixtures/openaireSearchResultsRSD.json').then(
+      (openaireSearchResultsRSD) => {
+        const { body, statusCode, headers } = openaireSearchResultsRSD;
+
+        cy.intercept(
+          'GET',
+          'https://api.openaire.eu/search/datasets/?title=forest&format=json&size=20&page=1',
+          { body, statusCode, headers },
+        ).as('openaireSearchResultsRSD');
+      },
+    );
+
+    // intercept Zotero save item from Openaire response
+    cy.fixture('../fixtures/saveItemResponse.json').then((saveItemResponse) => {
+      const { body, statusCode, headers } = saveItemResponse;
+
+      cy.intercept('POST', 'https://api.zotero.org/users/6732/items/', {
+        body,
+        statusCode,
+        headers,
+      }).as('saveItemResponse');
+    });
+
+    // intercept xml citation response for Zotero item (citation)
+    cy.fixture('../fixtures/item4.json').then((item4Resp) => {
+      const { body, statusCode, headers } = item4Resp;
+
+      cy.intercept(
+        'GET',
+        'https://api.zotero.org/users/6732/items/H8TWWRZC?format=bib&style=https://www.eea.europa.eu/zotero/eea.csl',
+        { body, statusCode, headers },
+      ).as('item4Resp');
+    });
+
+    // Enter text in slate input
+    cy.getSlateEditorAndType('Luck is failure that failed.');
+
+    // Zotero select item
+    cy.setSlateSelection('Luck', 'failure');
+    cy.clickSlateButton('Citation');
+
+    // Enter text "forest" in search input
+    cy.get('.collections.pastanaga-menu input')
+      .focus()
+      .click()
+      .wait(2000)
+      .type('forest');
+
+    // click search button
+    cy.get(
+      '.collections.pastanaga-menu header .ui.fluid.action.icon.input button',
+    )
+      .focus()
+      .click();
+
+    // select second item from list (first Openiare result)
+    cy.get('.collections.pastanaga-menu .pastanaga-menu-list ul li')
+      .wait(2000)
+      .first()
+      .next()
+      .click();
+
+    // click preview button to get the citation
+    cy.get('.ui.fluid.card .content .description button').first().click();
+
+    // save Openaire item to Zotero and get citation xml
+    cy.get('.sidebar-container #zotero-comp .form .header button:first-of-type')
+      .wait(2000)
+      .click();
+
+    // element is Zotero element
+    cy.get('.slate-editor.selected [contenteditable=true]')
+      .find('span[id^="cite_ref"]')
+      .should('have.attr', 'data-footnote-indice', '[1]');
   });
 });

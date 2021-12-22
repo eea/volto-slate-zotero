@@ -46,7 +46,7 @@ export const slateBeforeEach = (contentType = 'Document') => {
   cy.get(`.block.title h1`);
 
   // intercept requests to simulate response and not use real credentials
-  cy.fixture('../fixtures/credentials.json').then((credentialsResp) => {
+  cy.fixture('zotero-credentials.json').then((credentialsResp) => {
     const { body, statusCode, headers } = credentialsResp;
 
     cy.intercept('GET', '**/@zotero', { body, statusCode, headers }).as(
@@ -55,7 +55,7 @@ export const slateBeforeEach = (contentType = 'Document') => {
   });
 
   // intercept the top two collections
-  cy.fixture('../fixtures/collections.json').then((collectionsResp) => {
+  cy.fixture('zotero-collections.json').then((collectionsResp) => {
     const { body, statusCode, headers } = collectionsResp;
 
     cy.intercept(

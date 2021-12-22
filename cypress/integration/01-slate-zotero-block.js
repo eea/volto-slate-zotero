@@ -51,7 +51,7 @@ describe('Slate citations', () => {
 
   it('Adds Zotero single and multiple citations and correctly indicates it even when deleting citations', () => {
     // intercept the two items in the first collection
-    cy.fixture('../fixtures/items.json').then((itemsResp) => {
+    cy.fixture('zotero-items.json').then((itemsResp) => {
       const { body, statusCode, headers } = itemsResp;
 
       cy.intercept(
@@ -62,7 +62,7 @@ describe('Slate citations', () => {
     });
 
     // intercept xml citation response for first item (citation)
-    cy.fixture('../fixtures/item1.json').then((item1Resp) => {
+    cy.fixture('zotero-item1.json').then((item1Resp) => {
       const { body, statusCode, headers } = item1Resp;
 
       cy.intercept(
@@ -73,7 +73,7 @@ describe('Slate citations', () => {
     });
 
     // intercept xml citation response for second item (citation)
-    cy.fixture('../fixtures/item2.json').then((item2Resp) => {
+    cy.fixture('zotero-item2.json').then((item2Resp) => {
       const { body, statusCode, headers } = item2Resp;
 
       cy.intercept(
@@ -225,7 +225,7 @@ describe('Slate citations', () => {
 
   it('Determines if collection has subCollections and requests that data', () => {
     // intercept Zotero subcollections response
-    cy.fixture('../fixtures/subCollections.json').then((subCollections) => {
+    cy.fixture('zotero-subCollections.json').then((subCollections) => {
       const { body, statusCode, headers } = subCollections;
 
       cy.intercept(
@@ -236,7 +236,7 @@ describe('Slate citations', () => {
     });
 
     // intercept Zotero items response
-    cy.fixture('../fixtures/items3.json').then((items3) => {
+    cy.fixture('zotero-items3.json').then((items3) => {
       const { body, statusCode, headers } = items3;
 
       cy.intercept(
@@ -247,7 +247,7 @@ describe('Slate citations', () => {
     });
 
     // intercept Zotero subcollection items response
-    cy.fixture('../fixtures/items2.json').then((items2) => {
+    cy.fixture('zotero-items2.json').then((items2) => {
       const { body, statusCode, headers } = items2;
 
       cy.intercept(
@@ -258,7 +258,7 @@ describe('Slate citations', () => {
     });
 
     // intercept xml citation response for item
-    cy.fixture('../fixtures/item3.json').then((item3Resp) => {
+    cy.fixture('zotero-item3.json').then((item3Resp) => {
       const { body, statusCode, headers } = item3Resp;
 
       cy.intercept(
@@ -310,7 +310,7 @@ describe('Slate citations', () => {
 
   it('Searches for Openaire results Pub and RSD and Zotero results and adds them', () => {
     // intercept Zotero response for search term "forest"
-    cy.fixture('../fixtures/subCollections.json').then((subCollections) => {
+    cy.fixture('zotero-subCollections.json').then((subCollections) => {
       const { body, statusCode, headers } = subCollections;
 
       cy.intercept(
@@ -321,7 +321,7 @@ describe('Slate citations', () => {
     });
 
     // intercept Openaire publications author response for search term "forest"
-    cy.fixture('../fixtures/openaireSearchResultsPub.json').then(
+    cy.fixture('zotero-openaireSearchResultsPub.json').then(
       (openaireSearchResultsPub) => {
         const { body, statusCode, headers } = openaireSearchResultsPub;
 
@@ -334,7 +334,7 @@ describe('Slate citations', () => {
     );
 
     // intercept Openaire publications title response for search term "forest"
-    cy.fixture('../fixtures/openaireSearchResultsPub.json').then(
+    cy.fixture('zotero-openaireSearchResultsPub.json').then(
       (openaireSearchResultsPub) => {
         const { body, statusCode, headers } = openaireSearchResultsPub;
 
@@ -347,7 +347,7 @@ describe('Slate citations', () => {
     );
 
     // intercept Openaire datasets author response for search term "forest"
-    cy.fixture('../fixtures/openaireSearchResultsRSD.json').then(
+    cy.fixture('zotero-openaireSearchResultsRSD.json').then(
       (openaireSearchResultsRSD) => {
         const { body, statusCode, headers } = openaireSearchResultsRSD;
 
@@ -360,7 +360,7 @@ describe('Slate citations', () => {
     );
 
     // intercept Openaire datasets title response for search term "forest"
-    cy.fixture('../fixtures/openaireSearchResultsRSD.json').then(
+    cy.fixture('zotero-openaireSearchResultsRSD.json').then(
       (openaireSearchResultsRSD) => {
         const { body, statusCode, headers } = openaireSearchResultsRSD;
 
@@ -373,7 +373,7 @@ describe('Slate citations', () => {
     );
 
     // intercept Zotero save item from Openaire response
-    cy.fixture('../fixtures/saveItemResponse.json').then((saveItemResponse) => {
+    cy.fixture('zotero-saveItemResponse.json').then((saveItemResponse) => {
       const { body, statusCode, headers } = saveItemResponse;
 
       cy.intercept('POST', 'https://api.zotero.org/users/6732/items/', {
@@ -384,7 +384,7 @@ describe('Slate citations', () => {
     });
 
     // intercept xml citation response for Zotero item (citation)
-    cy.fixture('../fixtures/item4.json').then((item4Resp) => {
+    cy.fixture('zotero-item4.json').then((item4Resp) => {
       const { body, statusCode, headers } = item4Resp;
 
       cy.intercept(

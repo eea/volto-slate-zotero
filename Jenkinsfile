@@ -5,7 +5,7 @@ pipeline {
         GIT_NAME = "volto-slate-zotero"
         NAMESPACE = "@eeacms"
         DEPENDENCIES = "volto-slate:asDefault"
-        SONARQUBE_TAGS = "volto.eea.europa.eu,www.eea.europa.eu-ims,climate-energy.eea.europa.eu,sustainability.eionet.europa.eu,forest.eea.europa.eu,biodiversity.europa.eu,clms.land.copernicus.eu,industry.eea.europa.eu,water.europa.eu-freshwater"
+        SONARQUBE_TAGS = "volto.eea.europa.eu,www.eea.europa.eu-ims,climate-energy.eea.europa.eu,sustainability.eionet.europa.eu,forest.eea.europa.eu,biodiversity.europa.eu,clms.land.copernicus.eu,industry.eea.europa.eu,water.europa.eu-freshwater,demo-www.eea.europa.eu"
     }
 
   stages {

@@ -1,12 +1,12 @@
 {
   "baseUrl": "http://localhost:3000",
   "viewportWidth": 1280,
-  "viewportHeight": 1000,
-  "defaultCommandTimeout": 15000,
+  "defaultCommandTimeout": 8888,
+  "chromeWebSecurity": false,
   "reporter": "junit",
   "video": true,
   "retries": {
-    "runMode": 3,
+    "runMode": 8,
     "openMode": 0
   },
   "reporterOptions": {

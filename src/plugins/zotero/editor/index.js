@@ -1,6 +1,6 @@
 import tagSVG from '@plone/volto/icons/blog-entry.svg';
 import { defineMessages } from 'react-intl'; // , defineMessages
-import { makeInlineElementPlugin } from 'volto-slate/components/ElementEditor';
+import { makeInlineElementPlugin } from '@plone/volto-slate/elementEditor';
 import { FootnoteElement } from '@eeacms/volto-slate-footnote/editor/render';
 import { ZOTERO } from '../constants';
 import { withZotero } from './extensions';

@@ -2,7 +2,7 @@ import { isEqual } from 'lodash';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { ReactEditor } from 'slate-react';
-import { setPluginOptions } from 'volto-slate/actions';
+import { setPluginOptions } from '@plone/volto-slate/actions';
 import { ZoteroEditorSchema } from './schema';
 import ZoteroDataWrapper from './ZoteroDataWrapper';
 

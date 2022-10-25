@@ -1,6 +1,6 @@
 {
   "name": "@eeacms/volto-slate-zotero",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Zotero integration with Volto Slate Footnotes",
   "main": "src/index.js",
   "author": "European Environment Agency: IDM2 A-Team",
@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "@plone/scripts": "*",
-    "jest-css-modules": "^2.1.0",
     "@cypress/code-coverage": "^3.10.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "md5": "^2.3.0"

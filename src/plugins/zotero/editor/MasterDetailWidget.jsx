@@ -167,7 +167,14 @@ const panes = (
   {
     menuItem: (
       <Menu.Item key="zotero-tab">
-        Zotero<Label>{props.zoteroSearchItemsTotalResultsNumber}</Label>
+        Zotero
+        <Label>
+          {props.zoteroSearchLoading ? (
+            <Loader active inline size="mini" />
+          ) : (
+            <>{props.zoteroSearchItemsTotalResultsNumber}</>
+          )}
+        </Label>
       </Menu.Item>
     ),
     render: () => (

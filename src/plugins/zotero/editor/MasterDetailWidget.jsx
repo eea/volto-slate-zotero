@@ -82,8 +82,8 @@ const makeList = (props, resultsType, handleClick, activeIndex) => (
                   </Card.Meta>
                   <Card.Meta>
                     <span>
-                      Author: {item.data.creators[0]?.firstName}{' '}
-                      {item.data.creators[0]?.lastName}{' '}
+                      Author: {item?.data?.creators?.[0]?.firstName}{' '}
+                      {item?.data?.creators?.[0]?.lastName}{' '}
                     </span>
                   </Card.Meta>
                   <Card.Description>

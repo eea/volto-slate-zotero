@@ -106,8 +106,8 @@ export function zotero_item_citation(state = zoteroItemCitation, action = {}) {
         ...state,
         api: { ...action.result },
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -116,7 +116,7 @@ export function zotero_item_citation(state = zoteroItemCitation, action = {}) {
         ...state,
         api: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.error,
         },
@@ -143,8 +143,8 @@ export function zotero_settings(state = zoteroSettings, action = {}) {
         ...state,
         api: { ...action.result },
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -153,7 +153,7 @@ export function zotero_settings(state = zoteroSettings, action = {}) {
         ...state,
         api: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.error,
         },
@@ -180,8 +180,8 @@ export function zotero_item_saved(state = zoteroItemSaved, action = {}) {
         ...state,
         api: { ...action.result },
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -190,7 +190,7 @@ export function zotero_item_saved(state = zoteroItemSaved, action = {}) {
         ...state,
         api: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.result,
         },
@@ -218,8 +218,8 @@ export function zotero_collections(state = zoteroCollections, action = {}) {
         api: { ...action.result },
         totalResults: action.result.totalResults,
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -228,7 +228,7 @@ export function zotero_collections(state = zoteroCollections, action = {}) {
         ...state,
         api: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.error,
         },
@@ -256,8 +256,8 @@ export function zotero_sub_collections(state = zoteroCollections, action = {}) {
         api: { ...action.result },
         totalResults: action.result.totalResults,
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -266,7 +266,7 @@ export function zotero_sub_collections(state = zoteroCollections, action = {}) {
         ...state,
         api: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.error,
         },
@@ -294,8 +294,8 @@ export function zotero_items(state = zoteroItems, action = {}) {
         api: { ...action.result },
         totalResults: action.result.totalResults,
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -304,7 +304,7 @@ export function zotero_items(state = zoteroItems, action = {}) {
         ...state,
         api: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.error,
         },
@@ -321,7 +321,7 @@ export function zotero_search_items(state = zoteroSearchItems, action = {}) {
         ...state,
         api: null,
         totalResults: null,
-        [getRequestKey(action.type)]: {
+        get: {
           loading: true,
           loaded: false,
           error: null,
@@ -332,9 +332,9 @@ export function zotero_search_items(state = zoteroSearchItems, action = {}) {
         ...state,
         api: { ...action.result.results },
         totalResults: action.result.totalResults,
-        [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+        get: {
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -343,8 +343,8 @@ export function zotero_search_items(state = zoteroSearchItems, action = {}) {
         ...state,
         api: null,
         totalResults: null,
-        [getRequestKey(action.type)]: {
-          loading: true,
+        get: {
+          loading: false,
           loaded: false,
           error: action.error,
         },
@@ -381,8 +381,8 @@ export function openaire_items_pub(state = openaireItems, action = {}) {
         api,
         totalResults,
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -392,7 +392,7 @@ export function openaire_items_pub(state = openaireItems, action = {}) {
         api: null,
         totalResults: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.error,
         },
@@ -429,8 +429,8 @@ export function openaire_items_rsd(state = openaireItems, action = {}) {
         api,
         totalResults,
         [getRequestKey(action.type)]: {
-          loading: true,
-          loaded: false,
+          loading: false,
+          loaded: true,
           error: null,
         },
       };
@@ -440,7 +440,7 @@ export function openaire_items_rsd(state = openaireItems, action = {}) {
         api: null,
         totalResults: null,
         [getRequestKey(action.type)]: {
-          loading: true,
+          loading: false,
           loaded: false,
           error: action.error,
         },

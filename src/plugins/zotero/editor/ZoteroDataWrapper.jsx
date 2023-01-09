@@ -37,6 +37,7 @@ const ZoteroDataWrapper = (props) => {
   const [composedItems, setComposedItems] = useState([]);
   const [allSearchResults, setAllSearchResults] = useState([]);
   const [zoteroSearchResults, setZoteroSearchResults] = useState([]);
+  const [zoteroSearchLoading, setZoteroSearchLoading] = useState(false);
   const [openAireSearchResults, setOpenAireSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [citationLoading, setCitationLoading] = useState(false);
@@ -81,6 +82,9 @@ const ZoteroDataWrapper = (props) => {
   const zotero_settings = useSelector((state) => state?.zotero_settings?.api);
   const zotero_search_items = useSelector(
     (state) => state?.zotero_search_items?.api,
+  );
+  const zotero_search_request = useSelector(
+    (state) => state?.zotero_search_items?.get,
   );
   const zotero_collections = useSelector(
     (state) => state?.zotero_collections?.api,
@@ -448,6 +452,10 @@ const ZoteroDataWrapper = (props) => {
   }, [zotero_search_items]); // eslint-disable-line
 
   useEffect(() => {
+    setZoteroSearchLoading(!!zotero_search_request?.loading);
+  }, [zotero_search_request]);
+
+  useEffect(() => {
     if (openaire_items_pub.api) {
       const formattedResults = openaire_items_pub.api.map((item) =>
         formatOpenAire(item, 'publications', zotero_settings?.default),
@@ -610,6 +618,7 @@ const ZoteroDataWrapper = (props) => {
         showSearchResults={showSearchResults}
         allSearchResults={allSearchResults}
         zoteroSearchResults={zoteroSearchResults}
+        zoteroSearchLoading={zoteroSearchLoading}
         openAireSearchResults={openAireSearchResults}
         pushSearchItem={pushSearchItem}
         showCollections={showCollections}

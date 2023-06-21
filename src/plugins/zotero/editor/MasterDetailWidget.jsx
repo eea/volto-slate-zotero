@@ -30,101 +30,104 @@ const labelObj = {
   },
 };
 
-const makeList = (props, resultsType, handleClick, activeIndex) => (
-  <ul>
-    {!props.loading ? (
-      props[resultsType].length > 0 ? (
-        props[resultsType].map((item, index) => (
-          <li key={`result-${item.label}-${index}`}>
-            <div className="li-item">
-              <Image
-                avatar
-                src={item.icon ? iconsObj[item.icon] : iconsObj.zotero}
-              />
-              {item.label ? (
-                <Label color={labelObj[item.label].color} horizontal>
-                  {labelObj[item.label].name}
-                </Label>
-              ) : null}
+const makeList = (props, resultsType, handleClick, activeIndex) => {
+  if (props.loading) return null;
 
-              <button
-                className="list-button-md"
-                onClick={(ev) => {
-                  handleClick(index);
-                  ev.preventDefault();
-                }}
-              >
-                {item.citationTitle}
-              </button>
-            </div>
-            {activeIndex === index ? (
-              <Card fluid>
-                <Card.Content>
-                  <Card.Description>
-                    {item?.data?.title?.slice(0, 50) || ''}
-                    <Button
-                      circular
-                      color="twitter"
-                      size="mini"
-                      floated="right"
-                      onClick={(ev) => props.pushSearchItem(item)}
-                    >
-                      preview
-                    </Button>
-                  </Card.Description>
-                  <Card.Meta>
-                    <span className="result-type-orange">publication</span>
-                    <span className="result-type"> . </span>
-                    <span className="result-type">
-                      {' '}
-                      {item.data.itemType} . {item.data.date}{' '}
-                    </span>
-                  </Card.Meta>
-                  <Card.Meta>
-                    <span>
-                      Author: {item?.data?.creators?.[0]?.firstName}{' '}
-                      {item?.data?.creators?.[0]?.lastName}{' '}
-                    </span>
-                  </Card.Meta>
-                  <Card.Description>
-                    <a
-                      href={`https://dx.doi.org/${item.data.DOI}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      DOI: {item.data.DOI}
-                    </a>
-                  </Card.Description>
-                  <Card.Description>ISBN: {item.data.ISBN}</Card.Description>
-                  <Card.Description>
-                    Publisher: {item.data.publicationTitle}
-                  </Card.Description>
-                </Card.Content>
-              </Card>
-            ) : null}
+  return (
+    <ul>
+      {!props.loading &&
+        (props[resultsType].length > 0 ? (
+          props[resultsType].map((item, index) => (
+            <li key={`result-${item.label}-${index}`}>
+              <div className="li-item">
+                <Image
+                  avatar
+                  src={item.icon ? iconsObj[item.icon] : iconsObj.zotero}
+                />
+                {item.label ? (
+                  <Label color={labelObj[item.label].color} horizontal>
+                    {labelObj[item.label].name}
+                  </Label>
+                ) : null}
+
+                <button
+                  className="list-button-md"
+                  onClick={(ev) => {
+                    handleClick(index);
+                    ev.preventDefault();
+                  }}
+                >
+                  {item.citationTitle}
+                </button>
+              </div>
+              {activeIndex === index ? (
+                <Card fluid>
+                  <Card.Content>
+                    <Card.Description>
+                      {item?.data?.title?.slice(0, 50) || ''}
+                      <Button
+                        circular
+                        color="twitter"
+                        size="mini"
+                        floated="right"
+                        onClick={(ev) => props.pushSearchItem(item)}
+                      >
+                        preview
+                      </Button>
+                    </Card.Description>
+                    <Card.Meta>
+                      <span className="result-type-orange">publication</span>
+                      <span className="result-type"> . </span>
+                      <span className="result-type">
+                        {' '}
+                        {item.data.itemType} . {item.data.date}{' '}
+                      </span>
+                    </Card.Meta>
+                    <Card.Meta>
+                      <span>
+                        Author: {item?.data?.creators?.[0]?.firstName}{' '}
+                        {item?.data?.creators?.[0]?.lastName}{' '}
+                      </span>
+                    </Card.Meta>
+                    <Card.Description>
+                      <a
+                        href={`https://dx.doi.org/${item.data.DOI}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        DOI: {item.data.DOI}
+                      </a>
+                    </Card.Description>
+                    <Card.Description>ISBN: {item.data.ISBN}</Card.Description>
+                    <Card.Description>
+                      Publisher: {item.data.publicationTitle}
+                    </Card.Description>
+                  </Card.Content>
+                </Card>
+              ) : null}
+            </li>
+          ))
+        ) : (
+          <li>
+            <p>No results, try one of the following:</p>
+            <p> * Reduce the number of words in the search</p>
+            <p>
+              {' '}
+              * Use the DOI if you know it (you may find the DOI via a Google
+              search)
+            </p>
+            <p> * Make sure there is no misspelling</p>
+            <p>
+              {' '}
+              * Browse the Zotero library manually If none of the above works,
+              then you have to add a new record in the Zotero library and after
+              that come back here to search again.
+            </p>
           </li>
-        ))
-      ) : (
-        <li>
-          <p>No results, try one of the following:</p>
-          <p> * Reduce the number of words in the search</p>
-          <p>
-            {' '}
-            * Use the DOI if you know it (you may find the DOI via a Google
-            search)
-          </p>
-          <p> * Make sure there is no misspelling</p>
-          <p>
-            {' '}
-            * Browse the Zotero library manually If none of the above works,
-            then you have to add a new record in the Zotero library and after
-            that come back here to search again.
-          </p>
-        </li>
-      )
-    ) : null}
-  </ul>
-);
+        ))}
+    </ul>
+  );
+};
 
 let openAireFilterList = ['publications', 'rsd'];
 
@@ -316,102 +319,107 @@ const MasterDetailWidget = (props) => {
     </ul>
   );
 
-  const itemsList = () => (
-    <ul>
-      {!props.loading ? (
-        props.items.length > 0 ? (
-          props.items.map((item, index) => (
-            <li key={`item-${index}`}>
-              <button
-                className="list-button-md"
-                onClick={(ev) => {
-                  ev.preventDefault();
-                  const callbackAction = isNaN(item.meta.numCollections)
-                    ? handleItemIndexClick
-                    : pushCollection;
-                  callbackAction(index);
-                }}
-              >
-                {item.citationTitle}
-                {isNaN(item.meta.numCollections) ? null : (
-                  <Icon name={rightArrowSVG} size="24px" />
-                )}
-              </button>
+  const itemsList = () => {
+    if (props.loading) return null;
 
-              {listItemIndex === index ? (
-                <Card fluid>
-                  <Card.Content>
-                    <Card.Description>
-                      {item.data.title?.slice(0, 50) || ''}
-                      <Button
-                        circular
-                        color="twitter"
-                        size="mini"
-                        floated="right"
-                        onClick={(ev) => props.pushItem(item)}
-                      >
-                        preview
-                      </Button>
-                    </Card.Description>
-                    <Card.Meta>
-                      <span className="result-type-orange">publication</span>
-                      <span className="result-type"> . </span>
-                      <span className="result-type">
-                        {' '}
-                        {item.data?.itemType} . {item.data?.date}{' '}
-                      </span>
-                    </Card.Meta>
-                    <Card.Meta>
-                      <span>
-                        Author:{' '}
-                        {item.data.creators
-                          ? item.data.creators[0]
-                            ? item.data.creators[0].name
+    return (
+      <ul>
+        {!props.loading &&
+          (props.items.length > 0 ? (
+            props.items.map((item, index) => (
+              <li key={`item-${index}`}>
+                <button
+                  className="list-button-md"
+                  onClick={(ev) => {
+                    ev.preventDefault();
+                    const callbackAction = isNaN(item.meta.numCollections)
+                      ? handleItemIndexClick
+                      : pushCollection;
+                    callbackAction(index);
+                  }}
+                >
+                  {item.citationTitle}
+                  {isNaN(item.meta.numCollections) ? null : (
+                    <Icon name={rightArrowSVG} size="24px" />
+                  )}
+                </button>
+
+                {listItemIndex === index ? (
+                  <Card fluid>
+                    <Card.Content>
+                      <Card.Description>
+                        {item.data.title?.slice(0, 50) || ''}
+                        <Button
+                          circular
+                          color="twitter"
+                          size="mini"
+                          floated="right"
+                          onClick={(ev) => props.pushItem(item)}
+                        >
+                          preview
+                        </Button>
+                      </Card.Description>
+                      <Card.Meta>
+                        <span className="result-type-orange">publication</span>
+                        <span className="result-type"> . </span>
+                        <span className="result-type">
+                          {' '}
+                          {item.data?.itemType} . {item.data?.date}{' '}
+                        </span>
+                      </Card.Meta>
+                      <Card.Meta>
+                        <span>
+                          Author:{' '}
+                          {item.data.creators
+                            ? item.data.creators[0]
                               ? item.data.creators[0].name
-                              : `${item.data.creators[0].firstName} ${item.data.creators[0]?.lastName}`
-                            : null
-                          : null}{' '}
-                      </span>
-                    </Card.Meta>
-                    <Card.Description>
-                      <a
-                        href={`https://dx.doi.org/${item.data?.DOI}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        DOI: {item.data?.DOI}
-                      </a>
-                    </Card.Description>
-                    <Card.Description>ISBN: {item.data?.ISBN}</Card.Description>
-                    <Card.Description>
-                      Publisher: {item.data?.publicationTitle}
-                    </Card.Description>
-                  </Card.Content>
-                </Card>
-              ) : null}
+                                ? item.data.creators[0].name
+                                : `${item.data.creators[0].firstName} ${item.data.creators[0]?.lastName}`
+                              : null
+                            : null}{' '}
+                        </span>
+                      </Card.Meta>
+                      <Card.Description>
+                        <a
+                          href={`https://dx.doi.org/${item.data?.DOI}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          DOI: {item.data?.DOI}
+                        </a>
+                      </Card.Description>
+                      <Card.Description>
+                        ISBN: {item.data?.ISBN}
+                      </Card.Description>
+                      <Card.Description>
+                        Publisher: {item.data?.publicationTitle}
+                      </Card.Description>
+                    </Card.Content>
+                  </Card>
+                ) : null}
+              </li>
+            ))
+          ) : (
+            <li>
+              <p>No results, try one of the following:</p>
+              <p> * Reduce the number of words in the search</p>
+              <p>
+                {' '}
+                * Use the DOI if you know it (you may find the DOI via a Google
+                search)
+              </p>
+              <p> * Make sure there is no misspelling</p>
+              <p>
+                {' '}
+                * Browse the Zotero library manually If none of the above works,
+                then you have to add a new record in the Zotero library and
+                after that come back here to search again.
+              </p>
             </li>
-          ))
-        ) : (
-          <li>
-            <p>No results, try one of the following:</p>
-            <p> * Reduce the number of words in the search</p>
-            <p>
-              {' '}
-              * Use the DOI if you know it (you may find the DOI via a Google
-              search)
-            </p>
-            <p> * Make sure there is no misspelling</p>
-            <p>
-              {' '}
-              * Browse the Zotero library manually If none of the above works,
-              then you have to add a new record in the Zotero library and after
-              that come back here to search again.
-            </p>
-          </li>
-        )
-      ) : null}
-    </ul>
-  );
+          ))}
+      </ul>
+    );
+  };
 
   const searchResultsList = () => (
     <Tab

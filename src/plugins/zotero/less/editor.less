@@ -1,3 +1,7 @@
+@type: 'collection';
+@element: 'menu';
+@import (multiple) '../../theme.config';
+
 .zotero-edit-node {
   background-color: #e6f3ff;
 }
@@ -36,6 +40,22 @@
     transition: transform 300ms linear;
     transition: transform 300ms linear, -webkit-transform 300ms linear;
     will-change: transform;
+  }
+
+  .description .ui.button {
+    position: relative;
+  }
+
+  .pastanaga-menu-list {
+    .segment {
+      ul {
+        padding: 0;
+      }
+    }
+  }
+
+  .description .ui.button {
+    position: relative;
   }
 
   .pastanaga-menu-list {
@@ -124,14 +144,25 @@
     flex: 1;
   }
 
+  .ui.menu .item {
+    padding: @itemVerticalPadding @itemHorizontalPadding;
+  }
+
+  .ui.menu .item {
+    padding: @itemVerticalPadding @itemHorizontalPadding;
+  }
+
   .li-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0 10px 5px;
-    cursor: pointer;
+    padding: 10px 0px;
+    cursor: auto;
     -ms-flex-align: center;
     -ms-flex-pack: justify;
+    img {
+      margin-right: 0.5em;
+    }
   }
 
   .sidebar-container & {

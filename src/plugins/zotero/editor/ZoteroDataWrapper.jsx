@@ -30,7 +30,6 @@ const ZoteroDataWrapper = (props) => {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [hasMultipleDOIs, setHasMultipleDOIs] = useState(false);
   const [collections, setCollections] = useState([]);
   const [topCollections, setTopCollections] = useState([]);
   const [items, setItems] = useState([]);
@@ -143,21 +142,25 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const fetchAireSearch = (term = searchTerm) => {
-    setShowSearchResults(true);
-
     const filters = ['publications', 'rsd'];
     const objectTypeUrl = makeOpenAireUrlObj(filters);
     const searchForDoi = findDOI(term);
 
     if (searchForDoi.length > 0) {
-      searchForDoi.forEach((doi) => {
-        setHasMultipleDOIs(true);
-        const finalPubUrl = `${objectTypeUrl[0]}/?doi=${doi}&format=json`;
-        const finalRsdUrl = `${objectTypeUrl[1]}/?doi=${doi}&format=json`;
+      const [pubUrls, rsdUrls] = searchForDoi.reduce(
+        (accumulator, currentValue) => {
+          const finalPubUrl = `${objectTypeUrl[0]}/?doi=${currentValue}&format=json`;
+          const finalRsdUrl = `${objectTypeUrl[1]}/?doi=${currentValue}&format=json`;
+          return [
+            [...accumulator[0], finalPubUrl],
+            [...accumulator[1], finalRsdUrl],
+          ];
+        },
+        [[], []],
+      );
 
-        dispatch(fetchOpenairePubSearchItems([finalPubUrl]));
-        dispatch(fetchOpenaireRsdSearchItems([finalRsdUrl]));
-      });
+      dispatch(fetchOpenairePubSearchItems(pubUrls));
+      dispatch(fetchOpenaireRsdSearchItems(rsdUrls));
     } else {
       const finalTitlePubUrl = `${objectTypeUrl[0]}/?title=${term}&format=json&size=20&page=${openAirePage}`;
       const finalAuthorPubUrl = `${objectTypeUrl[0]}/?author=${term}&format=json&size=20&page=${openAirePage}`;
@@ -187,9 +190,8 @@ const ZoteroDataWrapper = (props) => {
   };
 
   const handleLoadMore = () => {
-    // load search rezults
+    // load search results
     setLoadingMore(true);
-    setHasMultipleDOIs(false);
     if (showSearchResults) {
       switch (activeTabIndexS) {
         case 0:
@@ -229,7 +231,6 @@ const ZoteroDataWrapper = (props) => {
     setSearchTerm(searchTerm);
     setZoteroSearchItemsOffset(0);
     setOpenAirePage(1);
-    setHasMultipleDOIs(false);
 
     fetchZoteroSearch(searchTerm);
     fetchAireSearch(searchTerm);
@@ -460,14 +461,12 @@ const ZoteroDataWrapper = (props) => {
       const formattedResults = openaire_items_pub.api.map((item) =>
         formatOpenAire(item, 'publications', zotero_settings?.default),
       );
-      const publicationRestuls =
+      const publicationResults =
         openAirePage > 1
-          ? [...openAirePublicationResults, ...formattedResults]
-          : hasMultipleDOIs
           ? [...openAirePublicationResults, ...formattedResults]
           : formattedResults;
 
-      const uniquePublicationRestuls = publicationRestuls.filter((result) => {
+      const uniquePublicationResults = publicationResults.filter((result) => {
         return !zoteroSearchResults.find(
           (zoteroResult) => zoteroResult.data.DOI === result.data.DOI,
         );
@@ -477,14 +476,14 @@ const ZoteroDataWrapper = (props) => {
       setOpenAireTotalResultsNumber(
         openaire_items_pub.totalResults + openAireRsdTotalResultsNumber,
       );
-      setOpenAirePublicationResults(uniquePublicationRestuls);
+      setOpenAirePublicationResults(uniquePublicationResults);
       setOpenAireSearchResults([
-        ...uniquePublicationRestuls,
+        ...uniquePublicationResults,
         ...openAireDataResults,
       ]);
       setAllSearchResults([
         ...zoteroSearchResults,
-        ...uniquePublicationRestuls,
+        ...uniquePublicationResults,
         ...openAireDataResults,
       ]);
       setLoading(false);
@@ -497,13 +496,11 @@ const ZoteroDataWrapper = (props) => {
       const formattedResults = openaire_items_rsd.api.map((item) =>
         formatOpenAire(item, 'rsd', zotero_settings?.default),
       );
-      const rsdRestuls =
+      const rsdResults =
         openAirePage > 1
           ? [...openAireDataResults, ...formattedResults]
-          : hasMultipleDOIs
-          ? [...openAireDataResults, ...formattedResults]
           : formattedResults;
-      const uniqueRsdRestuls = rsdRestuls.filter((result) => {
+      const uniqueRsdResults = rsdResults.filter((result) => {
         return !zoteroSearchResults.find(
           (zoteroResult) => zoteroResult.data.DOI === result.data.DOI,
         );
@@ -513,15 +510,15 @@ const ZoteroDataWrapper = (props) => {
       setOpenAireTotalResultsNumber(
         openaire_items_rsd.totalResults + openAirePubTotalResultsNumber,
       );
-      setOpenAireDataResults(uniqueRsdRestuls);
+      setOpenAireDataResults(uniqueRsdResults);
       setOpenAireSearchResults([
         ...openAirePublicationResults,
-        ...uniqueRsdRestuls,
+        ...uniqueRsdResults,
       ]);
       setAllSearchResults([
         ...zoteroSearchResults,
         ...openAirePublicationResults,
-        ...uniqueRsdRestuls,
+        ...uniqueRsdResults,
       ]);
       setLoading(false);
       setLoadingMore(false);

@@ -1,6 +1,6 @@
 {
   "name": "@eeacms/volto-slate-zotero",
-  "version": "5.2.2",
+  "version": "5.2.3",
   "description": "Zotero integration with Volto Slate Footnotes",
   "main": "src/index.js",
   "author": "European Environment Agency: IDM2 A-Team",

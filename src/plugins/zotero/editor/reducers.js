@@ -373,7 +373,7 @@ export function openaire_items_pub(state = openaireItems, action = {}) {
         return [...accumulator, ...x];
       }, []);
       const totalResults = action.result.reduce((accumulator, currentValue) => {
-        const x = currentValue.response?.header?.total?.$ || 0;
+        const x = parseInt(currentValue.response?.header?.total?.$) || 0;
         return accumulator + x;
       }, 0);
       return {
@@ -421,7 +421,7 @@ export function openaire_items_rsd(state = openaireItems, action = {}) {
         return [...accumulator, ...x];
       }, []);
       const totalResults = action.result.reduce((accumulator, currentValue) => {
-        const x = currentValue.response?.header?.total?.$ || 0;
+        const x = parseInt(currentValue.response?.header?.total?.$) || 0;
         return accumulator + x;
       }, 0);
       return {

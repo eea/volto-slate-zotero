@@ -42,6 +42,7 @@ const makeList = (props, resultsType, handleClick, activeIndex) => {
               <div className="li-item">
                 <Image
                   avatar
+                  className="has--object-fit--contain"
                   src={item.icon ? iconsObj[item.icon] : iconsObj.zotero}
                 />
                 {item.label ? (

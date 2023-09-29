@@ -27,6 +27,10 @@
 
 This version requires: `@plone/volto >= 16.0.0.alpha.15` (`volto-slate` part of Volto Core).
 
+## Dependencies (Backend)
+
+* [eea.zotero](https://pypi.org/project/eea.zotero)
+
 ## Getting started
 
 ### Try volto-slate-zotero with Docker
@@ -79,19 +83,6 @@ Go to http://localhost:3000
 
 1. Happy editing!
 
-
-## Dependencies
-
-### Backend
-
-- [Plone](https://plone.org/download)
-- [plone.restapi](https://pypi.org/project/plone.restapi/)
-- [eea.zotero](https://pypi.org/project/eea.zotero)
-
-### Frontend
-
-- [Volto](https://github.com/plone/volto)
-
 ## Release
 
 See [RELEASE.md](https://github.com/eea/volto-slate-zotero/blob/master/RELEASE.md).
@@ -99,7 +90,6 @@ See [RELEASE.md](https://github.com/eea/volto-slate-zotero/blob/master/RELEASE.m
 ## How to contribute
 
 See [DEVELOP.md](https://github.com/eea/volto-slate-zotero/blob/master/DEVELOP.md).
-
 
 ## Copyright and license
 

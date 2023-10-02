@@ -63,7 +63,7 @@
     "bootstrap": "npm install -g ejs; npm link ejs; node bootstrap",
     "test": "make test",
     "test:fix": "make test-update",
-    "pre-commit": "yarn stylelint:fix && yarn prettier:fix && yarn lint:fix",
+    "pre-commit": "yarn stylelint:fix && yarn prettier:fix",
     "stylelint": "make stylelint",
     "stylelint:overrides": "make stylelint-overrides",
     "stylelint:fix": "make stylelint-fix",

@@ -203,7 +203,7 @@ describe('Slate citations', () => {
 
     // In Footnotes block first reference has "a,b" to link to citing elements
     cy.get('.footnotes-listing-block ol')
-      .click()
+      .click({ force: true })
       .children()
       .first()
       .find('sup')

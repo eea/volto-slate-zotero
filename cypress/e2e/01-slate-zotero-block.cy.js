@@ -147,7 +147,10 @@ describe('Slate citations', () => {
     // select first Zotero collection
     cy.get('.pastanaga-menu-list ul>li button').should('be.visible');
     cy.get('.pastanaga-menu-list ul>li button').should('contain', '2009');
-    cy.get('.pastanaga-menu-list ul>li button').wait(5000).first().click();
+    cy.get('.pastanaga-menu-list ul>li button')
+      .should('be.visible')
+      .first()
+      .click();
 
     // select first item from the Zotero collection
     cy.get('.items.pastanaga-menu .pastanaga-menu-list ul li')

@@ -7,7 +7,7 @@ module.exports = defineConfig({
   reporter: 'junit',
   video: true,
   retries: {
-    runMode: 8,
+    runMode: 1,
     openMode: 0,
   },
   reporterOptions: {

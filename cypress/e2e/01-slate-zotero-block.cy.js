@@ -145,7 +145,13 @@ describe('Slate citations', () => {
     cy.clickSlateButton('Citation');
 
     // select first Zotero collection
-    cy.get('.pastanaga-menu-list ul>li button').wait(2000).first().click();
+    cy.get('.pastanaga-menu-list ul>li button').should('be.visible');
+    cy.get('.pastanaga-menu-list ul>li button').should('contain', '2009');
+    cy.get('.pastanaga-menu-list ul>li button')
+      .should('be.visible')
+      .should('be.enabled')
+      .first()
+      .click({ force: true });
 
     // select first item from the Zotero collection
     cy.get('.items.pastanaga-menu .pastanaga-menu-list ul li')
@@ -203,7 +209,7 @@ describe('Slate citations', () => {
 
     // In Footnotes block first reference has "a,b" to link to citing elements
     cy.get('.footnotes-listing-block ol')
-      .click()
+      .click({ force: true })
       .children()
       .first()
       .find('sup')

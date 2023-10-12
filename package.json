@@ -1,6 +1,6 @@
 {
   "name": "@eeacms/volto-slate-zotero",
-  "version": "5.2.3",
+  "version": "5.2.4",
   "description": "Zotero integration with Volto Slate Footnotes",
   "main": "src/index.js",
   "author": "European Environment Agency: IDM2 A-Team",
@@ -31,7 +31,30 @@
     "@cypress/code-coverage": "^3.10.0",
     "@plone/scripts": "*",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "husky": "*",
+    "lint-staged": "*",
     "md5": "^2.3.0"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json}": [
+      "make prettier-fix",
+      "make lint-fix"
+    ],
+    "src/**/*.{jsx}": [
+      "make i18n"
+    ],
+    "theme/**/*.{css,less}": [
+      "make stylelint-fix"
+    ],
+    "src/**/*.{css,less}": [
+      "make stylelint-fix"
+    ],
+    "theme/**/*.overrides": [
+      "make stylelint-fix"
+    ],
+    "src/**/*.overrides": [
+      "make stylelint-fix"
+    ]
   },
   "scripts": {
     "release": "release-it",
@@ -40,7 +63,7 @@
     "bootstrap": "npm install -g ejs; npm link ejs; node bootstrap",
     "test": "make test",
     "test:fix": "make test-update",
-    "pre-commit": "yarn stylelint:fix && yarn prettier:fix && yarn lint:fix",
+    "pre-commit": "yarn stylelint:fix && yarn prettier:fix && yarn lint:fix && yarn i18n",
     "stylelint": "make stylelint",
     "stylelint:overrides": "make stylelint-overrides",
     "stylelint:fix": "make stylelint-fix",
@@ -50,6 +73,7 @@
     "lint:fix": "make lint-fix",
     "i18n": "make i18n",
     "cypress:run": "make cypress-run",
-    "cypress:open": "make cypress-open"
+    "cypress:open": "make cypress-open",
+    "prepare": "husky install"
   }
 }

@@ -21,6 +21,8 @@
 - Volto Slate Footnotes integration with Zotero
 - OpenAire integration
 
+![Slate Zotero](https://raw.githubusercontent.com/eea/volto-slate-zotero/develop/docs/volto-slate-zotero.gif)
+
 ## Upgrade
 
 ### Upgrading to 5.x

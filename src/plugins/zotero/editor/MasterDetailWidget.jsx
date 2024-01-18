@@ -94,7 +94,7 @@ const makeList = (props, resultsType, handleClick, activeIndex) => {
                       <a
                         href={`https://dx.doi.org/${item.data.DOI}`}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener"
                       >
                         DOI: {item.data.DOI}
                       </a>
@@ -384,7 +384,7 @@ const MasterDetailWidget = (props) => {
                         <a
                           href={`https://dx.doi.org/${item.data?.DOI}`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener"
                         >
                           DOI: {item.data?.DOI}
                         </a>

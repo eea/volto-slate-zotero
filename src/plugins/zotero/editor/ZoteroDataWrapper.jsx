@@ -48,21 +48,14 @@ const ZoteroDataWrapper = (props) => {
     zoteroSearchItemsTotalResultsNumber,
     setZoteroSearchItemsTotalResultsNumber,
   ] = useState(0);
-  const [openAireTotalResultsNumber, setOpenAireTotalResultsNumber] = useState(
-    0,
-  );
-  const [
-    openAirePubTotalResultsNumber,
-    setOpenAirePubTotalResultsNumber,
-  ] = useState(0);
-  const [
-    openAireRsdTotalResultsNumber,
-    setOpenAireRsdTotalResultsNumber,
-  ] = useState(0);
-  const [
-    zoteroItemsTotalResultsNumber,
-    setZoteroItemsTotalResultsNumber,
-  ] = useState(0);
+  const [openAireTotalResultsNumber, setOpenAireTotalResultsNumber] =
+    useState(0);
+  const [openAirePubTotalResultsNumber, setOpenAirePubTotalResultsNumber] =
+    useState(0);
+  const [openAireRsdTotalResultsNumber, setOpenAireRsdTotalResultsNumber] =
+    useState(0);
+  const [zoteroItemsTotalResultsNumber, setZoteroItemsTotalResultsNumber] =
+    useState(0);
   const [
     zoteroCollectionsTotalResultsNumber,
     setZoteroCollectionsTotalResultsNumber,

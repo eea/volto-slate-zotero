@@ -6,6 +6,7 @@ import { setPluginOptions } from '@plone/volto-slate/actions';
 import { ZoteroEditorSchema } from './schema';
 import ZoteroDataWrapper from './ZoteroDataWrapper';
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default (props) => {
   const dispatch = useDispatch();
   const [formData, setFormData] = React.useState({});

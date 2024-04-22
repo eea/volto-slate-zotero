@@ -6,7 +6,7 @@ import { setPluginOptions } from '@plone/volto-slate/actions';
 import { ZoteroEditorSchema } from './schema';
 import ZoteroDataWrapper from './ZoteroDataWrapper';
 
-export default (props) => {
+const ZoteroEditor = (props) => {
   const dispatch = useDispatch();
   const [formData, setFormData] = React.useState({});
   const {
@@ -71,3 +71,5 @@ export default (props) => {
     ></ZoteroDataWrapper>
   );
 };
+
+export default ZoteroEditor;

@@ -209,6 +209,7 @@ Cypress.Commands.add(
 // will type in the existing slate field
 Cypress.Commands.add('getSlateEditorAndType', (type) => {
   cy.get('.content-area .slate-editor [contenteditable=true]')
+    .last()
     .focus()
     .click()
     .wait(2000)

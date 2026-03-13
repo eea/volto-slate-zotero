@@ -20,7 +20,8 @@ const testForErrors = (response) => {
 };
 
 const handleErrors = (response, component) => {
-  console.error( // NOSONAR
+  console.error(
+    // NOSONAR
     'handleErrors',
     response.statusText || response.message,
     component,

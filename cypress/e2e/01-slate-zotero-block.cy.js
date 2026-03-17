@@ -218,8 +218,7 @@ describe('Slate citations', () => {
     });
 
     cy.navigate('/cypress/my-page/edit');
-    cy.waitForResourceToLoad('@schema');
-
+    cy.get('.block.title h1').should('exist');
     cy.get('.block.slate').should('exist');
     cy.get('#toolbar-save').click();
     cy.url().should('include', '/cypress/my-page');

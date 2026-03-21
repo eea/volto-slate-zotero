@@ -1,6 +1,7 @@
 import { slateBeforeEach, slateAfterEach } from '../support/e2e';
 import {
   openLibraryItem,
+  openLibraryItemByText,
   openTopCollection,
   openZoteroSidebarForSelection,
   previewActiveLibraryItem,
@@ -62,7 +63,7 @@ describe('Slate citations', () => {
 
     cy.wait('@subCollections');
     cy.wait('@items3');
-    openLibraryItem(0);
+    openLibraryItemByText('2019 a');
 
     cy.wait('@items2');
     openLibraryItem(0);

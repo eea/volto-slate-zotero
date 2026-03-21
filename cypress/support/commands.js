@@ -229,18 +229,28 @@ Cypress.Commands.add('getSlateEditorAndType', (type) => {
 // will select based on query the selected slate field
 Cypress.Commands.add(
   'setSlateSelection',
-  (subject, query, endQuery, wait = 1000) => {
+  (subject, query, endQuery, wait = 1500) => {
     cy.get('.slate-editor.selected [contenteditable=true]')
+      .click({ force: true })
       .focus()
       .setSelection(subject, query, endQuery)
       .wait(wait);
+
+    cy.window().should((win) => {
+      expect(win.getSelection().toString()).not.to.equal('');
+    });
   },
 );
 
-Cypress.Commands.add('clickSlateButton', (button, timeout = 1000) => {
+Cypress.Commands.add('clickSlateButton', (button, timeout = 5000) => {
+  cy.get('.slate-inline-toolbar', {
+    timeout,
+  }).should('be.visible');
   cy.get(`.slate-inline-toolbar .button-wrapper a[title="${button}"]`, {
     timeout,
-  }).click({ force: true });
+  })
+    .should('be.visible')
+    .click({ force: true });
 });
 
 Cypress.Commands.add(

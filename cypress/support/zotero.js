@@ -134,6 +134,14 @@ export const openLibraryItem = (index = 0) => {
     .click();
 };
 
+export const openLibraryItemByText = (text) => {
+  cy.contains(LIBRARY_ITEM_BUTTONS_SELECTOR, text, {
+    timeout: 10000,
+  })
+    .should('be.visible')
+    .click();
+};
+
 export const previewActiveLibraryItem = () => {
   cy.get(LIBRARY_PREVIEW_BUTTONS_SELECTOR, {
     timeout: 10000,

@@ -233,6 +233,8 @@ const ZoteroDataWrapper = (props) => {
     setSelectedCollection(null);
     setTopCollectionFlag(true);
     setCollections(topCollections);
+    setItems([]);
+    setComposedItems([]);
     setZoteroCollectionsTotalResultsNumber(
       zoteroTopCollectionsTotalResultsNumber,
     );
@@ -245,6 +247,8 @@ const ZoteroDataWrapper = (props) => {
     setZoteroSearchItemsOffset(0);
     setZoteroItemsOffset(0);
     setCollections([]);
+    setItems([]);
+    setComposedItems([]);
     setZoteroCollectionsTotalResultsNumber(0);
     setTopCollectionFlag(false);
 
@@ -346,7 +350,6 @@ const ZoteroDataWrapper = (props) => {
       setZoteroCollectionsTotalResultsNumber(
         zotero_sub_collections.totalResults,
       );
-      setComposedItems([...formattedResults, ...items]);
       setLoading(false);
       setLoadingMore(false);
     }
@@ -367,11 +370,19 @@ const ZoteroDataWrapper = (props) => {
 
       setItems(formattedResults);
       setZoteroItemsTotalResultsNumber(zotero_items.totalResults);
-      setComposedItems([...collections, ...formattedResults]);
       setLoading(false);
       setLoadingMore(false);
     }
   }, [zotero_items]); // eslint-disable-line
+
+  useEffect(() => {
+    if (topCollectionFlag) {
+      setComposedItems([]);
+      return;
+    }
+
+    setComposedItems([...collections, ...items]);
+  }, [collections, items, topCollectionFlag]);
 
   useEffect(() => {
     if (zotero_item_citation && selectedItem) {

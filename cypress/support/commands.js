@@ -205,27 +205,42 @@ Cypress.Commands.add(
     });
   },
 );
+function shouldVerifyContent(type) {
+  return !type.includes('{');
+}
+
 // will type in the existing slate field
 Cypress.Commands.add('getSlateEditorAndType', (type) => {
   cy.get('.content-area .slate-editor [contenteditable=true]')
     .last()
-    .focus()
     .click()
-    .wait(2000)
+    .trigger('focus')
     .type(type);
+
+  if (shouldVerifyContent(type)) {
+    return cy
+      .get('.content-area .slate-editor [contenteditable=true]')
+      .last()
+      .should('contain', type);
+  }
+
+  return cy.get('.content-area .slate-editor [contenteditable=true]').last();
 });
 // will select based on query the selected slate field
-Cypress.Commands.add('setSlateSelection', (subject, query, endQuery) => {
-  cy.get('.slate-editor.selected [contenteditable=true]')
-    .focus()
-    .click()
-    .wait(2000)
-    .setSelection(subject, query, endQuery)
-    .wait(2000);
-});
+Cypress.Commands.add(
+  'setSlateSelection',
+  (subject, query, endQuery, wait = 1000) => {
+    cy.get('.slate-editor.selected [contenteditable=true]')
+      .focus()
+      .setSelection(subject, query, endQuery)
+      .wait(wait);
+  },
+);
 
-Cypress.Commands.add('clickSlateButton', (button) => {
-  cy.get(`.slate-inline-toolbar .button-wrapper a[title="${button}"]`).click();
+Cypress.Commands.add('clickSlateButton', (button, timeout = 1000) => {
+  cy.get(`.slate-inline-toolbar .button-wrapper a[title="${button}"]`, {
+    timeout,
+  }).click({ force: true });
 });
 
 Cypress.Commands.add(

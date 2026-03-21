@@ -1,7 +1,7 @@
 import { slateBeforeEach, slateAfterEach } from '../support/e2e';
 import {
   openLibraryItem,
-  openTopCollection,
+  openTopCollectionByText,
   openZoteroSidebarForSelection,
   previewActiveLibraryItem,
   saveZoteroSidebar,
@@ -49,7 +49,7 @@ describe('Slate citations', () => {
     cy.getSlateEditorAndType('Luck is failure that failed.');
 
     openZoteroSidebarForSelection('Luck', 'failure');
-    openTopCollection();
+    openTopCollectionByText('2009');
 
     cy.wait('@itemsResp');
     openLibraryItem(0);
@@ -70,7 +70,7 @@ describe('Slate citations', () => {
       .should('have.attr', 'data-footnote-indice', '[1][2]');
 
     openZoteroSidebarForSelection('failed');
-    openTopCollection();
+    openTopCollectionByText('2009');
 
     cy.wait('@itemsResp');
     openLibraryItem(0);

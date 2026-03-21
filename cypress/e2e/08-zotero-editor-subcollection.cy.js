@@ -2,7 +2,7 @@ import { slateBeforeEach, slateAfterEach } from '../support/e2e';
 import {
   openLibraryItem,
   openLibraryItemByText,
-  openTopCollection,
+  openTopCollectionByText,
   openZoteroSidebarForSelection,
   previewActiveLibraryItem,
   saveZoteroSidebar,
@@ -59,7 +59,7 @@ describe('Slate citations', () => {
     cy.getSlateEditorAndType('Luck is failure that failed.');
 
     openZoteroSidebarForSelection('Luck', 'failure');
-    openTopCollection(2);
+    openTopCollectionByText('2019');
 
     cy.wait('@subCollections');
     cy.wait('@items3');

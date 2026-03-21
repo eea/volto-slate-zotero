@@ -14,6 +14,23 @@ const OPENAIRE_RESULT_BUTTONS_SELECTOR =
   '#zotero-comp .collections.pastanaga-menu .ui.tab.active button.list-button-md';
 const OPENAIRE_PREVIEW_BUTTONS_SELECTOR =
   '#zotero-comp .collections.pastanaga-menu .ui.tab.active .ui.fluid.card .content .description button';
+const COLLECTIONS_PANE_SELECTOR = '#zotero-comp .collections.pastanaga-menu';
+
+const waitForCollectionsPaneReady = () => {
+  cy.wait('@collectionsResp', { timeout: 10000 });
+  cy.get(COLLECTIONS_PANE_SELECTOR, {
+    timeout: 10000,
+  }).should('be.visible');
+  cy.get(COLLECTIONS_PANE_SELECTOR)
+    .find('.loader-relative')
+    .should('not.exist');
+  cy.get(TOP_COLLECTION_BUTTONS_SELECTOR, {
+    timeout: 10000,
+  }).should('have.length.at.least', 1);
+};
+
+const exactButtonLabel = (text) =>
+  new RegExp(`^\\s*${Cypress._.escapeRegExp(text)}\\s*$`);
 
 export const buildZoteroNode = ({
   uid,
@@ -117,12 +134,7 @@ export const openZoteroSidebarForSelection = (anchor, focus = anchor) => {
   cy.openSlateContextSidebar({
     sidebarSelector: '#zotero-comp',
   });
-  cy.get('#zotero-comp .collections.pastanaga-menu', {
-    timeout: 10000,
-  }).should('be.visible');
-  cy.get(TOP_COLLECTION_BUTTONS_SELECTOR, {
-    timeout: 10000,
-  }).should('have.length.at.least', 1);
+  waitForCollectionsPaneReady();
 };
 
 export const saveZoteroSidebar = () => {
@@ -137,9 +149,23 @@ export const openTopCollection = (index = 0) => {
   cy.get(TOP_COLLECTION_BUTTONS_SELECTOR, {
     timeout: 10000,
   })
-    .eq(index)
+    .should('have.length.at.least', index + 1)
+    .then(($buttons) => {
+      const label = $buttons.eq(index).text().trim();
+      cy.contains(TOP_COLLECTION_BUTTONS_SELECTOR, exactButtonLabel(label), {
+        timeout: 10000,
+      })
+        .should('be.visible')
+        .click({ force: true });
+    });
+};
+
+export const openTopCollectionByText = (text) => {
+  cy.contains(TOP_COLLECTION_BUTTONS_SELECTOR, exactButtonLabel(text), {
+    timeout: 10000,
+  })
     .should('be.visible')
-    .click();
+    .click({ force: true });
 };
 
 export const openLibraryItem = (index = 0) => {

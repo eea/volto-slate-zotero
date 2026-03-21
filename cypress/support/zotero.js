@@ -95,7 +95,24 @@ export const visitPageEdit = () => {
 };
 
 export const openZoteroSidebarForSelection = (anchor, focus = anchor) => {
+  const citationButtonSelector =
+    '.slate-inline-toolbar .button-wrapper a[title="Citation"]';
+
+  cy.get('.slate-editor.selected [contenteditable=true]').should(
+    'contain.text',
+    anchor,
+  );
   cy.setSlateSelection(anchor, focus);
+  cy.get('body').then(($body) => {
+    if ($body.find(citationButtonSelector).length > 0) {
+      return;
+    }
+
+    cy.get('.slate-editor.selected [contenteditable=true]').click({
+      force: true,
+    });
+    cy.setSlateSelection(anchor, focus, undefined, 2000);
+  });
   cy.clickSlateButton('Citation');
   cy.openSlateContextSidebar({
     sidebarSelector: '#zotero-comp',
@@ -149,6 +166,13 @@ export const previewActiveLibraryItem = () => {
     .first()
     .should('be.visible')
     .click();
+};
+
+export const waitForSidebarCitationCount = (count) => {
+  cy.get('#blockform-fieldset-default .button-wrapper .item', {
+    timeout: 10000,
+  }).should('have.length', count);
+  cy.get('#zotero-comp .form > .header.pulled .ui.loader').should('not.exist');
 };
 
 export const searchZoteroLibrary = (term) => {

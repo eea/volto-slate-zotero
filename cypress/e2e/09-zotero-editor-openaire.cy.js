@@ -7,6 +7,7 @@ import {
   saveZoteroSidebar,
   searchZoteroLibrary,
   visitPageEdit,
+  waitForSidebarCitationCount,
 } from '../support/zotero';
 
 describe('Slate citations', () => {
@@ -97,10 +98,12 @@ describe('Slate citations', () => {
     openOpenAireResult();
     previewActiveOpenAireResult();
 
-    saveZoteroSidebar();
-
     cy.wait('@saveItemResponse');
     cy.wait('@item4Resp');
+    waitForSidebarCitationCount(1);
+
+    saveZoteroSidebar();
+
     cy.get('.slate-editor.selected [contenteditable=true]')
       .find('span[id^="cite_ref"]')
       .should('have.attr', 'data-footnote-indice', '[1]');

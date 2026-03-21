@@ -6,6 +6,7 @@ import {
   previewActiveLibraryItem,
   saveZoteroSidebar,
   visitPageEdit,
+  waitForSidebarCitationCount,
 } from '../support/zotero';
 
 describe('Slate citations', () => {
@@ -54,10 +55,12 @@ describe('Slate citations', () => {
     openLibraryItem(0);
     previewActiveLibraryItem();
     cy.wait('@item1Resp');
+    waitForSidebarCitationCount(1);
 
     openLibraryItem(1);
     previewActiveLibraryItem();
     cy.wait('@item2Resp');
+    waitForSidebarCitationCount(2);
 
     saveZoteroSidebar();
 
@@ -73,6 +76,7 @@ describe('Slate citations', () => {
     openLibraryItem(0);
     previewActiveLibraryItem();
     cy.wait('@item1Resp');
+    waitForSidebarCitationCount(1);
 
     saveZoteroSidebar();
 

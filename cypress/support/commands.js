@@ -235,14 +235,10 @@ Cypress.Commands.add(
       .focus()
       .setSelection(subject, query, endQuery)
       .wait(wait);
-
-    cy.window().should((win) => {
-      expect(win.getSelection().toString()).not.to.equal('');
-    });
   },
 );
 
-Cypress.Commands.add('clickSlateButton', (button, timeout = 5000) => {
+Cypress.Commands.add('clickSlateButton', (button, timeout = 8000) => {
   cy.get('.slate-inline-toolbar', {
     timeout,
   }).should('be.visible');

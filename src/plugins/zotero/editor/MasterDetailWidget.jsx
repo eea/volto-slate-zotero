@@ -455,7 +455,7 @@ const MasterDetailWidget = (props) => {
       <div
         className="pusher-puller"
         style={{
-          transform: `translateX(${moveMenu * 375}px)`,
+          transform: `translateX(${moveMenu * 50}%)`,
         }}
       >
         <div className={collectionsClass}>

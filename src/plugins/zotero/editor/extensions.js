@@ -6,7 +6,7 @@ export const withZotero = (editor) => {
   const { normalizeNode, isInline } = editor;
 
   editor.isInline = (element) => {
-    return element && element.type === ZOTERO ? true : isInline(element);
+    return (element && element.type === ZOTERO) || isInline(element);
   };
 
   editor.normalizeNode = (entry) => {

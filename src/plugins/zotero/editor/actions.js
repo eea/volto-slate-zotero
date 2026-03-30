@@ -21,6 +21,7 @@ const testForErrors = (response) => {
 
 const handleErrors = (response, component) => {
   console.error(
+    // NOSONAR
     'handleErrors',
     response.statusText || response.message,
     component,
@@ -33,7 +34,7 @@ const handleErrors = (response, component) => {
 
 const handleSilentErrors = (response, component) => {
   if (Object.keys(response.failed).length > 0) {
-    console.error('handleSilentErrors', response.failed[0].message);
+    console.error('handleSilentErrors', response.failed[0].message); // NOSONAR
 
     throw Error(response.failed[0].message);
   }
@@ -245,7 +246,6 @@ export function fetchOpenairePubSearchItems(openairePubUrls) {
 
 export function fetchOpenaireRsdSearchItems(openaireRsdUrls) {
   return (dispatch) => {
-    dispatch(setOpenaireRsdSearchItemsPending());
     getOpenaireSearchItems(
       openaireRsdUrls,
       dispatch,

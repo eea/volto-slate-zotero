@@ -11,27 +11,27 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
+#. Default: "Edit citation"
 #: plugins/zotero/editor/index
-# defaultMessage: Edit citation
 msgid "Edit citation"
 msgstr ""
 
+#. Default: "Edit values"
 #: plugins/zotero/editor/InlineForm
-# defaultMessage: Edit values
 msgid "Edit values"
 msgstr ""
 
+#. Default: "Error"
 #: plugins/zotero/editor/InlineForm
-# defaultMessage: Error
 msgid "Error"
 msgstr ""
 
+#. Default: "Remove citation"
 #: plugins/zotero/editor/index
-# defaultMessage: Remove citation
 msgid "Remove citation"
 msgstr ""
 
+#. Default: "There were some errors"
 #: plugins/zotero/editor/InlineForm
-# defaultMessage: There were some errors
 msgid "There were some errors"
 msgstr ""

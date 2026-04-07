@@ -1,4 +1,4 @@
-import { Icon } from '@plone/volto/components';
+import Icon from '@plone/volto/components/theme/Icon/Icon';
 import backSVG from '@plone/volto/icons/back.svg';
 import rightArrowSVG from '@plone/volto/icons/right-key.svg';
 import React, { useState } from 'react';

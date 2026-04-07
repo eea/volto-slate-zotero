@@ -1,10 +1,10 @@
-import { keys } from 'lodash';
+import keys from 'lodash/keys';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Card, Message, Segment, List, Button } from 'semantic-ui-react';
 import clearSVG from '@plone/volto/icons/delete.svg';
-import { Icon } from '@plone/volto/components';
+import Icon from '@plone/volto/components/theme/Icon/Icon';
 
 const messages = defineMessages({
   editValues: {
@@ -94,7 +94,14 @@ const InlineForm = ({
                     {/* new footnotes*/}
                     {updatedFormData.extra &&
                       updatedFormData.extra.map((item, index) => (
-                        <List.Item>
+                        <List.Item
+                          key={
+                            item.zoteroId ??
+                            item.uid ??
+                            item.footnoteTitle ??
+                            index
+                          }
+                        >
                           <List.Content floated="right">
                             <Button
                               as="a"

@@ -2,7 +2,7 @@ import tagSVG from '@plone/volto/icons/blog-entry.svg';
 import { defineMessages } from 'react-intl'; // , defineMessages
 import { makeInlineElementPlugin } from '@plone/volto-slate/elementEditor';
 import { FootnoteElement } from '@eeacms/volto-slate-footnote/editor/render';
-import { ZOTERO } from '../constants';
+import { ZOTERO } from '@eeacms/volto-slate-zotero/plugins/zotero/constants';
 import { withZotero } from './extensions';
 import {
   openaire_items_pub,

@@ -1,6 +1,6 @@
 /* eslint no-console: ["error", { allow: ["error"] }] */
 import { toast } from 'react-toastify';
-import { ZOTERO_SETTINGS } from '../constants';
+import { ZOTERO_SETTINGS } from '@eeacms/volto-slate-zotero/plugins/zotero/constants';
 
 export function getZoteroSettings() {
   return {

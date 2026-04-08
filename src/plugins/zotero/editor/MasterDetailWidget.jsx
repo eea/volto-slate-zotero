@@ -12,8 +12,8 @@ import {
   Menu,
   Tab,
 } from 'semantic-ui-react';
-import openairePNG from '../images/openaire.png';
-import zoteroSVG from '../images/zotero.svg';
+import openairePNG from '@eeacms/volto-slate-zotero/plugins/zotero/images/openaire.png';
+import zoteroSVG from '@eeacms/volto-slate-zotero/plugins/zotero/images/zotero.svg';
 
 const iconsObj = {
   zotero: zoteroSVG,

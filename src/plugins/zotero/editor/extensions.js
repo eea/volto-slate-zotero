@@ -1,4 +1,4 @@
-import { ZOTERO } from '../constants';
+import { ZOTERO } from '@eeacms/volto-slate-zotero/plugins/zotero/constants';
 import { nanoid } from '@plone/volto-slate/utils';
 import { Transforms } from 'slate';
 

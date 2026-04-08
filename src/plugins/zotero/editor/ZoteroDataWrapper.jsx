@@ -635,13 +635,14 @@ const ZoteroDataWrapper = (props) => {
           ? loadMoreButton
           : null
         : topCollectionFlag
-        ? zoteroCollectionsTotalResultsNumber > collections.length
-          ? loadMoreButton
-          : null
-        : zoteroCollectionsTotalResultsNumber + zoteroItemsTotalResultsNumber >
-          composedItems.length
-        ? loadMoreButton
-        : null}
+          ? zoteroCollectionsTotalResultsNumber > collections.length
+            ? loadMoreButton
+            : null
+          : zoteroCollectionsTotalResultsNumber +
+                zoteroItemsTotalResultsNumber >
+              composedItems.length
+            ? loadMoreButton
+            : null}
     </div>
   );
 };

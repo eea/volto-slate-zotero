@@ -1,4 +1,4 @@
-import { Icon as VoltoIcon } from '@plone/volto/components';
+import VoltoIcon from '@plone/volto/components/theme/Icon/Icon';
 import briefcaseSVG from '@plone/volto/icons/briefcase.svg';
 import checkSVG from '@plone/volto/icons/check.svg';
 import clearSVG from '@plone/volto/icons/clear.svg';
@@ -635,13 +635,14 @@ const ZoteroDataWrapper = (props) => {
           ? loadMoreButton
           : null
         : topCollectionFlag
-        ? zoteroCollectionsTotalResultsNumber > collections.length
-          ? loadMoreButton
-          : null
-        : zoteroCollectionsTotalResultsNumber + zoteroItemsTotalResultsNumber >
-          composedItems.length
-        ? loadMoreButton
-        : null}
+          ? zoteroCollectionsTotalResultsNumber > collections.length
+            ? loadMoreButton
+            : null
+          : zoteroCollectionsTotalResultsNumber +
+                zoteroItemsTotalResultsNumber >
+              composedItems.length
+            ? loadMoreButton
+            : null}
     </div>
   );
 };

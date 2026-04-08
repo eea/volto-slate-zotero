@@ -1,4 +1,4 @@
-import { Icon } from '@plone/volto/components';
+import Icon from '@plone/volto/components/theme/Icon/Icon';
 import backSVG from '@plone/volto/icons/back.svg';
 import rightArrowSVG from '@plone/volto/icons/right-key.svg';
 import React, { useState } from 'react';
@@ -12,8 +12,8 @@ import {
   Menu,
   Tab,
 } from 'semantic-ui-react';
-import openairePNG from '../images/openaire.png';
-import zoteroSVG from '../images/zotero.svg';
+import openairePNG from '@eeacms/volto-slate-zotero/plugins/zotero/images/openaire.png';
+import zoteroSVG from '@eeacms/volto-slate-zotero/plugins/zotero/images/zotero.svg';
 
 const iconsObj = {
   zotero: zoteroSVG,

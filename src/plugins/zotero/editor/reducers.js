@@ -9,7 +9,7 @@ import {
   ZOTERO_SEARCH_ITEMS,
   ZOTERO_SETTINGS,
   ZOTERO_SUB_COLLECTIONS,
-} from '../constants';
+} from '@eeacms/volto-slate-zotero/plugins/zotero/constants';
 
 const initialState = {};
 const zoteroSettings = {

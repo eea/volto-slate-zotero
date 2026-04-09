@@ -31,20 +31,20 @@ export const formatCitation = (selectedItem) => {
       ? data?.creators[0].name
         ? `${data.creators[0]?.name}`
         : data.creators[0]?.lastName && data.creators[0]?.firstName
-        ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
-        : data.creators[0]?.lastName
-        ? `${data.creators[0]?.lastName}`
-        : `${data.creators[0]?.firstName}`
+          ? `${data.creators[0]?.lastName}, ${data.creators[0]?.firstName}`
+          : data.creators[0]?.lastName
+            ? `${data.creators[0]?.lastName}`
+            : `${data.creators[0]?.firstName}`
       : null
     : null;
   const date = data.date ? ` ${data.date}` : null;
   const title = data.title
     ? ` ${data.title.slice(0, 40)}`
     : data.nameOfAct
-    ? ` ${data.nameOfAct}`
-    : data.name
-    ? ` ${data.name}`
-    : null;
+      ? ` ${data.nameOfAct}`
+      : data.name
+        ? ` ${data.name}`
+        : null;
   const publicationTitle = data.publicationTitle
     ? ` ${data.publicationTitle}`
     : null;
@@ -84,10 +84,10 @@ export const formatOpenAire = (item, label, parentCollection) => {
     ? Array.isArray(entry.pid)
       ? entry.pid.find((key) => key['@classid'] === 'doi')
       : entry.pid
-      ? entry.pid['@classid'] === 'doi'
-        ? entry.pid
+        ? entry.pid['@classid'] === 'doi'
+          ? entry.pid
+          : null
         : null
-      : null
     : null;
 
   result.data = {
@@ -107,14 +107,14 @@ export const formatOpenAire = (item, label, parentCollection) => {
           };
         })
       : entry.creator
-      ? [
-          {
-            creatorType: 'author',
-            lastName: entry.creator['@surname'] || entry.creator.$,
-            firstName: entry.creator['@name'] || '',
-          },
-        ]
-      : [],
+        ? [
+            {
+              creatorType: 'author',
+              lastName: entry.creator['@surname'] || entry.creator.$,
+              firstName: entry.creator['@name'] || '',
+            },
+          ]
+        : [],
     url: entry.url,
     publicationTitle: entry.publisher?.$,
     date:

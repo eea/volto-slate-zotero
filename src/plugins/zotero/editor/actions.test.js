@@ -7,7 +7,7 @@ import {
 } from './actions';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import { ZOTERO_SETTINGS } from '../constants';
+import { ZOTERO_SETTINGS } from '@eeacms/volto-slate-zotero/plugins/zotero/constants';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import MasterDetailWidget from './MasterDetailWidget';
@@ -18,14 +19,14 @@ describe('MasterDetailWidget', () => {
       allSearchResults: [],
       zoteroSearchResults: [],
       openAireSearchResults: [],
-      showCollections: jest.fn(),
-      pull: jest.fn(),
-      pushCollection: jest.fn(),
-      pushSearchItem: jest.fn(),
-      pushItem: jest.fn(),
-      onChangeSearchTerm: jest.fn(),
-      setActiveTabIndex: jest.fn(),
-      openAireCallback: jest.fn(),
+      showCollections: vi.fn(),
+      pull: vi.fn(),
+      pushCollection: vi.fn(),
+      pushSearchItem: vi.fn(),
+      pushItem: vi.fn(),
+      onChangeSearchTerm: vi.fn(),
+      setActiveTabIndex: vi.fn(),
+      openAireCallback: vi.fn(),
       showSearchResults: false,
     };
   });

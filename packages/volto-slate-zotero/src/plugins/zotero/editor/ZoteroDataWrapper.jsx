@@ -315,6 +315,10 @@ const ZoteroDataWrapper = (props) => {
 
   useEffect(() => {
     if (zotero_collections) {
+      setLoading(false);
+      setLoadingMore(false);
+      if (!topCollectionFlag) return;
+
       let mergedResult =
         zoteroCollectionsOffset > 0
           ? [...collections, ...zotero_collections.results]
@@ -328,8 +332,6 @@ const ZoteroDataWrapper = (props) => {
       setZoteroTopCollectionsTotalResultsNumber(
         zotero_collections.totalResults,
       );
-      setLoading(false);
-      setLoadingMore(false);
     }
   }, [zotero_collections]); // eslint-disable-line
 

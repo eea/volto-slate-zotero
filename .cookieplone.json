@@ -1,0 +1,7 @@
+{
+  "title": "Slate Zotero",
+  "frontend_addon_name": "volto-slate-zotero",
+  "description": "Zotero integration with Volto Slate Footnotes",
+  "volto_version": "19.3.0",
+  "__template__": "frontend_addon"
+}

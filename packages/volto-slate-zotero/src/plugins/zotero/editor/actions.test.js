@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import {
   getZoteroSettings,
   fetchZoteroCollections,
@@ -13,17 +14,17 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
-jest.mock('react-toastify', () => ({
+vi.mock('react-toastify', () => ({
   toast: {
-    error: jest.fn(),
+    error: vi.fn(),
   },
 }));
 
 describe('Zotero and Openaire actions', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     fetch.mockClear();
   });
 
@@ -43,7 +44,7 @@ describe('Zotero and Openaire actions', () => {
       ok: true,
       json: () => Promise.resolve({}),
       headers: {
-        get: jest.fn().mockReturnValue(0),
+        get: vi.fn().mockReturnValue(0),
       },
     });
 
@@ -63,7 +64,7 @@ describe('Zotero and Openaire actions', () => {
       ok: true,
       json: () => Promise.resolve({}),
       headers: {
-        get: jest.fn().mockReturnValue(0),
+        get: vi.fn().mockReturnValue(0),
       },
     });
 

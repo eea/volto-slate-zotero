@@ -6,6 +6,7 @@ import {
   openZoteroSidebarForSelection,
   previewActiveLibraryItem,
   saveZoteroSidebar,
+  waitForSidebarCitationCount,
   visitPageEdit,
 } from '../support/zotero';
 
@@ -69,6 +70,7 @@ describe('Slate citations', () => {
     openLibraryItem(0);
     previewActiveLibraryItem();
     cy.wait('@item3Resp');
+    waitForSidebarCitationCount(1);
 
     saveZoteroSidebar();
 
